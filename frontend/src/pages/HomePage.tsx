@@ -1,72 +1,139 @@
+import Header from "../components/Header";
+
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#f3f4f6" }}>
-      {/* Header */}
-      <header
-        className="text-white text-center py-16 px-6"
-        style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)" }}
+      <Header />
+
+      {/* Hero */}
+      <section
+        style={{
+          background: "#111",
+          color: "#fff",
+          padding: "80px 24px",
+          textAlign: "center",
+        }}
       >
-        <div className="text-5xl mb-4">⚡</div>
-        <h1 className="text-3xl font-bold tracking-tight">Terian Services</h1>
-        <p className="mt-3 text-indigo-200 text-lg max-w-xl mx-auto">
-          Enterprise SaaS solutions built for modern HR and people operations teams.
+        <h1
+          style={{
+            fontSize: "clamp(2rem, 5vw, 3.5rem)",
+            fontWeight: 700,
+            letterSpacing: "-0.5px",
+            marginBottom: "20px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          Enterprise HR Automation,{" "}
+          <span style={{ color: "#2ab8a8" }}>Simplified</span>
+        </h1>
+        <p
+          style={{
+            fontSize: "18px",
+            color: "#9ca3af",
+            maxWidth: "600px",
+            margin: "0 auto 36px",
+            lineHeight: 1.7,
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          Cloud-native platforms that streamline award nominations, recognition, and
+          compensation workflows for enterprise organisations — natively integrated
+          with Microsoft Azure AD and Workday.
         </p>
-      </header>
+        <a
+          href="mailto:support@terian-services.com"
+          style={{
+            display: "inline-block",
+            background: "#2ab8a8",
+            color: "#000",
+            padding: "14px 32px",
+            fontSize: "14px",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            textDecoration: "none",
+            borderRadius: "2px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          REQUEST A DEMO →
+        </a>
+      </section>
 
-      {/* Main content */}
-      <main className="flex-1 max-w-3xl mx-auto px-6 py-16 w-full">
-        <div className="bg-white rounded-2xl shadow-md p-10 text-center">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            Welcome to Terian Services
-          </h2>
-          <p className="text-gray-600 leading-relaxed mb-8">
-            We build cloud-native platforms that simplify award nominations, recognition,
-            and compensation workflows for enterprise organisations. Our products integrate
-            natively with Microsoft Azure AD and HR systems like Workday.
-          </p>
+      {/* Feature tiles */}
+      <main id="products" style={{ maxWidth: "1100px", margin: "0 auto", padding: "72px 24px", width: "100%" }}>
+        <h2
+          style={{
+            textAlign: "center",
+            fontSize: "28px",
+            fontWeight: 700,
+            color: "#111827",
+            marginBottom: "48px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          Our Products
+        </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 text-left">
-            <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-5">
-              <div className="text-2xl mb-2">🏆</div>
-              <h3 className="font-semibold text-indigo-900 mb-1">Award Nominations</h3>
-              <p className="text-indigo-700 text-sm">
-                Streamlined peer recognition and manager-led award workflows with full
-                audit trail.
-              </p>
-            </div>
-            <div className="rounded-xl border border-violet-100 bg-violet-50 p-5">
-              <div className="text-2xl mb-2">🔐</div>
-              <h3 className="font-semibold text-violet-900 mb-1">Azure AD Native</h3>
-              <p className="text-violet-700 text-sm">
-                Single sign-on for every employee — no extra credentials, no IT overhead.
-              </p>
-            </div>
-            <div className="rounded-xl border border-purple-100 bg-purple-50 p-5">
-              <div className="text-2xl mb-2">💸</div>
-              <h3 className="font-semibold text-purple-900 mb-1">Workday Integration</h3>
-              <p className="text-purple-700 text-sm">
-                Approved awards flow automatically into Workday as compensation events.
-              </p>
-            </div>
-          </div>
-
-          <a
-            href="mailto:support@terian-services.com"
-            className="inline-block px-6 py-3 rounded-lg text-white font-medium text-sm"
-            style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)" }}
-          >
-            Get in touch →
-          </a>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "24px",
+          }}
+        >
+          <Tile icon="🏆" title="Award Nominations" color="#2ab8a8" bg="#f0fdfb" border="#b2f0e8">
+            Streamlined peer recognition and manager-led award workflows with a full
+            audit trail, approval chains, and real-time dashboards.
+          </Tile>
+          <Tile icon="🔐" title="Azure AD Native" color="#4f46e5" bg="#f5f3ff" border="#c4b5fd">
+            Single sign-on for every employee — no extra credentials, no IT overhead.
+            B2B guest access for demo and partner environments included out of the box.
+          </Tile>
+          <Tile icon="💸" title="Workday Integration" color="#0369a1" bg="#f0f9ff" border="#bae6fd">
+            Approved awards flow automatically into Workday as compensation events,
+            eliminating manual data entry and payroll reconciliation.
+          </Tile>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="text-center text-xs text-gray-400 py-6 border-t border-gray-200">
+      <footer
+        style={{
+          background: "#000",
+          color: "#6b7280",
+          textAlign: "center",
+          padding: "24px",
+          fontSize: "13px",
+          fontFamily: "Arial, sans-serif",
+          marginTop: "auto",
+        }}
+      >
         &copy; {new Date().getFullYear()} Terian Services &nbsp;·&nbsp;
-        <a href="/privacy" className="text-gray-500 hover:underline">
+        <a href="/privacy" style={{ color: "#9ca3af", textDecoration: "none" }}>
           Privacy Notice
         </a>
       </footer>
+    </div>
+  );
+}
+
+// ── Tile helper ───────────────────────────────────────────────────────────────
+
+function Tile({
+  icon, title, color, bg, border, children,
+}: {
+  icon: string; title: string; color: string; bg: string; border: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: "12px", padding: "28px" }}>
+      <div style={{ fontSize: "28px", marginBottom: "12px" }}>{icon}</div>
+      <h3 style={{ fontSize: "17px", fontWeight: 700, color, marginBottom: "10px", fontFamily: "Arial, sans-serif" }}>
+        {title}
+      </h3>
+      <p style={{ fontSize: "14px", color: "#374151", lineHeight: 1.7, fontFamily: "Arial, sans-serif" }}>
+        {children}
+      </p>
     </div>
   );
 }

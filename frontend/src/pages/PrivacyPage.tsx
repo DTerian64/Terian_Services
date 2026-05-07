@@ -1,15 +1,9 @@
+import Header from "../components/Header";
+
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#f3f4f6" }}>
-      {/* Header */}
-      <header
-        className="text-white text-center py-10 px-6"
-        style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)" }}
-      >
-        <div className="text-4xl mb-3">🏆</div>
-        <h1 className="text-xl font-bold tracking-tight">Award Nominations — Demo Environment</h1>
-        <p className="mt-2 text-indigo-200 text-sm">Privacy Notice</p>
-      </header>
+      <Header />
 
       <main className="flex-1 max-w-2xl mx-auto px-5 py-10 w-full">
         <div className="bg-white rounded-xl shadow-md px-11 py-10">
