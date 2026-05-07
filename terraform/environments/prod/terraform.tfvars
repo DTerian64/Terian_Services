@@ -7,10 +7,11 @@
 #   terraform apply -target=module.static_web_app
 #
 # Retrieve the verification token:
-#   az staticwebapp show \
+#   az staticwebapp hostname set \
 #     --name terian-services-frontend \
 #     --resource-group rg_platform \
-#     --query "customDomainVerificationId" -o tsv
+#     --hostname terian-services.com \
+#     --validation-method dns-txt-token
 #
 # Phase 2 — fill in swa_verification_token below, then:
 #   terraform apply
@@ -24,4 +25,4 @@ dns_zone_name       = "terian-services.com"
 
 # SWA domain verification — fill in after Phase 1 apply
 swa_verification_dns_name = "asuid"
-swa_verification_token    = ""   # <-- paste token here before Phase 2 apply
+swa_verification_token    = "_85841r7fomw0t6m7orfn8l2gtb0mohk"
