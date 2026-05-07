@@ -1,0 +1,24 @@
+# Node
+node_modules/
+dist/
+.vite/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.hcl
+.terraform.lock.hcl
+terraform.tfvars.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
