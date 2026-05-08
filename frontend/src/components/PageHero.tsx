@@ -2,8 +2,8 @@ type PageHeroProps = {
   eyebrow: string;
   title: React.ReactNode;
   description?: React.ReactNode;
-  primaryCta?: { label: string; href: string };
-  secondaryCta?: { label: string; href: string };
+  primaryCta?: { label: string; href: string; target?: string; rel?: string };
+  secondaryCta?: { label: string; href: string; target?: string; rel?: string };
 };
 
 export default function PageHero({
@@ -26,6 +26,8 @@ export default function PageHero({
             {primaryCta ? (
               <a
                 href={primaryCta.href}
+                target={primaryCta.target}
+                rel={primaryCta.rel}
                 className="inline-flex items-center justify-center rounded-md bg-teal-400 px-6 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
               >
                 {primaryCta.label} →
@@ -34,6 +36,8 @@ export default function PageHero({
             {secondaryCta ? (
               <a
                 href={secondaryCta.href}
+                target={secondaryCta.target}
+                rel={secondaryCta.rel}
                 className="inline-flex items-center justify-center rounded-md border border-white/20 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:border-teal-300 hover:text-teal-300"
               >
                 {secondaryCta.label}

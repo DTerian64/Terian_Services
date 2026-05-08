@@ -1,6 +1,8 @@
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 
+const DEMO_REQUEST_URL = "https://demo-awards.terian-services.com/demo/request";
+
 export default function AwardNominationPage() {
   return (
     <PageLayout>
@@ -8,7 +10,7 @@ export default function AwardNominationPage() {
         eyebrow="Product · AI/ML-assisted"
         title="Award Nomination System"
         description="Recognize the right people, faster — with an AI-assisted nomination workflow that catches bias, surfaces collusion, and drops approved awards directly into Workday."
-        primaryCta={{ label: "Request a demo", href: "/contact" }}
+        primaryCta={{ label: "Request a demo", href: DEMO_REQUEST_URL, target: "_blank", rel: "noreferrer" }}
         secondaryCta={{ label: "Talk to engineering", href: "mailto:sales@terian-services.com" }}
       />
 
@@ -128,7 +130,9 @@ export default function AwardNominationPage() {
             </p>
           </div>
           <a
-            href="/contact"
+            href={DEMO_REQUEST_URL}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
           >
             Request a demo →
