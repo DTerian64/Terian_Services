@@ -22,9 +22,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0f0d18] text-white">
-      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-10">
+      <div className="mx-auto flex h-[5.4rem] max-w-7xl items-center justify-between px-6 lg:px-10">
         <a href="/" className="flex items-center gap-4 text-white no-underline" aria-label="Terian Services home">
-          <img src="/terian_services_logo.png" alt="" className="-my-2 h-16 w-16 rounded-full object-contain" />
+          <img src="/terian_services_logo.png" alt="" className="-my-1 h-[3.6rem] w-auto object-contain" />
           <span className="text-2xl font-bold tracking-normal">Terian Services</span>
         </a>
 
@@ -171,3 +171,5 @@ function ChevronDown({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+
+
