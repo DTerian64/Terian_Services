@@ -1,82 +1,145 @@
 import PageLayout from "../components/PageLayout";
+import { useEffect, useRef, useState } from "react";
 
-const CONVERSATIONS = [
-  { title: "345423 finding - explain, t...", date: "Apr 28" },
-  { title: "what's the minimum ring s...", date: "Apr 27" },
-  { title: "345413", date: "Apr 22" },
-  { title: "Show me the top approver...", date: "Apr 20" },
-  { title: "Let's take a look at the first...", date: "Apr 18" },
-];
+type ChatMessage = {
+  id: number;
+  role: "assistant" | "user";
+  content: string;
+};
+
+const INITIAL_MESSAGES: ChatMessage[] = [];
 
 export default function AskAIPage() {
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [prompt, setPrompt] = useState("");
+  const [isResponding, setIsResponding] = useState(false);
+  const nextId = useRef(1);
+  const transcriptEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    transcriptEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, isResponding]);
+
+  const startNewConversation = () => {
+    nextId.current = 1;
+    setMessages(INITIAL_MESSAGES);
+    setPrompt("");
+    setIsResponding(false);
+  };
+
+  const sendPrompt = (value = prompt) => {
+    const trimmed = value.trim();
+    if (!trimmed || isResponding) {
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      id: nextId.current++,
+      role: "user",
+      content: trimmed,
+    };
+
+    setMessages((current) => [...current, userMessage]);
+    setPrompt("");
+    setIsResponding(true);
+
+    window.setTimeout(() => {
+      const assistantMessage: ChatMessage = {
+        id: nextId.current++,
+        role: "assistant",
+        content:
+          "I can help with that once the analytics backend is connected. For now, this chat shell is ready to accept questions and preserve the conversation flow.",
+      };
+      setMessages((current) => [...current, assistantMessage]);
+      setIsResponding(false);
+    }, 450);
+  };
+
   return (
     <PageLayout>
       <section className="bg-slate-50 px-0 py-0 md:px-6 md:py-8">
         <div className="mx-auto min-h-[calc(100vh-5.4rem)] max-w-7xl overflow-hidden border border-slate-200 bg-white shadow-sm md:min-h-[720px] md:rounded-xl">
-          <div className="grid min-h-[calc(100vh-5.4rem)] md:min-h-[720px] lg:grid-cols-[30rem_1fr]">
-            <aside className="hidden border-r border-slate-200 bg-slate-50 lg:flex lg:flex-col">
-              <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5">
+          <div className="grid min-h-[calc(100vh-5.4rem)] grid-cols-[30%_70%] md:min-h-[720px]">
+            <aside className="flex min-w-0 flex-col border-r border-slate-200 bg-slate-50">
+              <div className="flex items-center gap-3 border-b border-slate-200 px-3 py-5 md:px-6">
                 <button
                   type="button"
-                  className="inline-flex flex-1 items-center justify-center gap-3 rounded-lg bg-blue-600 px-6 py-4 text-lg font-bold text-white shadow-sm transition hover:bg-blue-700"
+                  onClick={startNewConversation}
+                  className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-4 text-[15px] font-bold text-white shadow-sm transition hover:bg-blue-700"
                 >
-                  <PaperAirplaneIcon className="h-6 w-6" />
-                  New conversation
+                  <PaperAirplaneIcon className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
+                  <span className="truncate">New conversation</span>
                 </button>
                 <button
                   type="button"
+                  onClick={startNewConversation}
                   aria-label="Refresh conversations"
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                  className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 md:inline-flex"
                 >
                   <RefreshIcon className="h-6 w-6" />
                 </button>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-7 py-7">
-                <div className="space-y-12">
-                  {CONVERSATIONS.map((conversation) => (
-                    <a key={`${conversation.title}-${conversation.date}`} href="/ask-ai" className="block">
-                      <p className="truncate text-xl font-bold text-slate-800">{conversation.title}</p>
-                      <p className="mt-2 text-xl text-slate-400">{conversation.date}</p>
-                    </a>
-                  ))}
-                </div>
-              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto px-7 py-7" />
             </aside>
 
             <div className="flex min-w-0 flex-col">
               <header className="flex h-24 items-center border-b border-slate-200 px-6 md:px-10">
                 <div className="flex items-center gap-4">
-                  <PaperAirplaneIcon className="h-8 w-8 text-slate-950" />
-                  <h1 className="text-2xl font-bold tracking-normal text-slate-950 md:text-3xl">Ask Analytics AI</h1>
+                  <SparkleIcon className="h-8 w-8 text-teal-600" />
+                  <h1 className="text-2xl font-bold tracking-normal text-slate-950 md:text-3xl">Ask AI</h1>
                 </div>
               </header>
 
               <main className="flex min-h-0 flex-1 flex-col">
-                <div className="flex flex-1 items-center justify-center border-b border-slate-100 px-6 py-16">
-                  <div className="text-center">
-                    <PaperAirplaneIcon className="mx-auto h-16 w-16 text-slate-200" />
-                    <h2 className="mt-10 text-2xl font-bold tracking-normal text-slate-500 md:text-3xl">
-                      Ask anything about your nominations
-                    </h2>
-                    <p className="mt-5 text-xl leading-8 text-slate-400 md:text-2xl">
-                      Trends, fraud patterns, graph relationships, exports — all in one conversation.
-                    </p>
+                <div className="min-h-0 flex-1 overflow-y-auto border-b border-slate-100 px-6 py-8 md:px-10">
+                  <div className="mx-auto flex max-w-4xl flex-col gap-5">
+                    {messages.map((message) => (
+                      <MessageBubble key={message.id} message={message} />
+                    ))}
+
+                    {isResponding ? (
+                      <div className="flex items-start gap-3">
+                        <Avatar role="assistant" />
+                        <div className="rounded-2xl rounded-tl-md border border-slate-200 bg-white px-5 py-4 text-slate-500 shadow-sm">
+                          <span className="inline-flex items-center gap-1.5">
+                            <TypingDot />
+                            <TypingDot delayMs={150} />
+                            <TypingDot delayMs={300} />
+                          </span>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div ref={transcriptEndRef} />
                   </div>
                 </div>
 
-                <div className="px-6 py-6 md:px-10">
+                <form
+                  className="px-6 py-6 md:px-10"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    sendPrompt();
+                  }}
+                >
                   <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
                     <textarea
-                      disabled
                       rows={2}
+                      value={prompt}
+                      onChange={(event) => setPrompt(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && !event.shiftKey) {
+                          event.preventDefault();
+                          sendPrompt();
+                        }
+                      }}
                       placeholder="Ask a follow-up or a new question... (Shift+Enter for new line)"
-                      className="min-h-[5.5rem] flex-1 resize-none rounded-xl border border-slate-300 bg-white px-6 py-6 text-xl text-slate-500 placeholder:text-slate-400 disabled:cursor-not-allowed disabled:bg-white md:text-2xl"
+                      className="min-h-[5.5rem] flex-1 resize-none rounded-xl border border-slate-300 bg-white px-6 py-6 text-lg text-slate-700 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 md:text-xl"
                     />
                     <button
-                      type="button"
-                      disabled
-                      className="inline-flex min-h-[5.5rem] items-center justify-center gap-3 rounded-xl bg-slate-300 px-9 text-xl font-bold text-white disabled:cursor-not-allowed"
+                      type="submit"
+                      disabled={!prompt.trim() || isResponding}
+                      className="inline-flex min-h-[5.5rem] items-center justify-center gap-3 rounded-xl bg-blue-600 px-9 text-xl font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                     >
                       <PaperAirplaneIcon className="h-7 w-7" />
                       Send
@@ -86,15 +149,16 @@ export default function AskAIPage() {
                   <div className="mt-4 flex flex-col gap-3 text-slate-400 md:flex-row md:items-center md:justify-between">
                     <button
                       type="button"
-                      disabled
-                      className="inline-flex w-fit items-center gap-2 rounded-xl bg-slate-100 px-6 py-3 text-lg font-bold text-slate-400 disabled:cursor-not-allowed"
+                      onClick={() => sendPrompt("Investigate the current nomination data for anomalous patterns.")}
+                      disabled={isResponding}
+                      className="inline-flex w-fit items-center gap-2 rounded-xl bg-slate-100 px-6 py-3 text-lg font-bold text-slate-500 transition hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:text-slate-400"
                     >
                       <ShieldIcon className="h-5 w-5" />
                       Investigate
                     </button>
                     <p className="text-lg md:text-xl">Conversations saved automatically</p>
                   </div>
-                </div>
+                </form>
               </main>
             </div>
           </div>
@@ -104,6 +168,42 @@ export default function AskAIPage() {
   );
 }
 
+function MessageBubble({ message }: { message: ChatMessage }) {
+  const isUser = message.role === "user";
+
+  return (
+    <div className={`flex items-start gap-3 ${isUser ? "justify-end" : ""}`}>
+      {!isUser ? <Avatar role="assistant" /> : null}
+      <div
+        className={`max-w-[min(42rem,90%)] rounded-2xl px-5 py-4 text-base leading-7 shadow-sm ${
+          isUser
+            ? "rounded-tr-md bg-blue-600 text-white"
+            : "rounded-tl-md border border-slate-200 bg-white text-slate-700"
+        }`}
+      >
+        {message.content}
+      </div>
+      {isUser ? <Avatar role="user" /> : null}
+    </div>
+  );
+}
+
+function Avatar({ role }: { role: ChatMessage["role"] }) {
+  return (
+    <div
+      className={`mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+        role === "assistant" ? "bg-teal-100 text-teal-700" : "bg-slate-200 text-slate-700"
+      }`}
+    >
+      {role === "assistant" ? <SparkleIcon className="h-5 w-5" /> : <UserIcon className="h-5 w-5" />}
+    </div>
+  );
+}
+
+function TypingDot({ delayMs = 0 }: { delayMs?: number }) {
+  return <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400" style={{ animationDelay: `${delayMs}ms` }} />;
+}
+
 function PaperAirplaneIcon({ className }: { className?: string }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className={className} fill="none">
@@ -111,6 +211,29 @@ function PaperAirplaneIcon({ className }: { className?: string }) {
         d="M21 3 9.8 14.2M21 3l-7.1 18-4.1-6.8L3 10.1 21 3Z"
         stroke="currentColor"
         strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function SparkleIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M12.4 3.1a.75.75 0 0 1 1.2 0l1.9 2.8a.75.75 0 0 0 .5.3l3.2.8a.75.75 0 0 1 .3 1.3l-2.1 1.8a.75.75 0 0 0-.2.7l.5 3.1a.75.75 0 0 1-1.1.8l-3-1.5a.75.75 0 0 0-.7 0l-3 1.5a.75.75 0 0 1-1.1-.8l.5-3.1a.75.75 0 0 0-.2-.7L7 8.3A.75.75 0 0 1 7.3 7l3.2-.8a.75.75 0 0 0 .5-.3l1.4-2.8Z" />
+      <path d="M5.2 12.2a.6.6 0 0 1 1 0l.7 1.2a.6.6 0 0 0 .3.3l1.2.7a.6.6 0 0 1 0 1l-1.2.7a.6.6 0 0 0-.3.3l-.7 1.2a.6.6 0 0 1-1 0l-.7-1.2a.6.6 0 0 0-.3-.3L3 15.4a.6.6 0 0 1 0-1l1.2-.7a.6.6 0 0 0 .3-.3l.7-1.2ZM18.6 2.5a.5.5 0 0 1 .8 0l.4.7a.5.5 0 0 0 .2.2l.7.4a.5.5 0 0 1 0 .8l-.7.4a.5.5 0 0 0-.2.2l-.4.7a.5.5 0 0 1-.8 0l-.4-.7a.5.5 0 0 0-.2-.2l-.7-.4a.5.5 0 0 1 0-.8l.7-.4a.5.5 0 0 0 .2-.2l.4-.7Z" />
+    </svg>
+  );
+}
+
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className={className} fill="none">
+      <path
+        d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
