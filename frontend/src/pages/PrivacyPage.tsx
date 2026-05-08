@@ -11,12 +11,23 @@ export default function PrivacyPage() {
 
           <Section title="1. Who We Are">
             <p>
-              This demo environment is operated by{" "}
+              This site and its associated demo environments are operated by{" "}
               <strong>Terian Services</strong>{" "}
-              (<a href="https://terian-services.com" className="text-indigo-600 hover:underline">terian-services.com</a>)
-              solely for the purpose of demonstrating the Award Nominations SaaS platform to
-              prospective customers and partners. It is not a production service and does not
-              process real employee data.
+              (<a href="https://terian-services.com" className="text-indigo-600 hover:underline">terian-services.com</a>).
+              Terian Services builds AI/ML-empowered enterprise software (such as the Award
+              Nomination System and Integrity Sentinel) and delivers professional services in AI
+              analytics, integrity & fraud detection, data mining, and cloud migration. This notice
+              covers data we collect through this website and through Terian-operated demo
+              environments.
+            </p>
+          </Section>
+
+          <Section title="1a. Services Engagements">
+            <p>
+              For client services engagements, we typically operate <strong>inside the client's
+              Azure tenant</strong>, under an MSA and Data Processing Agreement specific to the
+              engagement. In those engagements, Terian Services acts as a processor; the client's
+              own privacy notice governs end-user data, and this notice does not apply.
             </p>
           </Section>
 

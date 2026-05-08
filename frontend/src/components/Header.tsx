@@ -1,24 +1,30 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 
-type MenuItem = { label: string; href: string };
+type MenuItem = { label: string; href: string; badge?: string };
 
 const PRODUCT_ITEMS: MenuItem[] = [
-  { label: "Award Nomination System", href: "/award_nomination" },
+  { label: "Award Nomination System", href: "/products/award-nomination" },
+  { label: "Integrity Sentinel", href: "/products/integrity-sentinel", badge: "Coming Soon" },
 ];
 
-const SOLUTION_ITEMS: MenuItem[] = [
-  { label: "Systemic Fraud Detection - Data Mining", href: "/systemic_fraud_detection" },
+const SERVICE_ITEMS: MenuItem[] = [
+  { label: "AI Analytics", href: "/services/ai-analytics" },
+  { label: "Integrity & Fraud Detection", href: "/services/integrity-fraud" },
+  { label: "Data Mining", href: "/services/data-mining" },
+  { label: "Datacenter → Cloud Migration", href: "/services/cloud-migration" },
+  { label: "MLOps & Model Governance", href: "/services/mlops" },
 ];
 
 const NAV_ITEMS: MenuItem[] = [
   { label: "About", href: "/about" },
+  { label: "Trust", href: "/trust" },
   { label: "Contact", href: "/contact" },
 ];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0f0d18] text-white">
@@ -28,22 +34,22 @@ export default function Header() {
           <span className="text-2xl font-bold tracking-normal">Terian Services</span>
         </a>
 
-        <nav className="hidden items-center gap-12 text-[15px] font-semibold text-white lg:flex" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-10 text-[15px] font-semibold text-white lg:flex" aria-label="Primary navigation">
           <Dropdown
             label="Products"
             items={PRODUCT_ITEMS}
             open={productsOpen}
             setOpen={setProductsOpen}
-            onOpen={() => setSolutionsOpen(false)}
-            widthClass="w-72"
+            onOpen={() => setServicesOpen(false)}
+            widthClass="w-80"
           />
           <Dropdown
-            label="Solutions"
-            items={SOLUTION_ITEMS}
-            open={solutionsOpen}
-            setOpen={setSolutionsOpen}
+            label="Services"
+            items={SERVICE_ITEMS}
+            open={servicesOpen}
+            setOpen={setServicesOpen}
             onOpen={() => setProductsOpen(false)}
-            widthClass="w-80"
+            widthClass="w-[22rem]"
           />
 
           {NAV_ITEMS.map((item) => (
@@ -73,7 +79,7 @@ export default function Header() {
         <nav className="border-t border-white/10 bg-[#0f0d18] px-6 pb-6 pt-2 lg:hidden" aria-label="Mobile navigation">
           <div className="mx-auto max-w-7xl space-y-1">
             <MobileGroup label="Products" items={PRODUCT_ITEMS} onNavigate={() => setMenuOpen(false)} />
-            <MobileGroup label="Solutions" items={SOLUTION_ITEMS} onNavigate={() => setMenuOpen(false)} />
+            <MobileGroup label="Services" items={SERVICE_ITEMS} onNavigate={() => setMenuOpen(false)} />
 
             {NAV_ITEMS.map((item) => (
               <a
@@ -134,10 +140,15 @@ function Dropdown({
             <a
               key={item.href}
               href={item.href}
-              className="block rounded px-4 py-3 text-sm text-white/90 transition hover:bg-white/10 hover:text-teal-300"
+              className="flex items-center justify-between gap-3 rounded px-4 py-3 text-sm text-white/90 transition hover:bg-white/10 hover:text-teal-300"
               role="menuitem"
             >
-              {item.label}
+              <span>{item.label}</span>
+              {item.badge ? (
+                <span className="rounded-full bg-teal-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-teal-300">
+                  {item.badge}
+                </span>
+              ) : null}
             </a>
           ))}
         </div>
@@ -155,9 +166,14 @@ function MobileGroup({ label, items, onNavigate }: { label: string; items: MenuI
           key={item.href}
           href={item.href}
           onClick={onNavigate}
-          className="block rounded-md px-3 py-3 text-base font-semibold text-white transition hover:bg-white/10 hover:text-teal-300"
+          className="flex items-center justify-between rounded-md px-3 py-3 text-base font-semibold text-white transition hover:bg-white/10 hover:text-teal-300"
         >
-          {item.label}
+          <span>{item.label}</span>
+          {item.badge ? (
+            <span className="rounded-full bg-teal-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-teal-300">
+              {item.badge}
+            </span>
+          ) : null}
         </a>
       ))}
     </div>
@@ -171,5 +187,3 @@ function ChevronDown({ className = "" }: { className?: string }) {
     </svg>
   );
 }
-
-
