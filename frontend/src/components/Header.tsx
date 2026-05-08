@@ -62,7 +62,7 @@ export default function Header() {
 
           <a
             href={ASK_AI_ITEM.href}
-            className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2.5 text-[15px] font-bold text-slate-950 transition hover:bg-teal-50 hover:text-teal-700"
+            className="inline-flex items-center gap-2 rounded-md px-1 py-3 text-[15px] font-bold text-white transition hover:text-teal-300"
           >
             <SparkleIcon />
             {ASK_AI_ITEM.label}
@@ -105,7 +105,7 @@ export default function Header() {
             <a
               href={ASK_AI_ITEM.href}
               onClick={() => setMenuOpen(false)}
-              className="mt-2 flex items-center gap-2 rounded-md bg-white px-3 py-3 text-base font-bold text-slate-950 transition hover:bg-teal-50 hover:text-teal-700"
+              className="mt-2 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold text-white transition hover:bg-white/10 hover:text-teal-300"
             >
               <SparkleIcon />
               {ASK_AI_ITEM.label}
@@ -209,7 +209,7 @@ function ChevronDown({ className = "" }: { className?: string }) {
 
 function SparkleIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 text-slate-500" fill="currentColor">
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 text-teal-400" fill="currentColor">
       <path d="M12.4 3.1a.75.75 0 0 1 1.2 0l1.9 2.8a.75.75 0 0 0 .5.3l3.2.8a.75.75 0 0 1 .3 1.3l-2.1 1.8a.75.75 0 0 0-.2.7l.5 3.1a.75.75 0 0 1-1.1.8l-3-1.5a.75.75 0 0 0-.7 0l-3 1.5a.75.75 0 0 1-1.1-.8l.5-3.1a.75.75 0 0 0-.2-.7L7 8.3A.75.75 0 0 1 7.3 7l3.2-.8a.75.75 0 0 0 .5-.3l1.4-2.8Z" />
       <path d="M5.2 12.2a.6.6 0 0 1 1 0l.7 1.2a.6.6 0 0 0 .3.3l1.2.7a.6.6 0 0 1 0 1l-1.2.7a.6.6 0 0 0-.3.3l-.7 1.2a.6.6 0 0 1-1 0l-.7-1.2a.6.6 0 0 0-.3-.3L3 15.4a.6.6 0 0 1 0-1l1.2-.7a.6.6 0 0 0 .3-.3l.7-1.2ZM18.6 2.5a.5.5 0 0 1 .8 0l.4.7a.5.5 0 0 0 .2.2l.7.4a.5.5 0 0 1 0 .8l-.7.4a.5.5 0 0 0-.2.2l-.4.7a.5.5 0 0 1-.8 0l-.4-.7a.5.5 0 0 0-.2-.2l-.7-.4a.5.5 0 0 1 0-.8l.7-.4a.5.5 0 0 0 .2-.2l.4-.7Z" />
     </svg>
