@@ -3,6 +3,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import TrustPage from "./pages/TrustPage";
+import AskAIPage from "./pages/AskAI";
 
 import ProductsPage from "./pages/ProductsPage";
 import AwardNominationPage from "./pages/AwardNominationPage";
@@ -24,6 +25,7 @@ const routes: RouteEntry[] = [
   // Static pages
   { match: (p) => p === "/about", component: AboutPage },
   { match: (p) => p === "/contact", component: ContactPage },
+  { match: (p) => p === "/ask-ai", component: AskAIPage },
   { match: (p) => p === "/trust", component: TrustPage },
   { match: (p) => p === "/privacy" || p === "/privacy.html", component: PrivacyPage },
 

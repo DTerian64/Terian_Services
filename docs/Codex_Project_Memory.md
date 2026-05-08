@@ -42,6 +42,8 @@ The Award Nomination System remains a flagship product, but the site should comm
 
 - Use `frontend/public/terian_services_logo.png` as the browser favicon instead of the temporary inline SVG clock icon.
 - Keep project memory in `docs/Codex_Project_Memory.md` so future Codex sessions can quickly recover the project context.
+- Add an `Ask AI` navigation item after `Contact`, pointing to `/ask-ai`.
+- Add `frontend/src/pages/AskAI.tsx` as a static Ask Analytics AI shell for now; live AI behavior will be implemented later.
 
 ## Useful Commands
 
