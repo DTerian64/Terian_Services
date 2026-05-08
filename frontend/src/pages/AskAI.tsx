@@ -15,10 +15,20 @@ export default function AskAIPage() {
   const [isResponding, setIsResponding] = useState(false);
   const nextId = useRef(1);
   const transcriptEndRef = useRef<HTMLDivElement | null>(null);
+  const promptRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     transcriptEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, isResponding]);
+
+  useEffect(() => {
+    if (!promptRef.current) {
+      return;
+    }
+
+    promptRef.current.style.height = "auto";
+    promptRef.current.style.height = `${Math.min(promptRef.current.scrollHeight, 224)}px`;
+  }, [prompt]);
 
   const startNewConversation = () => {
     nextId.current = 1;
@@ -56,16 +66,16 @@ export default function AskAIPage() {
   };
 
   return (
-    <PageLayout>
+    <PageLayout hideFooter>
       <section className="bg-slate-50 px-0 py-0 md:px-6 md:py-8">
         <div className="mx-auto min-h-[calc(100vh-5.4rem)] max-w-7xl overflow-hidden border border-slate-200 bg-white shadow-sm md:min-h-[720px] md:rounded-xl">
           <div className="grid min-h-[calc(100vh-5.4rem)] grid-cols-[30%_70%] md:min-h-[720px]">
             <aside className="flex min-w-0 flex-col border-r border-slate-200 bg-slate-50">
-              <div className="flex items-center gap-3 border-b border-slate-200 px-3 py-5 md:px-6">
+              <div className="flex h-24 items-center gap-3 border-b border-slate-200 px-3 md:px-6">
                 <button
                   type="button"
                   onClick={startNewConversation}
-                  className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-4 text-[15px] font-bold text-white shadow-sm transition hover:bg-blue-700"
+                  className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-3 text-[15px] font-bold text-white shadow-sm transition hover:bg-blue-700"
                 >
                   <PaperAirplaneIcon className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
                   <span className="truncate">New conversation</span>
@@ -124,22 +134,23 @@ export default function AskAIPage() {
                 >
                   <div className="flex flex-col gap-4 xl:flex-row xl:items-start">
                     <textarea
-                      rows={2}
+                      ref={promptRef}
+                      rows={3}
                       value={prompt}
                       onChange={(event) => setPrompt(event.target.value)}
                       onKeyDown={(event) => {
-                        if (event.key === "Enter" && !event.shiftKey) {
+                        if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
                           event.preventDefault();
                           sendPrompt();
                         }
                       }}
-                      placeholder="Ask a follow-up or a new question... (Shift+Enter for new line)"
-                      className="min-h-[5.5rem] flex-1 resize-none rounded-xl border border-slate-300 bg-white px-6 py-6 text-lg text-slate-700 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 md:text-xl"
+                      placeholder="Ask a follow-up or a new question... (Ctrl+Enter to send)"
+                      className="max-h-56 min-h-[7rem] flex-1 resize-none overflow-y-auto rounded-xl border border-slate-300 bg-white px-6 py-5 text-[15px] leading-7 text-slate-700 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
                     />
                     <button
                       type="submit"
                       disabled={!prompt.trim() || isResponding}
-                      className="inline-flex min-h-[5.5rem] items-center justify-center gap-3 rounded-xl bg-blue-600 px-9 text-xl font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      className="inline-flex min-h-[4.4rem] items-center justify-center gap-3 rounded-xl bg-blue-600 px-9 text-[15px] font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                     >
                       <PaperAirplaneIcon className="h-7 w-7" />
                       Send
@@ -151,12 +162,12 @@ export default function AskAIPage() {
                       type="button"
                       onClick={() => sendPrompt("Investigate the current nomination data for anomalous patterns.")}
                       disabled={isResponding}
-                      className="inline-flex w-fit items-center gap-2 rounded-xl bg-slate-100 px-6 py-3 text-lg font-bold text-slate-500 transition hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:text-slate-400"
+                      className="inline-flex w-fit items-center gap-2 rounded-xl bg-slate-100 px-6 py-3 text-[15px] font-bold text-slate-500 transition hover:bg-teal-50 hover:text-teal-700 disabled:cursor-not-allowed disabled:text-slate-400"
                     >
                       <ShieldIcon className="h-5 w-5" />
                       Investigate
                     </button>
-                    <p className="text-lg md:text-xl">Conversations saved automatically</p>
+                    <p className="text-[15px]">Conversations saved automatically</p>
                   </div>
                 </form>
               </main>
@@ -175,7 +186,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
     <div className={`flex items-start gap-3 ${isUser ? "justify-end" : ""}`}>
       {!isUser ? <Avatar role="assistant" /> : null}
       <div
-        className={`max-w-[min(42rem,90%)] rounded-2xl px-5 py-4 text-base leading-7 shadow-sm ${
+        className={`max-w-[min(42rem,90%)] rounded-2xl px-5 py-4 text-[15px] leading-7 shadow-sm ${
           isUser
             ? "rounded-tr-md bg-blue-600 text-white"
             : "rounded-tl-md border border-slate-200 bg-white text-slate-700"

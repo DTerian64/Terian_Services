@@ -62,7 +62,7 @@ export default function Header() {
 
           <a
             href={ASK_AI_ITEM.href}
-            className="inline-flex items-center gap-2 rounded-md px-1 py-3 text-[15px] font-bold text-white transition hover:text-teal-300"
+            className="inline-flex items-center gap-2 rounded-md px-1 py-3 text-[15px] font-semibold text-white transition hover:text-teal-300"
           >
             <SparkleIcon />
             {ASK_AI_ITEM.label}
@@ -105,7 +105,7 @@ export default function Header() {
             <a
               href={ASK_AI_ITEM.href}
               onClick={() => setMenuOpen(false)}
-              className="mt-2 flex items-center gap-2 rounded-md px-3 py-3 text-base font-bold text-white transition hover:bg-white/10 hover:text-teal-300"
+              className="mt-2 flex items-center gap-2 rounded-md px-3 py-3 text-base font-semibold text-white transition hover:bg-white/10 hover:text-teal-300"
             >
               <SparkleIcon />
               {ASK_AI_ITEM.label}
