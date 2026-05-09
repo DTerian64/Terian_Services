@@ -13,14 +13,22 @@ export default function HomePage() {
             Enterprise software & services
           </p>
           <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight md:text-6xl">
-            AI-empowered enterprise software,
+            AI-empowered enterprise software
             <br />
-            <span className="text-teal-300">delivered by engineers.</span>
+            and data analytics.
+            <br />
+            <span className="text-teal-300">Secure. Isolated. Provable.</span>
           </h1>
-          <p className="mx-auto mt-8 max-w-2xl text-lg leading-8 text-white/70">
-            Terian Services builds AI/ML-assisted SaaS products and partners with enterprise teams
-            on AI analytics, integrity & fraud detection, data mining, and datacenter-to-cloud
-            migration. Azure-native, secure by default, anchored to outcomes you can measure.
+          <p className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-white/70">
+            Terian Services builds AI/ML-empowered SaaS and delivers AI analytics, integrity &
+            fraud detection, and cloud modernization for the enterprise. Every product we ship and
+            every engagement we run is built around three commitments: your data stays{" "}
+            <strong className="font-semibold text-white">secure</strong> (encrypted, least-privilege,
+            threat-monitored),{" "}
+            <strong className="font-semibold text-white">isolated</strong> (hard tenant boundaries;
+            data never crosses), and{" "}
+            <strong className="font-semibold text-white">provable</strong> (full audit trail of
+            every change, approval, and model decision).
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">

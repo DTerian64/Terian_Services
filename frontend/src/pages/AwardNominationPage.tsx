@@ -59,7 +59,7 @@ export default function AwardNominationPage() {
             watching the patterns in real time and flagging the ones that matter.
           </p>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <MLCard
               title="Bias detection"
               description="Cohort-aware analysis of who's nominating whom. Surfaces under-recognized groups before they become a retention risk."
@@ -71,6 +71,10 @@ export default function AwardNominationPage() {
             <MLCard
               title="Anomaly flagging"
               description="Statistical and embedding-based models flag nominations that deviate from organizational norms — wrong category, suspicious timing, copied language."
+            />
+            <MLCard
+              title="Decision provenance"
+              description="Every flag is traceable to the model version and inputs that produced it, with explanation layers reviewable in the HRBP queue. Tenant-isolated by default — your data never trains another customer's model."
             />
           </div>
         </div>

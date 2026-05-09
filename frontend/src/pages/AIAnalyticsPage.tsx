@@ -46,6 +46,38 @@ export default function AIAnalyticsPage() {
         </div>
       </section>
 
+      <section className="bg-slate-100">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
+            Integrity, provenance, and confidentiality
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+            AI you can trace, defend, and explain.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+            "The model said so" is not an answer your auditor accepts. We build AI systems where
+            every prediction can be traced back to the data version and model version that produced
+            it, every input is governed by least-privilege access, and your data is never used to
+            train models that touch other tenants.
+          </p>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Card
+              title="Data lineage"
+              description="Versioned datasets, feature pipelines, and model artifacts wired through MLflow / Azure ML. Every prediction is reproducible from inputs and weights."
+            />
+            <Card
+              title="Decision provenance"
+              description="Each model output is logged with its model version, input snapshot, and explanation layer (SHAP, integrated gradients, or token-level attribution for LLMs)."
+            />
+            <Card
+              title="Confidentiality of inference"
+              description="Your prompts, embeddings, and inputs are never used to train cross-tenant models. Customer-managed keys and private endpoints supported on request."
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Engagement model</p>
         <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">

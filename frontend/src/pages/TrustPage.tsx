@@ -7,17 +7,77 @@ export default function TrustPage() {
       <PageHero
         eyebrow="Trust & Security"
         title="Boring on purpose."
-        description="The security posture for Terian-operated products and services. For demo environments and SOC controls in detail, contact security@terian-services.com."
+        description="The security posture for Terian-operated products and services. Built around three commitments: secure, isolated, provable. For SOC controls in detail, contact security@terian-services.com."
       />
 
-      <section className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Card title="Identity" description="Microsoft Azure AD / Entra ID for all user authentication. B2B guest access for partners and demo environments. SSO and MFA enforced." />
-          <Card title="Encryption" description="Encryption at rest (Azure-managed keys, customer-managed keys on request) and in transit (TLS 1.2+ everywhere)." />
-          <Card title="Hosting region" description="Primary region: Microsoft Azure West US 2. EU/UK landing under evaluation; contact us for current options." />
-          <Card title="Network" description="Private endpoints for data services where supported. Public surfaces front-ended by Azure Front Door / Static Web Apps with WAF rules." />
-          <Card title="Logging & monitoring" description="Azure Monitor, Log Analytics, Defender for Cloud. Audit logs retained per engagement; export available." />
-          <Card title="Access control" description="Least-privilege RBAC, just-in-time elevation via Privileged Identity Management. No standing admin." />
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
+          The three commitments
+        </p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          Secure. Isolated. Provable.
+        </h2>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <Pillar
+            title="Secure"
+            description="Encryption at rest and in transit, identity-led access, threat-monitored. Defense-in-depth from identity through application."
+          />
+          <Pillar
+            title="Isolated"
+            description="Hard tenant boundaries enforced at the database, identity, and network layers. Your data never crosses into another customer's compute or storage."
+          />
+          <Pillar
+            title="Provable"
+            description="Every state change, approval, and model decision is captured in an immutable audit trail. Exportable, reviewable, defensible."
+          />
+        </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Controls</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+            How we deliver on each.
+          </h2>
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Card
+              title="Identity"
+              description="Microsoft Azure AD / Entra ID for all user authentication. SSO and MFA enforced. B2B guest access for partners and demo environments — invitation-only, time-bound."
+            />
+            <Card
+              title="Encryption"
+              description="Encryption at rest (Azure-managed keys; customer-managed keys on request) and in transit (TLS 1.2+ everywhere). Secrets in Azure Key Vault."
+            />
+            <Card
+              title="Defense in depth"
+              description="Layered controls: identity → network → data → application. No single control is the last line. WAF, private endpoints, RBAC, and runtime monitoring all working in concert."
+            />
+            <Card
+              title="Tenant isolation"
+              description="Per-tenant database schemas (or separate databases for higher tiers), row-level security, and identity-scoped storage paths. ML models are tenant-isolated — your data never trains a model used elsewhere."
+            />
+            <Card
+              title="Least privilege by default"
+              description="Role-based access control with no standing admin. Just-in-time elevation via Azure Privileged Identity Management. Service principals scoped to the smallest possible permission set."
+            />
+            <Card
+              title="Confidentiality of inference"
+              description="For AI features, your prompts, embeddings, and inputs are not used to train cross-tenant models. LLM calls go through tenant-scoped endpoints with logging you control."
+            />
+            <Card
+              title="Logging & monitoring"
+              description="Azure Monitor, Log Analytics, Microsoft Defender for Cloud. Audit logs retained per engagement; export available. Anomaly alerts on identity, network, and data-plane signals."
+            />
+            <Card
+              title="Audit trail (provable)"
+              description="Every nomination, approval, model flag, and configuration change is captured with actor, timestamp, and prior/next state. Exportable for SOX, internal audit, and regulator review."
+            />
+            <Card
+              title="Data sovereignty"
+              description="Primary region: Microsoft Azure West US 2. Customer data stays in the elected region. EU / UK / Canada landing zones available on request for regulated workloads."
+            />
+          </div>
         </div>
       </section>
 
@@ -73,6 +133,15 @@ function Card({ title, description }: { title: string; description: string }) {
     <div className="rounded-xl border border-slate-200 bg-white p-6">
       <h3 className="text-base font-bold text-slate-950">{title}</h3>
       <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    </div>
+  );
+}
+
+function Pillar({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="rounded-xl border border-teal-200 bg-teal-50 p-6">
+      <h3 className="text-lg font-bold text-teal-900">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-teal-900/80">{description}</p>
     </div>
   );
 }
