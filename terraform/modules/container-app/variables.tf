@@ -1,0 +1,127 @@
+# modules/container-app/variables.tf
+
+variable "resource_group_name" {
+  description = "Resource group to deploy all backend resources into."
+  type        = string
+}
+
+variable "location" {
+  description = "Azure region."
+  type        = string
+}
+
+variable "app_name" {
+  description = "Container App resource name."
+  type        = string
+}
+
+variable "environment_name" {
+  description = "Container App Environment name."
+  type        = string
+}
+
+variable "uami_name" {
+  description = "User-assigned managed identity name (ACR pull + Key Vault read)."
+  type        = string
+}
+
+variable "acr_name" {
+  description = "Azure Container Registry name (globally unique, alphanumeric, 5–50 chars)."
+  type        = string
+}
+
+variable "log_analytics_workspace_name" {
+  description = "Log Analytics workspace name."
+  type        = string
+}
+
+variable "key_vault_name" {
+  description = "Key Vault that stores backend secrets."
+  type        = string
+}
+
+variable "image" {
+  description = "Container image reference (registry/image:tag)."
+  type        = string
+}
+
+variable "min_replicas" {
+  description = "Minimum replicas (0 = scale-to-zero)."
+  type        = number
+  default     = 0
+}
+
+variable "max_replicas" {
+  description = "Maximum replicas for autoscale."
+  type        = number
+  default     = 3
+}
+
+variable "target_port" {
+  description = "Container port the app listens on."
+  type        = number
+  default     = 8000
+}
+
+# ── Azure OpenAI (created by this module) ───────────────────────────────────
+# The endpoint is derived from azurerm_cognitive_account.openai; the
+# deployment name is what we create here.  Both flow into the Container
+# App's env vars as AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_MODEL.
+
+variable "openai_account_name" {
+  description = "Azure OpenAI (cognitive) account name. Becomes part of the endpoint URL: https://<name>.openai.azure.com/."
+  type        = string
+}
+
+variable "openai_deployment_name" {
+  description = "Name of the model deployment used by the Container App as AZURE_OPENAI_MODEL."
+  type        = string
+}
+
+variable "openai_model_name" {
+  description = "Model family (e.g. 'gpt-4o-mini', 'gpt-4o', 'gpt-4.1')."
+  type        = string
+}
+
+variable "openai_model_version" {
+  description = "Specific model snapshot version (e.g. '2024-07-18' for gpt-4o-mini)."
+  type        = string
+}
+
+variable "openai_tpm_capacity" {
+  description = "Tokens-per-minute capacity in thousands (e.g. 5 = 5,000 TPM). Lower = stronger cost protection."
+  type        = number
+  default     = 5
+}
+
+variable "azure_openai_api_version" {
+  description = "Azure OpenAI API version used by the backend (e.g. '2024-12-01-preview')."
+  type        = string
+}
+
+variable "tf_principal_object_id" {
+  description = "Object ID of the principal running Terraform — granted Key Vault Secrets Officer so TF can write the OpenAI key. Pass data.azurerm_client_config.current.object_id."
+  type        = string
+}
+
+variable "allowed_origins" {
+  description = "Comma-separated origins allowed to call /api/*."
+  type        = string
+}
+
+variable "github_actions_principal_id" {
+  description = "Object ID of the GitHub Actions OIDC principal. Granted AcrPush + Container App Contributor. Empty string skips the role assignments."
+  type        = string
+  default     = ""
+}
+
+variable "tags" {
+  description = "Tags applied to every resource."
+  type        = map(string)
+  default     = {}
+}
+
+variable "tenant_id" {
+  description = "Azure AD tenant ID for Key Vault."
+  type        = string
+}
