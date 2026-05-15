@@ -272,6 +272,18 @@ resource "azurerm_container_app" "backend" {
         name  = "AZURE_CLIENT_ID"
         value = azurerm_user_assigned_identity.backend.client_id
       }
+      env {
+        name  = "AZURE_COSMOS_ENDPOINT"
+        value = var.cosmos_endpoint
+      }
+      env {
+        name  = "AZURE_COSMOS_DATABASE"
+        value = var.cosmos_database_name
+      }
+      env {
+        name  = "AZURE_STORAGE_BLOB_ENDPOINT"
+        value = var.storage_blob_endpoint
+      }
     }
   }
 

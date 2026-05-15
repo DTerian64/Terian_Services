@@ -180,7 +180,56 @@ resource "azurerm_static_web_app_custom_domain" "www" {
   ]
 }
 
-# ── 6. Container App (backend) — in rg_corporate ────────────────────────────
+# ── 6. Data store — Storage Account + Cosmos DB ─────────────────────────────
+module "data_store" {
+  source = "../../modules/data-store"
+
+  resource_group_name  = azurerm_resource_group.corporate.name
+  location             = var.location
+  storage_account_name = var.storage_account_name
+  cosmos_account_name  = var.cosmos_account_name
+  cosmos_database_name = var.cosmos_database_name
+  tags                 = local.tags
+}
+
+# ── Data store role assignments ──────────────────────────────────────────────
+# Kept here (not in the data-store module) to avoid a circular dependency:
+# data_store outputs flow into container_app, so data_store must not depend
+# on container_app's outputs (i.e. the UAMI principal ID).
+
+resource "azurerm_role_assignment" "uami_blob_reader" {
+  scope                = module.data_store.storage_account_id
+  role_definition_name = "Storage Blob Data Reader"
+  principal_id         = module.container_app.uami_principal_id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "uami_cosmos_contributor" {
+  resource_group_name = azurerm_resource_group.corporate.name
+  account_name        = module.data_store.cosmos_account_name
+  role_definition_id  = "${module.data_store.cosmos_account_id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = module.container_app.uami_principal_id
+  scope               = module.data_store.cosmos_account_id
+}
+
+# ── Admin user access (david64.terian@terian-services.com) ──────────────────
+
+resource "azurerm_role_assignment" "admin_blob_contributor" {
+  count                = var.admin_principal_id != "" ? 1 : 0
+  scope                = module.data_store.storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = var.admin_principal_id
+}
+
+resource "azurerm_cosmosdb_sql_role_assignment" "admin_cosmos_contributor" {
+  count               = var.admin_principal_id != "" ? 1 : 0
+  resource_group_name = azurerm_resource_group.corporate.name
+  account_name        = module.data_store.cosmos_account_name
+  role_definition_id  = "${module.data_store.cosmos_account_id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = var.admin_principal_id
+  scope               = module.data_store.cosmos_account_id
+}
+
+# ── 7. Container App (backend) — in rg_corporate ─────────────────────────────
 module "container_app" {
   source = "../../modules/container-app"
 
@@ -213,9 +262,14 @@ module "container_app" {
   github_actions_principal_id  = var.github_actions_principal_id
 
   # App Insights (Award Nomination System showcase metrics)
-  app_insights_resource_id              = var.app_insights_resource_id
+  app_insights_resource_id               = var.app_insights_resource_id
   app_insights_log_analytics_resource_id = var.app_insights_log_analytics_resource_id
-  app_insights_workspace_id             = var.app_insights_workspace_id
+  app_insights_workspace_id              = var.app_insights_workspace_id
+
+  # Data store — Cosmos DB + Blob Storage
+  cosmos_endpoint        = module.data_store.cosmos_endpoint
+  cosmos_database_name   = module.data_store.cosmos_database_name
+  storage_blob_endpoint  = module.data_store.storage_blob_endpoint
 
   tags = local.tags
 }

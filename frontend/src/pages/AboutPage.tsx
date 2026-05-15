@@ -1,5 +1,6 @@
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
+import TeamSection from "../components/TeamSection";
 
 export default function AboutPage() {
   return (
@@ -55,18 +56,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Founder</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
-          Built by people who've shipped enterprise software.
-        </h2>
-        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300">
-          Terian Services was founded by David Terian, drawing on years of building Azure-native
-          enterprise platforms, machine-learning systems, and data infrastructure for HR, finance,
-          and operations teams. The company exists to deliver the same engineering rigor to clients
-          that the largest tech companies enjoy internally — without the overhead.
-        </p>
-      </section>
+      <TeamSection />
 
       <section className="bg-[#0f0d18] text-white">
         <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-6 py-14 lg:flex-row lg:items-center lg:px-10">

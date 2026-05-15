@@ -198,3 +198,29 @@ variable "app_insights_workspace_id" {
   type        = string
   default     = ""
 }
+
+# ── Data store ───────────────────────────────────────────────────────────────
+
+variable "storage_account_name" {
+  description = "Storage Account name for media assets (photos). Must be globally unique, 3–24 lowercase alphanumeric."
+  type        = string
+  default     = "stterianservices"
+}
+
+variable "cosmos_account_name" {
+  description = "Cosmos DB account name. Must be globally unique, 3–44 lowercase alphanumeric + hyphens."
+  type        = string
+  default     = "terian-services-cosmos-db"
+}
+
+variable "cosmos_database_name" {
+  description = "Cosmos DB SQL database name."
+  type        = string
+  default     = "terian-services"
+}
+
+variable "admin_principal_id" {
+  description = "Object ID of the admin user (david64.terian@terian-services.com). Granted Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor for direct data access."
+  type        = string
+  default     = ""
+}

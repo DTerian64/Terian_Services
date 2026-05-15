@@ -27,3 +27,7 @@ app_insights_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/
 app_insights_workspace_id = "fd6f9a14-55e5-4df1-8d38-213f826b962a"
 
 app_insights_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-primary-sandbox"
+
+# Admin user — david64.terian@terian-services.com
+# Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
+admin_principal_id = "3790e0a2-8fe4-4595-9173-a9f1e18c5ae2"

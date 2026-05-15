@@ -139,6 +139,24 @@ variable "app_insights_resource_id" {
   default     = ""
 }
 
+variable "cosmos_endpoint" {
+  description = "Cosmos DB account endpoint URL. Injected as AZURE_COSMOS_ENDPOINT. Leave empty to skip."
+  type        = string
+  default     = ""
+}
+
+variable "cosmos_database_name" {
+  description = "Cosmos DB SQL database name. Injected as AZURE_COSMOS_DATABASE."
+  type        = string
+  default     = ""
+}
+
+variable "storage_blob_endpoint" {
+  description = "Storage Account primary blob endpoint. Injected as AZURE_STORAGE_BLOB_ENDPOINT. Leave empty to skip."
+  type        = string
+  default     = ""
+}
+
 variable "app_insights_log_analytics_resource_id" {
   description = "Full resource ID of the Log Analytics workspace that backs the App Insights instance (providers/Microsoft.OperationalInsights/workspaces/<name>). Grants Monitoring Reader at the workspace scope — required for LogsQueryClient to execute KQL queries."
   type        = string
