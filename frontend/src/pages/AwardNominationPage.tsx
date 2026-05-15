@@ -1,5 +1,6 @@
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
+import AwardMetrics from "../components/AwardMetrics";
 
 const DEMO_REQUEST_URL = "https://demo-awards.terian-services.com/demo/request";
 
@@ -124,6 +125,8 @@ export default function AwardNominationPage() {
           See our <a className="font-semibold text-teal-400 hover:text-teal-300" href="/trust">Trust & Security</a> page for the full posture.
         </p>
       </section>
+
+      <AwardMetrics />
 
       <section className="bg-[#0f0d18] text-white">
         <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-6 py-14 lg:flex-row lg:items-center lg:px-10">
