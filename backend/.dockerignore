@@ -1,0 +1,22 @@
+# Local secrets — never bake into the image
+.env
+.env.*
+!.env.example
+
+# Python caches / venv
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
