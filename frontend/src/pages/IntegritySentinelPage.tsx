@@ -99,7 +99,7 @@ export default function IntegritySentinelPage() {
             <div className="mt-9 flex flex-wrap gap-3">
               <a
                 href={CONTACT_HREF}
-                className="inline-flex items-center justify-center rounded-md bg-teal-400 px-6 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+                className="inline-flex items-center justify-center rounded-md bg-teal-400 px-6 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-teal-300"
               >
                 Discuss the platform
               </a>
@@ -119,12 +119,12 @@ export default function IntegritySentinelPage() {
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Strategic positioning</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Strategic positioning</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
               Not a SIEM. Not a dashboard. An integrity intelligence system.
             </h2>
           </div>
-          <div className="space-y-5 text-base leading-8 text-slate-600">
+          <div className="space-y-5 text-base leading-8 text-slate-300">
             <p>
               Traditional BI systems surface metrics. Integrity Sentinel is designed to surface
               relationships, intent, behavioral anomalies, and operational risk across the systems
@@ -139,10 +139,10 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
-      <section id="capabilities" className="bg-white">
+      <section id="capabilities">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Core capabilities</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Core capabilities</p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Built around relationships, behavior, and explainable investigation.
           </h2>
 
@@ -157,34 +157,34 @@ export default function IntegritySentinelPage() {
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Behavioral risk example</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Behavioral risk example</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
               Alerts become evidence-backed narratives.
             </h2>
-            <p className="mt-5 text-base leading-8 text-slate-600">
+            <p className="mt-5 text-base leading-8 text-slate-300">
               Investigators need more than a flagged record. Integrity Sentinel is envisioned to
               explain the relationships, timing, similarity, and workflow context behind each risk
               signal so teams can decide what deserves action.
             </p>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div className="rounded-lg border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+            <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Case signal</p>
-                <h3 className="mt-1 text-xl font-bold text-slate-950">Approval network anomaly</h3>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Case signal</p>
+                <h3 className="mt-1 text-xl font-bold text-slate-100">Approval network anomaly</h3>
               </div>
-              <span className="rounded-md bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700">High</span>
+              <span className="rounded-md bg-rose-400/20 px-3 py-2 text-sm font-bold text-rose-300">High</span>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               {signalStats.map((stat) => (
-                <div key={stat.label} className="rounded-md bg-slate-50 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{stat.label}</p>
-                  <p className="mt-2 text-xl font-bold text-slate-950">{stat.value}</p>
+                <div key={stat.label} className="rounded-md bg-[#0a0916] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{stat.label}</p>
+                  <p className="mt-2 text-xl font-bold text-slate-100">{stat.value}</p>
                 </div>
               ))}
             </div>
-            <ul className="mt-6 space-y-3 text-sm leading-6 text-slate-600">
+            <ul className="mt-6 space-y-3 text-sm leading-6 text-slate-300">
               <EvidenceItem text="Semantic similarity detected across prior submissions" />
               <EvidenceItem text="Shared approval network appears in multiple unrelated requests" />
               <EvidenceItem text="Elevated after-hours activity and unusual submission velocity" />
@@ -194,10 +194,10 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
-      <section className="bg-slate-100">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Use cases</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Use cases</p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             One platform pattern, multiple integrity domains.
           </h2>
 
@@ -212,18 +212,18 @@ export default function IntegritySentinelPage() {
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Product modules</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Product modules</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
               A modular path from concept to enterprise SaaS.
             </h2>
-            <p className="mt-5 text-base leading-8 text-slate-600">
+            <p className="mt-5 text-base leading-8 text-slate-300">
               Integrity Sentinel is currently in strategic concept and architecture development,
               with modules shaped around realistic implementation pathways and enterprise controls.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {modules.map((module) => (
-              <div key={module} className="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+              <div key={module} className="rounded-md border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 px-4 py-3 text-sm font-semibold text-slate-200">
                 {module}
               </div>
             ))}
@@ -231,18 +231,18 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Reference architecture</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Reference architecture</p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Cloud-native, explainable, auditable, and tenant-aware by design.
           </h2>
 
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {architecture.map((item) => (
-              <div key={item.layer} className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-                <h3 className="text-sm font-bold text-slate-950">{item.layer}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{item.tools}</p>
+              <div key={item.layer} className="rounded-lg border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-5">
+                <h3 className="text-sm font-bold text-slate-100">{item.layer}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{item.tools}</p>
               </div>
             ))}
           </div>
@@ -261,7 +261,7 @@ export default function IntegritySentinelPage() {
           </div>
           <a
             href={CONTACT_HREF}
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-teal-300"
           >
             Start a discussion
           </a>
@@ -351,9 +351,9 @@ function ConsolePanel({ title, value }: { title: string; value: string }) {
 
 function FeatureCard({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-lg border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-3 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -369,11 +369,11 @@ function EvidenceItem({ text }: { text: string }) {
 
 function UseCaseCard({ title, signals }: { title: string; signals: string[] }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6">
-      <h3 className="text-lg font-bold text-slate-950">{title}</h3>
+    <div className="rounded-lg border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-lg font-bold text-slate-100">{title}</h3>
       <div className="mt-5 grid gap-2 sm:grid-cols-2">
         {signals.map((signal) => (
-          <span key={signal} className="rounded-md bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+          <span key={signal} className="rounded-md bg-[#0a0916] px-3 py-2 text-sm font-semibold text-slate-200">
             {signal}
           </span>
         ))}

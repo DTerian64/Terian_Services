@@ -55,12 +55,12 @@ export default function ServicesPage() {
             <a
               key={service.href}
               href={service.href}
-              className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 transition hover:border-slate-300 hover:shadow-md"
+              className="group flex h-full flex-col rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6 transition hover:border-white/30 hover:bg-white/[0.13]"
             >
               <div className="text-2xl">{service.icon}</div>
-              <h3 className="mt-4 text-lg font-bold text-slate-950">{service.title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-7 text-slate-600">{service.description}</p>
-              <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-teal-700 group-hover:text-teal-800">
+              <h3 className="mt-4 text-lg font-bold text-slate-100">{service.title}</h3>
+              <p className="mt-2 flex-1 text-sm leading-7 text-slate-300">{service.description}</p>
+              <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-teal-400 group-hover:text-teal-300">
                 Learn more →
               </span>
             </a>
@@ -68,10 +68,10 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">How we engage</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How we engage</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             A simple, predictable engagement shape.
           </h2>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -97,22 +97,14 @@ export default function ServicesPage() {
   );
 }
 
-function Step({
-  number,
-  title,
-  description,
-}: {
-  number: string;
-  title: string;
-  description: string;
-}) {
+function Step({ number, title, description }: { number: string; title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+    <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-6">
       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm font-bold text-white">
         {number}
       </span>
-      <h3 className="mt-4 text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+      <h3 className="mt-4 text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }

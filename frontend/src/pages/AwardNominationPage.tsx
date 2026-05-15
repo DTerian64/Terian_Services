@@ -15,8 +15,8 @@ export default function AwardNominationPage() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">What it does</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">What it does</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           A complete recognition workflow, built for the enterprise.
         </h2>
 
@@ -48,13 +48,13 @@ export default function AwardNominationPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">AI/ML layer</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">AI/ML layer</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Recognition that knows when something looks off.
           </h2>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
             Most recognition platforms are forms with a database behind them. Ours has an ML layer
             watching the patterns in real time and flagging the ones that matter.
           </p>
@@ -81,8 +81,8 @@ export default function AwardNominationPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">How it works</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How it works</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Four steps from intent to paycheck.
         </h2>
 
@@ -94,10 +94,10 @@ export default function AwardNominationPage() {
         </div>
       </section>
 
-      <section className="bg-slate-100">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Integrations</p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Integrations</p>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Wires into the systems your enterprise already runs.
           </h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -110,8 +110,8 @@ export default function AwardNominationPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Security & compliance</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Security & compliance</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Boring on purpose.
         </h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -120,8 +120,8 @@ export default function AwardNominationPage() {
           <Pill label="Region: Azure West US 2" />
           <Pill label="B2B guest access" />
         </div>
-        <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
-          See our <a className="font-semibold text-teal-700 hover:text-teal-800" href="/trust">Trust & Security</a> page for the full posture.
+        <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-300">
+          See our <a className="font-semibold text-teal-400 hover:text-teal-300" href="/trust">Trust & Security</a> page for the full posture.
         </p>
       </section>
 
@@ -137,7 +137,7 @@ export default function AwardNominationPage() {
             href={DEMO_REQUEST_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-teal-300"
           >
             Request a demo →
           </a>
@@ -149,18 +149,18 @@ export default function AwardNominationPage() {
 
 function Feature({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function MLCard({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-teal-200 bg-teal-50 p-6">
-      <h3 className="text-base font-bold text-teal-900">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-teal-900/80">{description}</p>
+    <div className="rounded-xl border-2 border-teal-400/30 bg-[#0f0d18] p-6 transition hover:border-teal-400">
+      <h3 className="text-base font-bold text-teal-300">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -175,19 +175,19 @@ function Step({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm font-bold text-white">
         {number}
       </span>
-      <h3 className="mt-4 text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+      <h3 className="mt-4 text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function IntegrationPill({ label }: { label: string }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+    <div className="rounded-md border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 px-4 py-3 text-sm font-semibold text-slate-200">
       {label}
     </div>
   );
@@ -195,7 +195,7 @@ function IntegrationPill({ label }: { label: string }) {
 
 function Pill({ label }: { label: string }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+    <div className="rounded-md border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 px-4 py-3 text-sm font-semibold text-slate-200">
       {label}
     </div>
   );

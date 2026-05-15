@@ -12,11 +12,11 @@ export default function IntegrityFraudPage() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">The problem</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">The problem</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           The losses you see are a fraction of the losses you have.
         </h2>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
           Most fraud is systemic, not transactional. Collusion between approvers and vendors, ghost
           employees on payroll, duplicate payments hiding in different invoice formats, expense
           reports tuned just under thresholds — none of it surfaces from rules alone.
@@ -30,10 +30,10 @@ export default function IntegrityFraudPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Our methodology</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Our methodology</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Four layers, working together.
           </h2>
 
@@ -63,8 +63,8 @@ export default function IntegrityFraudPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Engagement model</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Engagement model</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Three phases, fixed-price pilot.
         </h2>
 
@@ -87,10 +87,10 @@ export default function IntegrityFraudPage() {
         </div>
       </section>
 
-      <section className="bg-slate-100">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Outcomes we target</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Outcomes we target</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             We measure what matters.
           </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
@@ -109,7 +109,7 @@ export default function IntegrityFraudPage() {
           </div>
           <a
             href="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-teal-300"
           >
             Book a discovery call →
           </a>
@@ -121,9 +121,9 @@ export default function IntegrityFraudPage() {
 
 function Card({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5">
-      <h3 className="text-sm font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-xs leading-6 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-5">
+      <h3 className="text-sm font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-xs leading-6 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -138,10 +138,10 @@ function Layer({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-      <span className="text-xs font-bold text-teal-700">Layer {number}</span>
-      <h3 className="mt-2 text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-6">
+      <span className="text-xs font-bold text-teal-400">Layer {number}</span>
+      <h3 className="mt-2 text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -156,20 +156,20 @@ function Step({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm font-bold text-white">
         {number}
       </span>
-      <h3 className="mt-4 text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+      <h3 className="mt-4 text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function Metric({ label }: { label: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <p className="text-sm font-semibold text-slate-950">{label}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <p className="text-sm font-semibold text-slate-100">{label}</p>
     </div>
   );
 }

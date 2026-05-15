@@ -12,8 +12,8 @@ export default function AIAnalyticsPage() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Capabilities</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Capabilities</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           The shape of work we deliver.
         </h2>
 
@@ -27,10 +27,10 @@ export default function AIAnalyticsPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Tech stack</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Tech stack</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             The Microsoft data and AI stack — plus the right open tools.
           </h2>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -46,15 +46,15 @@ export default function AIAnalyticsPage() {
         </div>
       </section>
 
-      <section className="bg-slate-100">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
             Integrity, provenance, and confidentiality
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             AI you can trace, defend, and explain.
           </h2>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
+          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
             "The model said so" is not an answer your auditor accepts. We build AI systems where
             every prediction can be traced back to the data version and model version that produced
             it, every input is governed by least-privilege access, and your data is never used to
@@ -79,8 +79,8 @@ export default function AIAnalyticsPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Engagement model</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Engagement model</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Start with the metric. End with the proof.
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -110,9 +110,9 @@ export default function AIAnalyticsPage() {
 
 function Card({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -127,19 +127,19 @@ function Step({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+    <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-6">
       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-sm font-bold text-white">
         {number}
       </span>
-      <h3 className="mt-4 text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+      <h3 className="mt-4 text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function Pill({ label }: { label: string }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+    <div className="rounded-md border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 px-4 py-3 text-sm font-semibold text-slate-200">
       {label}
     </div>
   );

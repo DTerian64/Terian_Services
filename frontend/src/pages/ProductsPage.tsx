@@ -37,20 +37,20 @@ export default function ProductsPage() {
             <a
               key={product.href}
               href={product.href}
-              className="group flex flex-col rounded-xl border border-slate-200 bg-white p-8 transition hover:border-slate-300 hover:shadow-md"
+              className="group flex flex-col rounded-xl border border-white/15 bg-[#0f0d18] p-8 transition hover:border-2 hover:border-teal-400"
             >
               <span
                 className={`inline-flex w-fit rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${
                   product.accent === "teal"
-                    ? "border-teal-200 bg-teal-50 text-teal-800"
-                    : "border-indigo-200 bg-indigo-50 text-indigo-800"
+                    ? "border-teal-400/30 bg-teal-400/10 text-teal-300"
+                    : "border-indigo-400/30 bg-indigo-400/10 text-indigo-300"
                 }`}
               >
                 {product.tag}
               </span>
-              <h3 className="mt-5 text-2xl font-bold text-slate-950">{product.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-600">{product.description}</p>
-              <span className="mt-6 text-sm font-semibold text-teal-700 group-hover:text-teal-800">
+              <h3 className="mt-5 text-2xl font-bold text-slate-100">{product.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">{product.description}</p>
+              <span className="mt-6 text-sm font-semibold text-teal-400 group-hover:text-teal-300">
                 {product.cta} →
               </span>
             </a>

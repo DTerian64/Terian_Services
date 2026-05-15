@@ -1,14 +1,11 @@
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import PageLayout from "../components/PageLayout";
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-950">
-      <Header />
-
+    <PageLayout>
       {/* Hero */}
       <section className="bg-[#0f0d18] text-white">
-        <div className="mx-auto max-w-5xl px-6 py-24 text-center lg:px-10 lg:py-32">
+        <div className="mx-auto max-w-5xl px-6 py-24 lg:px-10 lg:py-32">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">
             Enterprise software & services
           </p>
@@ -19,7 +16,7 @@ export default function HomePage() {
             <br />
             <span className="text-teal-300">Secure. Isolated. Provable.</span>
           </h1>
-          <p className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-white/70">
+          <p className="mt-8 max-w-3xl text-lg leading-8 text-white/70">
             Terian Services builds AI/ML-empowered SaaS and delivers AI analytics, integrity &
             fraud detection, and cloud modernization for the enterprise. Every product we ship and
             every engagement we run is built around three commitments: your data stays{" "}
@@ -31,7 +28,7 @@ export default function HomePage() {
             every change, approval, and model decision).
           </p>
 
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <div className="mt-10 flex flex-wrap gap-3">
             <a
               href="/contact"
               className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
@@ -49,7 +46,7 @@ export default function HomePage() {
       </section>
 
       {/* Products */}
-      <section id="products" className="border-b border-slate-200">
+      <section id="products" className="border-b border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Products"
@@ -79,7 +76,7 @@ export default function HomePage() {
       </section>
 
       {/* Services */}
-      <section id="services" className="bg-white">
+      <section id="services">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Services"
@@ -114,10 +111,10 @@ export default function HomePage() {
             />
           </div>
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8">
             <a
               href="/services"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-teal-700 hover:text-teal-800"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-teal-400 hover:text-teal-300"
             >
               See all services →
             </a>
@@ -126,7 +123,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Terian */}
-      <section className="bg-slate-50">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Why Terian"
@@ -167,9 +164,7 @@ export default function HomePage() {
           </a>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
 
@@ -185,10 +180,10 @@ function SectionHeading({
   description?: string;
 }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">{title}</h2>
-      {description ? <p className="mt-4 text-base leading-7 text-slate-600">{description}</p> : null}
+    <div className="max-w-3xl">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">{eyebrow}</p>
+      <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">{title}</h2>
+      {description ? <p className="mt-4 text-base leading-7 text-slate-300">{description}</p> : null}
     </div>
   );
 }
@@ -210,20 +205,20 @@ function ProductCard({
 }) {
   const accentClasses =
     accent === "teal"
-      ? "border-teal-200 bg-teal-50 text-teal-800"
-      : "border-indigo-200 bg-indigo-50 text-indigo-800";
+      ? "border-teal-400/30 bg-teal-400/10 text-teal-300"
+      : "border-indigo-400/30 bg-indigo-400/10 text-indigo-300";
 
   return (
     <a
       href={href}
-      className="group flex flex-col rounded-xl border border-slate-200 bg-white p-8 transition hover:border-slate-300 hover:shadow-md"
+      className="group flex flex-col rounded-xl border-2 border-white/10 bg-[#0f0d18] p-8 transition hover:border-teal-400"
     >
       <span className={`inline-flex w-fit rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${accentClasses}`}>
         {tag}
       </span>
-      <h3 className="mt-5 text-2xl font-bold text-slate-950">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-slate-600">{description}</p>
-      <span className="mt-6 text-sm font-semibold text-teal-700 group-hover:text-teal-800">
+      <h3 className="mt-5 text-2xl font-bold text-slate-100">{title}</h3>
+      <p className="mt-3 text-sm leading-7 text-slate-300">{description}</p>
+      <span className="mt-6 text-sm font-semibold text-teal-400 group-hover:text-teal-300">
         {ctaLabel} →
       </span>
     </a>
@@ -244,12 +239,12 @@ function ServiceCard({
   return (
     <a
       href={href}
-      className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 transition hover:border-slate-300 hover:shadow-md"
+      className="group flex h-full flex-col rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 transition hover:border-teal-400"
     >
       <div className="text-2xl">{icon}</div>
-      <h3 className="mt-4 text-lg font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{description}</p>
-      <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-teal-700 group-hover:text-teal-800">
+      <h3 className="mt-4 text-lg font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 flex-1 text-sm leading-6 text-slate-300">{description}</p>
+      <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-teal-400 group-hover:text-teal-300">
         Learn more →
       </span>
     </a>
@@ -258,9 +253,9 @@ function ServiceCard({
 
 function ValueCard({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-lg font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-lg font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }

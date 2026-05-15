@@ -12,8 +12,8 @@ export default function CloudMigrationPage() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">The migration spectrum</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">The migration spectrum</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Six R's. We help you pick the right one per workload.
         </h2>
 
@@ -27,10 +27,10 @@ export default function CloudMigrationPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Our 5-phase method</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Our 5-phase method</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Predictable, instrumented, and rollback-ready at every step.
           </h2>
 
@@ -45,8 +45,8 @@ export default function CloudMigrationPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Stack</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Stack</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Azure-first. IaC by default.
         </h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -59,16 +59,16 @@ export default function CloudMigrationPage() {
           <Pill label="Defender for Cloud" />
           <Pill label="GitHub Actions / Azure DevOps" />
         </div>
-        <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-600">
+        <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-300">
           This very site is deployed via Terraform on Azure Static Web Apps — same toolchain we'll
           use on yours.
         </p>
       </section>
 
-      <section className="bg-slate-100">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Risk & rollback</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Risk & rollback</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Every cutover has a rehearsed reverse.
           </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
@@ -87,7 +87,7 @@ export default function CloudMigrationPage() {
           </div>
           <a
             href="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-teal-300"
           >
             Book the assessment →
           </a>
@@ -99,9 +99,9 @@ export default function CloudMigrationPage() {
 
 function R({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
@@ -116,19 +116,19 @@ function Phase({
   description: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+    <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-5">
       <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-teal-500 text-xs font-bold text-white">
         {number}
       </span>
-      <h3 className="mt-3 text-sm font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-xs leading-6 text-slate-600">{description}</p>
+      <h3 className="mt-3 text-sm font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-xs leading-6 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function Pill({ label }: { label: string }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700">
+    <div className="rounded-md border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 px-4 py-3 text-sm font-semibold text-slate-200">
       {label}
     </div>
   );
@@ -136,9 +136,9 @@ function Pill({ label }: { label: string }) {
 
 function Bullet({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }

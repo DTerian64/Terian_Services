@@ -12,8 +12,8 @@ export default function DataMiningPage() {
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">What it covers</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">What it covers</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Three datasets where mining usually pays back fastest.
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -32,10 +32,10 @@ export default function DataMiningPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Methods</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Methods</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             The toolkit, applied judiciously.
           </h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -48,8 +48,8 @@ export default function DataMiningPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Deliverables</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Deliverables</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           What you walk away with.
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -67,7 +67,7 @@ export default function DataMiningPage() {
           </div>
           <a
             href="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-teal-300"
           >
             Scope a pilot →
           </a>
@@ -79,27 +79,27 @@ export default function DataMiningPage() {
 
 function Card({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function Method({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function Deliverable({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-teal-200 bg-teal-50 p-6">
-      <h3 className="text-base font-bold text-teal-900">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-teal-900/80">{description}</p>
+    <div className="rounded-xl border-2 border-teal-400/30 bg-[#0f0d18] p-6 transition hover:border-teal-400">
+      <h3 className="text-base font-bold text-teal-300">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }

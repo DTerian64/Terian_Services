@@ -7,7 +7,7 @@ export default function AboutPage() {
       <PageHero
         eyebrow="About"
         title="Engineering for the parts of the enterprise that matter."
-        description="Terian Services is a boutique engineering firm building AI/ML-empowered SaaS and delivering high-trust enterprise services. We work where the data is sensitive, the workflows are real, and the outcomes are measurable."
+        description="Terian Services builds AI/ML-empowered SaaS and delivering high-trust enterprise services. We work where the data is sensitive, the workflows are real, and the outcomes are measurable."
       />
 
       <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
@@ -27,10 +27,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">How we work</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How we work</p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
             Four habits we don't compromise on.
           </h2>
 
@@ -56,11 +56,11 @@ export default function AboutPage() {
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700">Founder</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Founder</p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
           Built by people who've shipped enterprise software.
         </h2>
-        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600">
+        <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300">
           Terian Services was founded by David Terian, drawing on years of building Azure-native
           enterprise platforms, machine-learning systems, and data infrastructure for HR, finance,
           and operations teams. The company exists to deliver the same engineering rigor to clients
@@ -88,18 +88,18 @@ export default function AboutPage() {
 
 function Pillar({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6">
-      <h3 className="text-lg font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      <h3 className="text-lg font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
 
 function Habit({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-      <h3 className="text-base font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+    <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] transition hover:border-teal-400 p-6">
+      <h3 className="text-base font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
     </div>
   );
 }
