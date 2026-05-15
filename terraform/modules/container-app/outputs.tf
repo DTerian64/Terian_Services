@@ -11,8 +11,8 @@ output "container_app_name" {
 }
 
 output "container_app_fqdn" {
-  description = "Container App default hostname — e.g. terian-services-backend.<env>.eastus2.azurecontainerapps.io"
-  value       = azurerm_container_app.backend.latest_revision_fqdn
+  description = "Container App stable ingress hostname — e.g. terian-services-backend.<env>.eastus2.azurecontainerapps.io"
+  value       = azurerm_container_app.backend.ingress[0].fqdn
 }
 
 output "container_app_environment_id" {

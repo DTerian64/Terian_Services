@@ -27,7 +27,7 @@ from typing import Optional
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 # Load .env early so AZURE_OPENAI_* are available when the agent initialises.
 # In production, env vars are injected by the platform and load_dotenv is a no-op.
@@ -91,7 +91,8 @@ class HistoryTurn(BaseModel):
     role: str = Field(..., description="'user' or 'assistant'")
     content: str = Field(..., max_length=4000)
 
-    @validator("role")
+    @field_validator("role")
+    @classmethod
     def _role_valid(cls, v: str) -> str:
         if v not in ("user", "assistant"):
             raise ValueError("role must be 'user' or 'assistant'")
@@ -102,7 +103,8 @@ class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
     history: list[HistoryTurn] = Field(default_factory=list)
 
-    @validator("history")
+    @field_validator("history")
+    @classmethod
     def _history_capped(cls, v: list[HistoryTurn]) -> list[HistoryTurn]:
         # Hard cap on history length to bound token cost per request.
         # ~10 turns = 20 messages of up to 4 KB each = ~80 KB max prompt.
@@ -143,7 +145,7 @@ async def ask(body: AskRequest) -> AskResponse:
             detail="Ask AI is temporarily unavailable. Please try again shortly.",
         )
 
-    history = [t.dict() for t in body.history]
+    history = [t.model_dump() for t in body.history]
     result = await agent.ask(body.question, history=history)
 
     if result.error and not result.answer:
