@@ -9,3 +9,20 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Global left-align — overrides any browser or Tailwind center defaults */
+body {
+  text-align: left;
+}
+
+/* Dark textured background used on all pages except Ask AI.
+   Replace the radial-gradient with a url('/bg-texture.jpg') once
+   the final asset is available. */
+.page-bg-dark {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    #2c2c2c 0%,
+    #141414 55%,
+    #080808 100%
+  );
+}

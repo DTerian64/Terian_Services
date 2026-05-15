@@ -261,7 +261,7 @@ export default function AskAIPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <PageLayout hideFooter>
+    <PageLayout hideFooter darkBg={false}>
       <section className="bg-slate-50 px-0 py-0 md:px-6 md:py-6">
         <div
           className="mx-auto flex max-w-7xl gap-0 overflow-hidden rounded-none border border-gray-200 bg-white shadow-sm md:rounded-lg"
