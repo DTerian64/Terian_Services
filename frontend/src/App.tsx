@@ -42,7 +42,7 @@ const routes: RouteEntry[] = [
 
   // Services
   { match: (p) => p === "/services" || p === "/services/", component: ServicesPage },
-  { match: (p) => p === "/services/ai-analytics", component: AIAnalyticsPage },
+  { match: (p) => p === "/services/ai-analytics", component: AIAnalyticsPage }, 
   {
     match: (p) =>
       p === "/services/integrity-fraud" ||
