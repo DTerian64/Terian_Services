@@ -8,7 +8,7 @@
  * so the marketing page is never broken by a monitoring outage.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   CartesianGrid,
   Line,
@@ -73,6 +73,10 @@ function SkeletonCard() {
 export default function AwardMetrics() {
   const [data, setData] = useState<MetricsData | null>(null);
   const [error, setError] = useState(false);
+  const [showDiagram, setShowDiagram] = useState(false);
+
+  const openDiagram = useCallback(() => setShowDiagram(true), []);
+  const closeDiagram = useCallback(() => setShowDiagram(false), []);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/metrics/awards`)
@@ -91,8 +95,14 @@ export default function AwardMetrics() {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400 flex items-center gap-2">
         Live platform metrics
+        <button
+          onClick={openDiagram}
+          className="normal-case tracking-normal font-medium text-teal-400/70 hover:text-teal-300 underline underline-offset-2 transition"
+        >
+          (how it works)
+        </button>
       </p>
       <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
         Last 24 hours.
@@ -190,6 +200,45 @@ export default function AwardMetrics() {
             <span className="flex items-center gap-2 text-xs text-slate-400">
               <span className="inline-block h-0.5 w-6 rounded bg-red-400" /> Failures
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* ── How-it-works diagram modal ── */}
+      {showDiagram && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-sm"
+          onClick={closeDiagram}
+        >
+          <div className="flex min-h-full items-start justify-center p-4 sm:p-8">
+            <div
+              className="relative w-full rounded-2xl border-2 border-white/10 bg-[#0f0d18] p-6 shadow-2xl"
+              style={{ minWidth: "860px", maxWidth: "960px" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+                  How live metrics work
+                </p>
+                <button
+                  onClick={closeDiagram}
+                  className="rounded-md px-3 py-1 text-sm text-slate-400 hover:bg-white/10 hover:text-slate-100 transition"
+                >
+                  ✕ Close
+                </button>
+              </div>
+              {/* SVG diagram — rendered at natural width, container scrolls horizontally on small screens */}
+              <div className="overflow-x-auto">
+                <img
+                  src="/award_live_metrics_workflow.svg"
+                  alt="Live metrics workflow diagram"
+                  className="rounded-lg"
+                  style={{ minWidth: "820px", width: "100%" }}
+                />
+              </div>
+              <p className="mt-3 text-center text-xs text-slate-500">Click outside to close</p>
+            </div>
           </div>
         </div>
       )}
