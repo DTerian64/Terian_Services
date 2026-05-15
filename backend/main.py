@@ -35,6 +35,7 @@ load_dotenv()
 
 from agents import AskAgent          # noqa: E402  — must come after load_dotenv()
 from metrics_router import router as metrics_router  # noqa: E402
+from team_router import router as team_router        # noqa: E402
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -66,6 +67,7 @@ _allowed_origins = [
 ]
 
 app.include_router(metrics_router)
+app.include_router(team_router)
 
 app.add_middleware(
     CORSMiddleware,
