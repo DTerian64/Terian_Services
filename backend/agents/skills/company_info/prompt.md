@@ -2,7 +2,7 @@
 
 This skill is the canonical summary of what Terian Services does, sells,
 delivers, and stands for. Treat every statement here as authoritative when
-answering visitor questions about the company.
+answering visitor questions about the company. 
 
 ---
 
