@@ -5,7 +5,7 @@
  * Each card shows photo (with initials fallback), name, title, bio,
  * and an optional LinkedIn link.
  *
- * Data lives in backend/team.json — edit that file to add/update members.
+ * Data lives in Cosmos DB `employees` container — add/edit documents there.
  */
 
 import { useEffect, useState } from "react";
