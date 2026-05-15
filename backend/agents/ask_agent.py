@@ -259,12 +259,22 @@ class AskAgent:
                 # NOTE: `max_completion_tokens` is the forward-compatible
                 # parameter name for GPT-4.1-class models and newer.
                 # `temperature` is omitted to use the model's default.
+                # `tools`, `tool_choice`, and `parallel_tool_calls` are all
+                # rejected by the API when no tools are present — omit the
+                # entire group together rather than sending tool_choice="none".
+                tool_kwargs = (
+                    {
+                        "tools": self._tools,
+                        "tool_choice": "auto",
+                        "parallel_tool_calls": False,
+                    }
+                    if self._tools
+                    else {}
+                )
                 response = client.chat.completions.create(
                     model=self._deployment,
                     messages=messages,
-                    tools=self._tools or None,
-                    tool_choice="auto" if self._tools else "none",
-                    parallel_tool_calls=False,
+                    **tool_kwargs,
                     max_completion_tokens=1200,
                 )
 
