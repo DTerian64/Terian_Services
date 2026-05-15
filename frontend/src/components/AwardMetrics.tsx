@@ -160,7 +160,7 @@ export default function AwardMetrics() {
                   borderRadius: 8,
                 }}
                 labelStyle={{ color: "#94a3b8", fontSize: 11 }}
-                labelFormatter={formatHour}
+                labelFormatter={(label) => formatHour(String(label))}
               />
               <Line
                 type="monotone"
