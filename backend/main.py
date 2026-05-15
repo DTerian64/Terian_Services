@@ -33,7 +33,8 @@ from pydantic import BaseModel, Field, field_validator
 # In production, env vars are injected by the platform and load_dotenv is a no-op.
 load_dotenv()
 
-from agents import AskAgent  # noqa: E402  — must come after load_dotenv()
+from agents import AskAgent          # noqa: E402  — must come after load_dotenv()
+from metrics_router import router as metrics_router  # noqa: E402
 
 # ── Logging ─────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -63,6 +64,8 @@ _allowed_origins = [
     for o in os.getenv("TERIAN_ALLOWED_ORIGINS", _default_origins).split(",")
     if o.strip()
 ]
+
+app.include_router(metrics_router)
 
 app.add_middleware(
     CORSMiddleware,
