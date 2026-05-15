@@ -127,11 +127,20 @@ variable "tenant_id" {
 }
 
 # ── App Insights (Award Nomination System — read-only metrics) ───────────────
-# The backend's UAMI is granted Monitoring Reader on this resource so it can
-# query the Log Analytics workspace without a service-account key.
+# LogsQueryClient queries the Log Analytics *workspace*, not the App Insights
+# component directly.  Both role assignments are required:
+#   • App Insights component  — allows the UAMI to be recognised as a reader
+#   • Log Analytics workspace — grants actual query execution rights (this is
+#     the scope the SDK enforces at query time)
 
 variable "app_insights_resource_id" {
-  description = "Full resource ID of the Award Nomination System's Application Insights component. Used to scope the Monitoring Reader role assignment on the backend UAMI. Leave empty to skip the role assignment."
+  description = "Full resource ID of the Award Nomination System's Application Insights component. Grants Monitoring Reader at the component scope."
+  type        = string
+  default     = ""
+}
+
+variable "app_insights_log_analytics_resource_id" {
+  description = "Full resource ID of the Log Analytics workspace that backs the App Insights instance (providers/Microsoft.OperationalInsights/workspaces/<name>). Grants Monitoring Reader at the workspace scope — required for LogsQueryClient to execute KQL queries."
   type        = string
   default     = ""
 }

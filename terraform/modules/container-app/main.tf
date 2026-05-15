@@ -184,12 +184,20 @@ resource "azurerm_role_assignment" "gha_aca_contributor" {
   principal_id         = var.github_actions_principal_id
 }
 
-# UAMI → Monitoring Reader on the Award Nomination System's App Insights
-# resource, so the /api/metrics/awards endpoint can query Log Analytics without
-# a service-account key.  Only created when app_insights_resource_id is set.
+# UAMI → Monitoring Reader on the App Insights component.
 resource "azurerm_role_assignment" "uami_app_insights_reader" {
   count                = var.app_insights_resource_id != "" ? 1 : 0
   scope                = var.app_insights_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
+# UAMI → Monitoring Reader on the backing Log Analytics workspace.
+# LogsQueryClient enforces RBAC at the workspace scope — the App Insights
+# component role alone is not sufficient to execute KQL queries.
+resource "azurerm_role_assignment" "uami_log_analytics_reader" {
+  count                = var.app_insights_log_analytics_resource_id != "" ? 1 : 0
+  scope                = var.app_insights_log_analytics_resource_id
   role_definition_name = "Monitoring Reader"
   principal_id         = azurerm_user_assigned_identity.backend.principal_id
 }

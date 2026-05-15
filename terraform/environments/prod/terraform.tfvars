@@ -25,3 +25,5 @@ github_actions_principal_id = "dbbfce6e-5ae5-4337-8741-03cbb821cf0a"
 app_insights_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/components/appi-award-api-sandbox"
 
 app_insights_workspace_id = "fd6f9a14-55e5-4df1-8d38-213f826b962a"
+
+app_insights_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-primary-sandbox"

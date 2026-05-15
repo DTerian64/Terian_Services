@@ -187,6 +187,12 @@ variable "app_insights_resource_id" {
   default     = ""
 }
 
+variable "app_insights_log_analytics_resource_id" {
+  description = "Full resource ID of the Log Analytics workspace backing the App Insights instance. Required for LogsQueryClient KQL query access."
+  type        = string
+  default     = ""
+}
+
 variable "app_insights_workspace_id" {
   description = "Log Analytics workspace ID (GUID) backing the Award Nomination System's App Insights instance."
   type        = string

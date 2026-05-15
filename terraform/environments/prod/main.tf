@@ -213,8 +213,9 @@ module "container_app" {
   github_actions_principal_id  = var.github_actions_principal_id
 
   # App Insights (Award Nomination System showcase metrics)
-  app_insights_resource_id  = var.app_insights_resource_id
-  app_insights_workspace_id = var.app_insights_workspace_id
+  app_insights_resource_id              = var.app_insights_resource_id
+  app_insights_log_analytics_resource_id = var.app_insights_log_analytics_resource_id
+  app_insights_workspace_id             = var.app_insights_workspace_id
 
   tags = local.tags
 }
