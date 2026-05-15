@@ -57,11 +57,15 @@ resource "azurerm_role_assignment" "uami_acr_pull" {
   principal_id         = azurerm_user_assigned_identity.backend.principal_id
 }
 
-# GitHub Actions principal → AcrPush (server-side `az acr build` pushes here)
+# GitHub Actions principal → Contributor on ACR.
+# AcrPush alone is insufficient for `az acr build`: that command schedules an
+# ACR Task (control-plane) and requires registries/read + scheduleRun/action
+# in addition to push/write. Contributor on the ACR scope covers all three
+# without widening access beyond the registry resource.
 resource "azurerm_role_assignment" "gha_acr_push" {
   count                = var.github_actions_principal_id == "" ? 0 : 1
   scope                = azurerm_container_registry.acr.id
-  role_definition_name = "AcrPush"
+  role_definition_name = "Contributor"
   principal_id         = var.github_actions_principal_id
 }
 
@@ -169,11 +173,13 @@ resource "azurerm_key_vault_secret" "openai_key" {
   ]
 }
 
-# GitHub Actions principal → Container App Contributor (so the workflow can
-# call `az containerapp update --image …` to roll a new revision)
+# GitHub Actions principal → Contributor on the Container App (so the workflow
+# can call `az containerapp update --image …` to roll a new revision).
+# Scoped to the container app resource directly — the environment is a sibling
+# under the RG, not a parent, so RBAC does not inherit from it.
 resource "azurerm_role_assignment" "gha_aca_contributor" {
   count                = var.github_actions_principal_id == "" ? 0 : 1
-  scope                = azurerm_container_app_environment.env.id
+  scope                = azurerm_container_app.backend.id
   role_definition_name = "Contributor"
   principal_id         = var.github_actions_principal_id
 }
