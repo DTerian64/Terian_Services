@@ -1,0 +1,6 @@
+ContainerAppConsoleLogs_CL
+| where TimeGenerated > ago(15m)
+| extend PacificTime = datetime_utc_to_local(TimeGenerated, 'US/Pacific')
+| where ContainerAppName_s in ("terian-services-backend")
+| project PacificTime, Log_s
+| order by PacificTime asc

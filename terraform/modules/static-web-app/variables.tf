@@ -21,3 +21,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "app_settings" {
+  description = "Key/value map of SWA application settings. VITE_* values here are injected as environment variables during the SWA build step, so the frontend bundle picks them up at compile time."
+  type        = map(string)
+  default     = {}
+}

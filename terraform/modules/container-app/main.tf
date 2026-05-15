@@ -184,6 +184,16 @@ resource "azurerm_role_assignment" "gha_aca_contributor" {
   principal_id         = var.github_actions_principal_id
 }
 
+# UAMI → Monitoring Reader on the Award Nomination System's App Insights
+# resource, so the /api/metrics/awards endpoint can query Log Analytics without
+# a service-account key.  Only created when app_insights_resource_id is set.
+resource "azurerm_role_assignment" "uami_app_insights_reader" {
+  count                = var.app_insights_resource_id != "" ? 1 : 0
+  scope                = var.app_insights_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
 # ── Container App ───────────────────────────────────────────────────────────
 resource "azurerm_container_app" "backend" {
   name                         = var.app_name
@@ -244,6 +254,16 @@ resource "azurerm_container_app" "backend" {
         name  = "TERIAN_ALLOWED_ORIGINS"
         value = var.allowed_origins
       }
+      # App Insights metrics — workspace ID for KQL queries; client ID so
+      # DefaultAzureCredential picks the correct UAMI unambiguously in ACA.
+      env {
+        name  = "APPINSIGHTS_WORKSPACE_ID"
+        value = var.app_insights_workspace_id
+      }
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = azurerm_user_assigned_identity.backend.client_id
+      }
     }
   }
 
@@ -268,6 +288,7 @@ resource "azurerm_container_app" "backend" {
   depends_on = [
     azurerm_role_assignment.uami_acr_pull,
     azurerm_role_assignment.uami_kv_secrets_user,
+    azurerm_role_assignment.uami_app_insights_reader,
     azurerm_key_vault_secret.openai_key,
     azurerm_cognitive_deployment.gpt,
   ]

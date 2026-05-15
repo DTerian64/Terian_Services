@@ -178,3 +178,17 @@ variable "github_actions_principal_id" {
   type        = string
   default     = ""
 }
+
+# ── App Insights (Award Nomination System — read-only metrics) ───────────────
+
+variable "app_insights_resource_id" {
+  description = "Full resource ID of the Award Nomination System's Application Insights component. Used to scope the Monitoring Reader role assignment on the backend UAMI."
+  type        = string
+  default     = ""
+}
+
+variable "app_insights_workspace_id" {
+  description = "Log Analytics workspace ID (GUID) backing the Award Nomination System's App Insights instance."
+  type        = string
+  default     = ""
+}

@@ -96,6 +96,15 @@ module "static_web_app" {
   location            = var.location
   app_name            = var.swa_name
   tags                = local.tags
+
+  # VITE_API_URL is consumed by the SWA build step so the frontend bundle
+  # knows where the backend API lives.  Derived from the Container App's
+  # stable ingress hostname — no hard-coded URL needed here.
+  app_settings = {
+    VITE_API_URL = "https://${module.container_app.container_app_fqdn}"
+  }
+
+  depends_on = [module.container_app]
 }
 
 # ── 3. DNS — CNAME: www → SWA default hostname (record lives in rg_platform) ─
@@ -109,7 +118,13 @@ resource "azurerm_dns_cname_record" "www" {
 }
 
 # ── 4. DNS — TXT record for apex domain ownership verification ──────────────
+# Only created when swa_verification_token is set.  The token comes from the
+# SWA portal after the first apply; once the apex custom-domain binding has
+# been verified and the cert is Active, the record can stay or be removed —
+# Azure doesn't re-check it after initial issuance.  Leaving the variable
+# empty (the default) skips the record without breaking the plan.
 resource "azurerm_dns_txt_record" "swa_verify" {
+  count               = var.swa_verification_token != "" ? 1 : 0
   name                = var.swa_verification_dns_name
   zone_name           = data.azurerm_dns_zone.terian.name
   resource_group_name = var.dns_resource_group_name
@@ -148,7 +163,7 @@ resource "azurerm_static_web_app_custom_domain" "apex" {
   validation_type   = "dns-txt-token"
 
   depends_on = [
-    azurerm_dns_txt_record.swa_verify,
+    azurerm_dns_txt_record.swa_verify,  # empty list when token unset — harmless
     azurerm_dns_a_record.apex_alias,
     azurerm_dns_cname_record.www,
   ]
@@ -196,6 +211,10 @@ module "container_app" {
   allowed_origins              = var.backend_allowed_origins
 
   github_actions_principal_id  = var.github_actions_principal_id
+
+  # App Insights (Award Nomination System showcase metrics)
+  app_insights_resource_id  = var.app_insights_resource_id
+  app_insights_workspace_id = var.app_insights_workspace_id
 
   tags = local.tags
 }

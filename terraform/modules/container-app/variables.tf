@@ -125,3 +125,19 @@ variable "tenant_id" {
   description = "Azure AD tenant ID for Key Vault."
   type        = string
 }
+
+# ── App Insights (Award Nomination System — read-only metrics) ───────────────
+# The backend's UAMI is granted Monitoring Reader on this resource so it can
+# query the Log Analytics workspace without a service-account key.
+
+variable "app_insights_resource_id" {
+  description = "Full resource ID of the Award Nomination System's Application Insights component. Used to scope the Monitoring Reader role assignment on the backend UAMI. Leave empty to skip the role assignment."
+  type        = string
+  default     = ""
+}
+
+variable "app_insights_workspace_id" {
+  description = "Log Analytics workspace ID (GUID) for the Award Nomination System App Insights instance. Injected into the Container App as APPINSIGHTS_WORKSPACE_ID so the metrics router can query it."
+  type        = string
+  default     = ""
+}
