@@ -3,7 +3,7 @@
 # Persistent data layer for Terian Services:
 #
 #   Storage Account (stterianservices)
-#     └── Blob container: team-photos   (private; UAMI reads via identity)
+#     └── Blob container: team-photos   (public blob read; images served directly to frontend)
 #
 #   Cosmos DB account (terian-services-cosmos-db) — Serverless, SQL API
 #     └── Database: terian-services
@@ -32,9 +32,9 @@ resource "azurerm_storage_account" "media" {
   account_replication_type = "LRS"
   min_tls_version          = "TLS1_2"
 
-  # Disable anonymous public access at the account level.
-  # Individual containers can be opened later if needed (e.g. a public CDN).
-  allow_nested_items_to_be_public = false
+  # Allow public blob access at the account level so the team-photos
+  # container can serve images directly to the frontend without SAS tokens.
+  allow_nested_items_to_be_public = true
 
   tags = var.tags
 }
@@ -43,7 +43,7 @@ resource "azurerm_storage_account" "media" {
 resource "azurerm_storage_container" "team_photos" {
   name                  = "team-photos"
   storage_account_name  = azurerm_storage_account.media.name
-  container_access_type = "private"
+  container_access_type = "blob"   # public read for blobs; no container listing
 }
 
 

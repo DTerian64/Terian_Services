@@ -59,43 +59,41 @@ function Avatar({ name, photo_url }: { name: string; photo_url: string }) {
 
 function MemberCard({ member }: { member: TeamMember }) {
   return (
-    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 transition hover:border-teal-400">
-      <div className="flex items-center gap-4">
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 transition hover:border-teal-400 flex gap-6 items-start">
+      <div className="shrink-0">
         <Avatar name={member.name} photo_url={member.photo_url} />
-        <div>
-          <h3 className="text-base font-bold text-slate-100">{member.name}</h3>
-          <p className="text-sm font-medium text-teal-400">{member.title}</p>
-        </div>
       </div>
-      <p className="mt-4 text-sm leading-7 text-slate-300">{member.bio}</p>
-      {member.linkedin_url && (
-        <a
-          href={member.linkedin_url}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-teal-400 hover:text-teal-300 transition"
-        >
-          LinkedIn →
-        </a>
-      )}
+      <div className="flex-1 min-w-0">
+        <h3 className="text-base font-bold text-slate-100">{member.name}</h3>
+        <p className="text-sm font-medium text-teal-400">{member.title}</p>
+        <p className="mt-3 text-sm leading-7 text-slate-300">{member.bio}</p>
+        {member.linkedin_url && (
+          <a
+            href={member.linkedin_url}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-teal-400 hover:text-teal-300 transition"
+          >
+            LinkedIn →
+          </a>
+        )}
+      </div>
     </div>
   );
 }
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 animate-pulse">
-      <div className="flex items-center gap-4">
-        <div className="h-20 w-20 rounded-full bg-white/10" />
-        <div className="space-y-2">
-          <div className="h-4 w-32 rounded bg-white/10" />
-          <div className="h-3 w-24 rounded bg-white/10" />
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 animate-pulse flex gap-6 items-start">
+      <div className="shrink-0 h-20 w-20 rounded-full bg-white/10" />
+      <div className="flex-1 space-y-3 pt-1">
+        <div className="h-4 w-32 rounded bg-white/10" />
+        <div className="h-3 w-24 rounded bg-white/10" />
+        <div className="space-y-2 pt-1">
+          <div className="h-3 w-full rounded bg-white/10" />
+          <div className="h-3 w-5/6 rounded bg-white/10" />
+          <div className="h-3 w-4/6 rounded bg-white/10" />
         </div>
-      </div>
-      <div className="mt-4 space-y-2">
-        <div className="h-3 w-full rounded bg-white/10" />
-        <div className="h-3 w-5/6 rounded bg-white/10" />
-        <div className="h-3 w-4/6 rounded bg-white/10" />
       </div>
     </div>
   );
@@ -129,7 +127,7 @@ export default function TeamSection() {
         Built by people who've shipped enterprise software.
       </h2>
 
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-6">
         {isLoading ? (
           <>
             <SkeletonCard />
