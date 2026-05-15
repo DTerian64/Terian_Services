@@ -123,11 +123,8 @@ export default function TeamSection() {
   return (
     <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Our Team &amp; Partners</p>
-      <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
-        Built by people who've shipped enterprise software.
-      </h2>
 
-      <div className="mt-10 grid gap-6">
+      <div className="mt-6 grid gap-6">
         {isLoading ? (
           <>
             <SkeletonCard />
