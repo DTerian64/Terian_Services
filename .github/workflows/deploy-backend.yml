@@ -70,6 +70,7 @@ jobs:
         run: |
           az acr build \
             --registry "${{ vars.TERIAN_ACR_NAME }}" \
+            --resource-group "${{ vars.TERIAN_BACKEND_RG }}" \
             --image "${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}" \
             --image "${{ env.IMAGE_NAME }}:latest" \
             --file backend/Dockerfile \
