@@ -12,7 +12,7 @@
 Terian Services builds **AI/ML-empowered enterprise software** and delivers **data, integrity, and cloud-modernization services** that turn operational complexity into measurable outcomes.
 
 ### Elevator pitch (3 sentences)
-Terian Services is a boutique engineering firm specializing in AI/ML-assisted SaaS products and high-trust enterprise services. We ship Azure-native applications such as our Award Nomination System, and we partner with mid-market and enterprise clients on AI analytics, systemic integrity & fraud detection, data mining, and datacenter-to-cloud migration. Every engagement is built on the same engineering DNA: secure-by-default, measurable, and grounded in real production constraints.
+Terian Services specializes in AI/ML-assisted SaaS products and high-trust enterprise services. We ship Azure-native applications such as our Award Nomination System, and we partner with mid-market and enterprise clients on AI analytics, systemic integrity & fraud detection, data mining, and datacenter-to-cloud migration. Every engagement is built on the same engineering DNA: secure-by-default, measurable, and grounded in real production constraints.
 
 ### Three pillars (use across the site)
 1. **Products** — AI/ML-empowered SaaS we own and operate.

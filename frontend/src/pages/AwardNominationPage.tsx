@@ -33,6 +33,7 @@ export default function AwardNominationPage() {
           <Feature
             title="Real-time dashboards"
             description="Pipeline view by status, category, business unit. Org-level recognition equity and trend reporting."
+            href="#live-metrics"
           />
           <Feature
             title="Full audit trail"
@@ -126,7 +127,9 @@ export default function AwardNominationPage() {
         </p>
       </section>
 
-      <AwardMetrics />
+      <div id="live-metrics">
+        <AwardMetrics />
+      </div>
 
       <section className="bg-[#0f0d18] text-white">
         <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-6 py-14 lg:flex-row lg:items-center lg:px-10">
@@ -150,11 +153,26 @@ export default function AwardNominationPage() {
   );
 }
 
-function Feature({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+function Feature({ title, description, href }: { title: string; description: string; href?: string }) {
+  const inner = (
+    <>
       <h3 className="text-base font-bold text-slate-100">{title}</h3>
       <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
+      {href && (
+        <p className="mt-3 text-xs font-semibold text-teal-400">View live →</p>
+      )}
+    </>
+  );
+  if (href) {
+    return (
+      <a href={href} className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6 block">
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
+      {inner}
     </div>
   );
 }

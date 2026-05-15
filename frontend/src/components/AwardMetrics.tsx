@@ -87,10 +87,7 @@ export default function AwardMetrics() {
       });
   }, []);
 
-  // Fail silently — never break the product page over a monitoring hiccup
-  if (error) return null;
-
-  const isLoading = !data;
+  const isLoading = !data && !error;
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
@@ -112,30 +109,34 @@ export default function AwardMetrics() {
             <SkeletonCard />
             <SkeletonCard />
           </>
+        ) : error ? (
+          <div className="col-span-3 rounded-xl border-2 border-white/10 bg-[#0f0d18] px-6 py-10 text-center text-sm text-slate-500">
+            Metrics are temporarily unavailable — live telemetry refreshes every 5 minutes.
+          </div>
         ) : (
           <>
             <KpiCard
               label="Total requests"
-              value={data.summary.total != null ? data.summary.total.toLocaleString() : "—"}
+              value={data!.summary.total != null ? data!.summary.total.toLocaleString() : "—"}
             />
             <KpiCard
               label="Median response time"
-              value={data.summary.p50_ms != null ? `${data.summary.p50_ms} ms` : "—"}
+              value={data!.summary.p50_ms != null ? `${data!.summary.p50_ms} ms` : "—"}
             />
-            <KpiCard label="Failure rate" value={failureRate(data.summary)} />
+            <KpiCard label="Failure rate" value={failureRate(data!.summary)} />
           </>
         )}
       </div>
 
       {/* Time-series chart */}
-      {!isLoading && data.hourly.length > 0 && (
+      {!isLoading && !error && data!.hourly.length > 0 && (
         <div className="mt-6 rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Requests &amp; failures per hour
           </p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
-              data={data.hourly}
+              data={data!.hourly}
               margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
