@@ -50,6 +50,36 @@ const newId = () =>
 const formatDay = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
+const URL_RE = /(https?:\/\/[^\s]+)/g;
+
+/** Renders plain text with any http/https URLs turned into clickable links. */
+function MessageContent({ text, isUser }: { text: string; isUser: boolean }) {
+  const linkClass = isUser
+    ? "underline text-blue-200 hover:text-white"
+    : "underline text-blue-600 hover:text-blue-800";
+
+  const parts = text.split(URL_RE);
+  return (
+    <p className="whitespace-pre-wrap text-sm leading-relaxed">
+      {parts.map((part, i) =>
+        URL_RE.test(part) ? (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={linkClass}
+          >
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+    </p>
+  );
+}
+
 const titleFromQuestion = (q: string) => {
   const cleaned = q.trim().replace(/\s+/g, " ");
   return cleaned.length > 48 ? `${cleaned.slice(0, 45)}…` : cleaned || "New conversation";
@@ -362,7 +392,7 @@ export default function AskAIPage() {
                         : "rounded-bl-sm bg-gray-100 text-gray-800"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</p>
+                    <MessageContent text={msg.content} isUser={msg.role === "user"} />
                   </div>
                 </div>
               ))}
