@@ -156,18 +156,16 @@ export default function AskAIPage() {
   };
 
   // ── Ask handler ─────────────────────────────────────────────────────────
-  const handleAskQuestion = () => {
+  const handleAskQuestion = async () => {
     const question = aiQuestion.trim();
     if (!question || aiLoading) return;
 
-    // Capture orchestrator mode synchronously — it resets in the timeout below
-    // so the button stays highlighted for the duration of this single submit.
     const isInvestigating = useOrchestrator;
+    if (isInvestigating) setUseOrchestrator(false); // one-shot — reset immediately
 
     // Generate / reuse conversation ID synchronously
     let convId = activeConversationRef.current;
-    const isNewConversation = !convId;
-    if (isNewConversation) {
+    if (!convId) {
       convId = newId();
       activeConversationRef.current = convId;
       setActiveConversationId(convId);
@@ -178,6 +176,8 @@ export default function AskAIPage() {
       role: "user",
       content: question,
     };
+    // Snapshot history before appending the new user message
+    const historyForApi = chatMessages.map(({ role, content }) => ({ role, content }));
     const nextMessages = [...chatMessages, userMessage];
 
     setChatMessages(nextMessages);
@@ -189,21 +189,38 @@ export default function AskAIPage() {
     }
     setAiLoading(true);
 
-    // Mock assistant response — wire this to the real endpoint when ready.
-    window.setTimeout(() => {
+    try {
+      const apiBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+      const res = await fetch(`${apiBase}/api/ask`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, history: historyForApi }),
+      });
+
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+      const data: { question: string; answer: string; error?: string | null } = await res.json();
       const assistantMessage: ChatMessage = {
         id: nextMsgId.current++,
         role: "assistant",
-        content: isInvestigating
-          ? "Investigation queued. Once the analytics backend is connected I'll run a multi-agent deep dive across the available data and report findings here."
-          : "I can answer that once the analytics backend is connected. The chat shell is ready — questions, conversation history, and the Investigate toggle all carry through to the real API.",
+        content: data.answer || "Sorry, I couldn't generate a response. Please try again.",
       };
       const withAssistant = [...nextMessages, assistantMessage];
       setChatMessages(withAssistant);
       upsertConversation(convId!, withAssistant, question);
+    } catch {
+      const assistantMessage: ChatMessage = {
+        id: nextMsgId.current++,
+        role: "assistant",
+        content:
+          "Sorry, I couldn't reach the server. Please check your connection and try again.",
+      };
+      const withAssistant = [...nextMessages, assistantMessage];
+      setChatMessages(withAssistant);
+      upsertConversation(convId!, withAssistant, question);
+    } finally {
       setAiLoading(false);
-      if (isInvestigating) setUseOrchestrator(false); // one-shot
-    }, 700);
+    }
   };
 
   // ── Derived ─────────────────────────────────────────────────────────────
