@@ -1,0 +1,91 @@
+name: Deploy Terian Services Backend (ACA)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Builds the FastAPI backend image server-side in ACR (no Docker on the
+# runner) and rolls a new Container App revision pointing at it.
+#
+# One-time setup
+# ──────────────
+# 1. Create or reuse an AAD service principal / user-assigned MI for OIDC.
+# 2. Add a federated credential on it for this GitHub repo:
+#      subject:  repo:DTerian64/Terian_Services:ref:refs/heads/main
+#      issuer:   https://token.actions.githubusercontent.com
+#      audience: api://AzureADTokenExchange
+# 3. Set its object ID in terraform.tfvars as `github_actions_principal_id`
+#    and `terraform apply` — this grants AcrPush on the ACR and Contributor
+#    on the Container App Environment.
+# 4. Create a GitHub Environment named "prod" and add:
+#      Secrets (sensitive):
+#        AZURE_CLIENT_ID        — the SP / MI client ID
+#        AZURE_TENANT_ID        — your AAD tenant GUID
+#        AZURE_SUBSCRIPTION_ID  — subscription GUID
+#      Variables (non-sensitive):
+#        TERIAN_ACR_NAME        — e.g. acrterianservices
+#        TERIAN_BACKEND_RG      — rg_corporate
+#        TERIAN_BACKEND_APP     — terian-services-backend
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+# OIDC requires id-token: write
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  IMAGE_NAME: terian-services-backend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Build image in ACR and roll ACA revision
+    environment: prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure login (OIDC, no secrets)
+        uses: azure/login@v2
+        with:
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Compute image tag
+        id: tag
+        run: |
+          SHORT_SHA="$(echo "${GITHUB_SHA}" | cut -c1-7)"
+          echo "tag=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "Building tag: ${SHORT_SHA}"
+
+      - name: Build image in ACR (server-side)
+        run: |
+          az acr build \
+            --registry "${{ vars.TERIAN_ACR_NAME }}" \
+            --image "${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}" \
+            --image "${{ env.IMAGE_NAME }}:latest" \
+            --file backend/Dockerfile \
+            backend
+
+      - name: Update Container App revision
+        run: |
+          az containerapp update \
+            --name "${{ vars.TERIAN_BACKEND_APP }}" \
+            --resource-group "${{ vars.TERIAN_BACKEND_RG }}" \
+            --image "${{ vars.TERIAN_ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+
+      - name: Show new revision
+        run: |
+          az containerapp revision list \
+            --name "${{ vars.TERIAN_BACKEND_APP }}" \
+            --resource-group "${{ vars.TERIAN_BACKEND_RG }}" \
+            --query "[?properties.active].{name:name, image:properties.template.containers[0].image, traffic:properties.trafficWeight}" \
+            -o table
