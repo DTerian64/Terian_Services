@@ -2,7 +2,7 @@ import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 import TeamSection from "../components/TeamSection";
 
-export default function AboutPage() {
+export default function AboutPage() { 
   return (
     <PageLayout>
       <PageHero
