@@ -31,7 +31,7 @@ export default function AboutPage() {
       <section>
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How we work</p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Four habits we don't compromise on.
           </h2>
 

@@ -9,7 +9,7 @@ export default function HomePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">
             Enterprise software & services
           </p>
-          <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+          <h1 className="mt-5 font-playfair text-3xl font-bold leading-tight tracking-tight md:text-4xl">
             AI-empowered enterprise software
             <br />
             and data analytics.
@@ -182,7 +182,7 @@ function SectionHeading({
   return (
     <div className="max-w-3xl">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">{eyebrow}</p>
-      <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">{title}</h2>
+      <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">{title}</h2>
       {description ? <p className="mt-4 text-base leading-7 text-slate-300">{description}</p> : null}
     </div>
   );

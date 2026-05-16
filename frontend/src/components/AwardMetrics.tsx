@@ -104,7 +104,7 @@ export default function AwardMetrics() {
           (how it works)
         </button>
       </p>
-      <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+      <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
         Last 24 hours.
       </h2>
       <p className="mt-3 text-sm text-slate-400">

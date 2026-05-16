@@ -13,7 +13,7 @@ export default function IntegrityFraudPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">The problem</p>
-        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           The losses you see are a fraction of the losses you have.
         </h2>
         <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
@@ -33,7 +33,7 @@ export default function IntegrityFraudPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Our methodology</p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Four layers, working together.
           </h2>
 
@@ -64,7 +64,7 @@ export default function IntegrityFraudPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Engagement model</p>
-        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Three phases, fixed-price pilot.
         </h2>
 
@@ -90,7 +90,7 @@ export default function IntegrityFraudPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Outcomes we target</p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             We measure what matters.
           </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">

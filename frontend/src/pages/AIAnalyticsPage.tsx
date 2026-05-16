@@ -13,7 +13,7 @@ export default function AIAnalyticsPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Capabilities</p>
-        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           The shape of work we deliver.
         </h2>
 
@@ -30,7 +30,7 @@ export default function AIAnalyticsPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Tech stack</p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             The Microsoft data and AI stack — plus the right open tools.
           </h2>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -51,7 +51,7 @@ export default function AIAnalyticsPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
             Integrity, provenance, and confidentiality
           </p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             AI you can trace, defend, and explain.
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
@@ -80,7 +80,7 @@ export default function AIAnalyticsPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Engagement model</p>
-        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Start with the metric. End with the proof.
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">

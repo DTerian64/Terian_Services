@@ -33,7 +33,7 @@ export default function Header() {
       <div className="mx-auto flex h-[5.4rem] max-w-7xl items-center justify-between px-6 lg:px-10">
         <a href="/" className="flex items-center gap-4 text-white no-underline" aria-label="Terian Services home">
           <img src="/terian_services_logo.svg" alt="" className="-my-1 h-[3.6rem] w-auto object-contain" />
-          <span className="text-2xl font-bold tracking-normal">Terian Services</span>
+          <span className="font-playfair text-2xl font-bold tracking-normal">Terian Services</span>
         </a>
 
         <nav className="hidden items-center gap-10 text-[15px] font-semibold text-white lg:flex" aria-label="Primary navigation">
