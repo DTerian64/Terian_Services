@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import "./telemetry";   // initialise App Insights before the app renders
 import App from "./App";
 
 const rootEl = document.getElementById("root");

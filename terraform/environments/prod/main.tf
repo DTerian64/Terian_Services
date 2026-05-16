@@ -274,6 +274,21 @@ module "container_app" {
   tags = local.tags
 }
 
+# ── 8. Application Insights (frontend telemetry) ────────────────────────────
+data "azurerm_log_analytics_workspace" "corporate" {
+  name                = var.log_analytics_workspace_name
+  resource_group_name = azurerm_resource_group.corporate.name
+}
+
+resource "azurerm_application_insights" "frontend" {
+  name                = "appi-terian-services-frontend"
+  resource_group_name = azurerm_resource_group.corporate.name
+  location            = var.location
+  workspace_id        = data.azurerm_log_analytics_workspace.corporate.id
+  application_type    = "web"
+  tags                = local.tags
+}
+
 # ── 7. Post-apply notes ─────────────────────────────────────────────────────
 # Azure OpenAI is now fully provisioned by the container-app module — the
 # account, the model deployment, the Key Vault secret holding the key, and

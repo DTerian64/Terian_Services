@@ -64,3 +64,10 @@ output "openai_deployment_name" {
   description = "OpenAI model deployment name (the backend's AZURE_OPENAI_MODEL)."
   value       = module.container_app.openai_deployment_name
 }
+
+# ── Frontend telemetry ───────────────────────────────────────────────────────
+output "frontend_appinsights_connection_string" {
+  description = "App Insights connection string — add as GitHub Actions variable VITE_APPINSIGHTS_CONNECTION_STRING."
+  value       = azurerm_application_insights.frontend.connection_string
+  sensitive   = true
+}
