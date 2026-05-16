@@ -13,7 +13,7 @@ export default function CloudMigrationPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">The migration spectrum</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Six R's. We help you pick the right one per workload.
         </h2>
 
@@ -30,7 +30,7 @@ export default function CloudMigrationPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Our 5-phase method</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Predictable, instrumented, and rollback-ready at every step.
           </h2>
 
@@ -46,7 +46,7 @@ export default function CloudMigrationPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Stack</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Azure-first. IaC by default.
         </h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -68,7 +68,7 @@ export default function CloudMigrationPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Risk & rollback</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Every cutover has a rehearsed reverse.
           </h2>
           <div className="mt-8 grid gap-6 md:grid-cols-3">

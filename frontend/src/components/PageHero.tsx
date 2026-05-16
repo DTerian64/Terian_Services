@@ -15,9 +15,9 @@ export default function PageHero({
 }: PageHeroProps) {
   return (
     <section className="bg-[#0f0d18] text-white">
-      <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10 lg:py-28">
+      <div className="mx-auto max-w-5xl px-6 py-10 lg:px-10 lg:py-14">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">{eyebrow}</p>
-        <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight md:text-5xl">{title}</h1>
+        <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight md:text-4xl">{title}</h1>
         {description ? (
           <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">{description}</p>
         ) : null}

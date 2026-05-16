@@ -13,7 +13,7 @@ export default function MLOpsPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Why MLOps</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Most "AI in production" is one failed retrain away from off.
         </h2>
         <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
@@ -26,7 +26,7 @@ export default function MLOpsPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Capabilities</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             What we set up.
           </h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -40,7 +40,7 @@ export default function MLOpsPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Reference architecture</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Familiar tools, sensibly wired.
         </h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

@@ -89,7 +89,7 @@ export default function IntegritySentinelPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">
               Product vision · Enterprise integrity intelligence
             </p>
-            <h1 className="mt-4 max-w-4xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+            <h1 className="mt-4 max-w-4xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
               Integrity Sentinel
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-white/72">
@@ -120,7 +120,7 @@ export default function IntegritySentinelPage() {
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Strategic positioning</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
               Not a SIEM. Not a dashboard. An integrity intelligence system.
             </h2>
           </div>
@@ -142,7 +142,7 @@ export default function IntegritySentinelPage() {
       <section id="capabilities">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Core capabilities</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 max-w-3xl text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Built around relationships, behavior, and explainable investigation.
           </h2>
 
@@ -158,7 +158,7 @@ export default function IntegritySentinelPage() {
         <div className="grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Behavioral risk example</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
               Alerts become evidence-backed narratives.
             </h2>
             <p className="mt-5 text-base leading-8 text-slate-300">
@@ -172,7 +172,7 @@ export default function IntegritySentinelPage() {
             <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Case signal</p>
-                <h3 className="mt-1 text-xl font-bold text-slate-100">Approval network anomaly</h3>
+                <h3 className="mt-1 text-2xl font-bold text-slate-100">Approval network anomaly</h3>
               </div>
               <span className="rounded-md bg-rose-400/20 px-3 py-2 text-sm font-bold text-rose-300">High</span>
             </div>
@@ -180,7 +180,7 @@ export default function IntegritySentinelPage() {
               {signalStats.map((stat) => (
                 <div key={stat.label} className="rounded-md bg-[#0a0916] p-4">
                   <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{stat.label}</p>
-                  <p className="mt-2 text-xl font-bold text-slate-100">{stat.value}</p>
+                  <p className="mt-2 text-2xl font-bold text-slate-100">{stat.value}</p>
                 </div>
               ))}
             </div>
@@ -197,7 +197,7 @@ export default function IntegritySentinelPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Use cases</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 max-w-3xl text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             One platform pattern, multiple integrity domains.
           </h2>
 
@@ -213,7 +213,7 @@ export default function IntegritySentinelPage() {
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Product modules</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
               A modular path from concept to enterprise SaaS.
             </h2>
             <p className="mt-5 text-base leading-8 text-slate-300">
@@ -234,7 +234,7 @@ export default function IntegritySentinelPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Reference architecture</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 max-w-3xl text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Cloud-native, explainable, auditable, and tenant-aware by design.
           </h2>
 

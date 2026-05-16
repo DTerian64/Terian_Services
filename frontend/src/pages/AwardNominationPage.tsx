@@ -17,7 +17,7 @@ export default function AwardNominationPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">What it does</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           A complete recognition workflow, built for the enterprise.
         </h2>
 
@@ -53,7 +53,7 @@ export default function AwardNominationPage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">AI/ML layer</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
             Recognition that knows when something looks off.
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
@@ -84,7 +84,7 @@ export default function AwardNominationPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How it works</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Four steps from intent to paycheck.
         </h2>
 
@@ -113,7 +113,7 @@ export default function AwardNominationPage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Security & compliance</p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-100 md:text-4xl">
+        <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Boring on purpose.
         </h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
