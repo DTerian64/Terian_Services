@@ -1,3 +1,4 @@
+import { useState } from "react";
 import PageLayout from "../components/PageLayout";
 
 const CONTACT_HREF = "mailto:sales@terian-services.com?subject=Integrity%20Sentinel%20discussion";
@@ -81,15 +82,17 @@ const architecture = [
 ];
 
 export default function IntegritySentinelPage() {
+  const [previewOpen, setPreviewOpen] = useState(false);
+
   return (
     <PageLayout>
       <section className="overflow-hidden bg-[#0f0d18] text-white">
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-[1fr_0.95fr] lg:px-10 lg:py-24">
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-start">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">
               Product vision · Enterprise integrity intelligence
             </p>
-            <h1 className="mt-4 max-w-4xl text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            <h1 className="mt-4 max-w-4xl font-playfair text-3xl font-bold leading-tight tracking-tight md:text-4xl">
               Integrity Sentinel
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-white/72">
@@ -109,7 +112,47 @@ export default function IntegritySentinelPage() {
               >
                 Explore capabilities
               </a>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(true)}
+                className="inline-flex items-center justify-center rounded-md border border-indigo-400/40 px-6 py-3 text-sm font-bold uppercase tracking-wider text-indigo-300 transition hover:border-indigo-300 hover:text-indigo-200"
+              >
+                Preview the Admin UI
+              </button>
             </div>
+
+            {/* Admin UI preview modal */}
+            {previewOpen && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                onClick={() => setPreviewOpen(false)}
+              >
+                <div
+                  className="relative flex w-full max-w-6xl flex-col overflow-hidden rounded-xl shadow-2xl"
+                  style={{ height: "88vh" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between border-b border-white/10 bg-[#0f0d18] px-5 py-3">
+                    <span className="text-sm font-semibold text-slate-300">
+                      Integrity Sentinel — Admin Configuration Workflow
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewOpen(false)}
+                      aria-label="Close preview"
+                      className="text-slate-400 transition hover:text-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <iframe
+                    src="/mockups/integrity-sentinel/admin_configuration_workflow/index.html"
+                    title="Integrity Sentinel Admin UI Preview"
+                    className="w-full flex-1 bg-white"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <IntegrityConsole />

@@ -1,0 +1,8 @@
+
+pageViews
+| project timestamp, name, url, duration, client_City, client_CountryOrRegion, client_Browser, client_OS
+| order by timestamp desc
+
+pageViews
+| summarize visits=count() by client_CountryOrRegion, client_City, client_Browser
+| order by visits desc
