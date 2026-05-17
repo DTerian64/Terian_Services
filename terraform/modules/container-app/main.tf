@@ -262,11 +262,11 @@ resource "azurerm_container_app" "backend" {
         name  = "TERIAN_ALLOWED_ORIGINS"
         value = var.allowed_origins
       }
-      # App Insights metrics — workspace ID for KQL queries; client ID so
-      # DefaultAzureCredential picks the correct UAMI unambiguously in ACA.
+      # App Insights metrics — resource ID for KQL queries via query_resource();
+      # client ID so DefaultAzureCredential picks the correct UAMI in ACA.
       env {
-        name  = "APPINSIGHTS_WORKSPACE_ID"
-        value = var.app_insights_workspace_id
+        name  = "APPINSIGHTS_RESOURCE_ID"
+        value = var.app_insights_resource_id
       }
       env {
         name  = "AZURE_CLIENT_ID"

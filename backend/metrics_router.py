@@ -11,11 +11,16 @@ GET /api/metrics/awards
 Authentication
   Uses DefaultAzureCredential — managed identity in Azure Container Apps,
   Azure CLI credentials locally (run `az login` and ensure your account has
-  Monitoring Reader on the App Insights resource).
+  Monitoring Reader on the App Insights component resource).
 
   When AZURE_CLIENT_ID is set (automatically wired by Terraform to the UAMI
   client ID), ManagedIdentityCredential is used instead so ACA picks the
   correct identity unambiguously.
+
+  Querying
+  Uses LogsQueryClient.query_resource() targeting the App Insights ARM
+  resource ID (APPINSIGHTS_RESOURCE_ID env var) rather than the backing
+  Log Analytics workspace GUID — matching how Grafana queries the same data.
 
 Caching
   Results are cached in-process for CACHE_TTL_SECONDS (default 5 min) to
@@ -38,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-WORKSPACE_ID = os.getenv("APPINSIGHTS_WORKSPACE_ID", "")
+RESOURCE_ID = os.getenv("APPINSIGHTS_RESOURCE_ID", "")
 CACHE_TTL_SECONDS = int(os.getenv("METRICS_CACHE_TTL", "300"))  # 5 minutes
 
 _cache: dict[str, Any] = {}
@@ -47,7 +52,9 @@ _cache: dict[str, Any] = {}
 
 # Hourly time-series: total requests, failures, avg duration over last 24h
 _HOURLY_KQL = """
-union isfuzzy=true requests
+requests
+| where name !startswith "HEAD /health"
+| where name !startswith "OPTIONS "
 | where timestamp > ago(24h)
 | summarize
     total    = count(),
@@ -59,7 +66,9 @@ union isfuzzy=true requests
 
 # Single-row 24h summary: totals + response-time percentiles
 _SUMMARY_KQL = """
-union isfuzzy=true requests
+requests
+| where name !startswith "HEAD /health"
+| where name !startswith "OPTIONS "
 | where timestamp > ago(24h)
 | summarize
     total    = count(),
@@ -79,13 +88,17 @@ def _credential():
 
 
 def _query(client: LogsQueryClient, kql: str) -> list[dict]:
-    response = client.query_workspace(
-        workspace_id=WORKSPACE_ID,
+    response = client.query_resource(
+        resource_id=RESOURCE_ID,
         query=kql,
         timespan=timedelta(hours=24),
     )
-    if response.status != LogsQueryStatus.SUCCESS:
+    # PARTIAL means some sub-queries failed (e.g. isfuzzy skipped a missing table);
+    # the data we do have is still usable.
+    if response.status == LogsQueryStatus.FAILURE:
         raise RuntimeError(f"App Insights query failed: {response.partial_error}")
+    if not response.tables:
+        return []
     table = response.tables[0]
     cols = [col.name for col in table.columns]
     rows = []
@@ -107,10 +120,10 @@ async def awards_metrics() -> dict:
     Last-24h metrics for the Award Nomination System.
     Served from an in-process cache; refreshes at most every 5 minutes.
     """
-    if not WORKSPACE_ID:
+    if not RESOURCE_ID:
         raise HTTPException(
             status_code=503,
-            detail="Metrics endpoint is not configured (APPINSIGHTS_WORKSPACE_ID missing).",
+            detail="Metrics endpoint is not configured (APPINSIGHTS_RESOURCE_ID missing).",
         )
 
     now = time.monotonic()
@@ -118,22 +131,24 @@ async def awards_metrics() -> dict:
     if cached and now - cached["ts"] < CACHE_TTL_SECONDS:
         return cached["data"]
 
+    _empty_summary: dict[str, Any] = {
+        "total": 0, "failures": 0, "p50_ms": 0, "p95_ms": 0,
+    }
+
     try:
         client = LogsQueryClient(_credential())
         hourly = _query(client, _HOURLY_KQL)
         summary_rows = _query(client, _SUMMARY_KQL)
+        summary = summary_rows[0] if summary_rows else _empty_summary
     except Exception as exc:
-        logger.exception("App Insights query failed: %s", exc)
-        raise HTTPException(
-            status_code=502,
-            detail="Could not retrieve metrics from Application Insights.",
-        )
+        # Metrics are best-effort on this marketing page — log and return zeros
+        # rather than propagating a 502 to visitors.
+        logger.warning("App Insights query unavailable, returning zeros: %s", exc)
+        hourly = []
+        summary = _empty_summary
 
-    _empty_summary: dict[str, Any] = {
-        "total": 0, "failures": 0, "p50_ms": 0, "p95_ms": 0,
-    }
     data: dict[str, Any] = {
-        "summary": summary_rows[0] if summary_rows else _empty_summary,
+        "summary": summary,
         "hourly": hourly,
     }
     _cache["awards"] = {"ts": now, "data": data}
