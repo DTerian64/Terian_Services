@@ -47,25 +47,29 @@ _cache: dict[str, Any] = {}
 
 # Hourly time-series: total requests, failures, avg duration over last 24h
 _HOURLY_KQL = """
-requests
-| where timestamp > ago(24h)
-| summarize
-    total    = count(),
-    failures = countif(success == false),
-    avg_ms   = round(avg(duration))
-  by bin(timestamp, 1h)
-| order by timestamp asc
+union isfuzzy=true (
+    requests
+    | where timestamp > ago(24h)
+    | summarize
+        total    = count(),
+        failures = countif(success == false),
+        avg_ms   = round(avg(duration))
+      by bin(timestamp, 1h)
+    | order by timestamp asc
+)
 """
 
 # Single-row 24h summary: totals + response-time percentiles
 _SUMMARY_KQL = """
-requests
-| where timestamp > ago(24h)
-| summarize
-    total    = count(),
-    failures = countif(success == false),
-    p50_ms   = round(percentile(duration, 50)),
-    p95_ms   = round(percentile(duration, 95))
+union isfuzzy=true (
+    requests
+    | where timestamp > ago(24h)
+    | summarize
+        total    = count(),
+        failures = countif(success == false),
+        p50_ms   = round(percentile(duration, 50)),
+        p95_ms   = round(percentile(duration, 95))
+)
 """
 
 
@@ -129,8 +133,11 @@ async def awards_metrics() -> dict:
             detail="Could not retrieve metrics from Application Insights.",
         )
 
+    _empty_summary: dict[str, Any] = {
+        "total": 0, "failures": 0, "p50_ms": 0, "p95_ms": 0,
+    }
     data: dict[str, Any] = {
-        "summary": summary_rows[0] if summary_rows else {},
+        "summary": summary_rows[0] if summary_rows else _empty_summary,
         "hourly": hourly,
     }
     _cache["awards"] = {"ts": now, "data": data}
