@@ -74,7 +74,7 @@ app.add_middleware(
     allow_origins=_allowed_origins,
     allow_credentials=False,        # public endpoint — no cookies needed
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_headers=["*"],
 )
 
 
