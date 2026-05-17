@@ -55,7 +55,6 @@ _HOURLY_KQL = """
 requests
 | where name !startswith "HEAD /health"
 | where name !startswith "OPTIONS "
-| where timestamp > ago(24h)
 | summarize
     total    = count(),
     failures = countif(success == false),
@@ -69,7 +68,6 @@ _SUMMARY_KQL = """
 requests
 | where name !startswith "HEAD /health"
 | where name !startswith "OPTIONS "
-| where timestamp > ago(24h)
 | summarize
     total    = count(),
     failures = countif(success == false),

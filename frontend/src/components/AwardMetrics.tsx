@@ -112,15 +112,16 @@ export default function AwardMetrics() {
       </p>
 
       {/* KPI cards */}
-      <div className="mt-10 grid gap-4 sm:grid-cols-3">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {isLoading ? (
           <>
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
+            <SkeletonCard />
           </>
         ) : error ? (
-          <div className="col-span-3 rounded-xl border-2 border-white/10 bg-[#0f0d18] px-6 py-10 text-center text-sm text-slate-500">
+          <div className="col-span-4 rounded-xl border-2 border-white/10 bg-[#0f0d18] px-6 py-10 text-center text-sm text-slate-500">
             Metrics are temporarily unavailable — live telemetry refreshes every 5 minutes.
           </div>
         ) : (
@@ -130,8 +131,12 @@ export default function AwardMetrics() {
               value={data!.summary.total != null ? data!.summary.total.toLocaleString() : "—"}
             />
             <KpiCard
-              label="Median response time"
+              label="Median latency"
               value={data!.summary.p50_ms != null ? `${data!.summary.p50_ms} ms` : "—"}
+            />
+            <KpiCard
+              label="P95 latency"
+              value={data!.summary.p95_ms != null ? `${data!.summary.p95_ms} ms` : "—"}
             />
             <KpiCard label="Failure rate" value={failureRate(data!.summary)} />
           </>
