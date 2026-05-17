@@ -47,29 +47,25 @@ _cache: dict[str, Any] = {}
 
 # Hourly time-series: total requests, failures, avg duration over last 24h
 _HOURLY_KQL = """
-union isfuzzy=true (
-    requests
-    | where timestamp > ago(24h)
-    | summarize
-        total    = count(),
-        failures = countif(success == false),
-        avg_ms   = round(avg(duration))
-      by bin(timestamp, 1h)
-    | order by timestamp asc
-)
+union isfuzzy=true requests
+| where timestamp > ago(24h)
+| summarize
+    total    = count(),
+    failures = countif(success == false),
+    avg_ms   = round(avg(duration))
+  by bin(timestamp, 1h)
+| order by timestamp asc
 """
 
 # Single-row 24h summary: totals + response-time percentiles
 _SUMMARY_KQL = """
-union isfuzzy=true (
-    requests
-    | where timestamp > ago(24h)
-    | summarize
-        total    = count(),
-        failures = countif(success == false),
-        p50_ms   = round(percentile(duration, 50)),
-        p95_ms   = round(percentile(duration, 95))
-)
+union isfuzzy=true requests
+| where timestamp > ago(24h)
+| summarize
+    total    = count(),
+    failures = countif(success == false),
+    p50_ms   = round(percentile(duration, 50)),
+    p95_ms   = round(percentile(duration, 95))
 """
 
 
