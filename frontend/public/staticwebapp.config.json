@@ -38,6 +38,12 @@
       }
     },
     {
+      "route": "/mockups/*",
+      "headers": {
+        "X-Frame-Options": "SAMEORIGIN"
+      }
+    },
+    {
       "route": "/award_nomination",
       "redirect": "/products/award-nomination",
       "statusCode": 301
