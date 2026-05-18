@@ -45,8 +45,9 @@ router = APIRouter()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-RESOURCE_ID       = os.getenv("APPINSIGHTS_RESOURCE_ID", "")
-CACHE_TTL_SECONDS = int(os.getenv("METRICS_CACHE_TTL", "300"))  # 5 minutes
+RESOURCE_ID          = os.getenv("APPINSIGHTS_RESOURCE_ID", "")
+FRONTEND_RESOURCE_ID = os.getenv("AWARD_APPI_FRONTEND_RESOURCE_ID", "")
+CACHE_TTL_SECONDS    = int(os.getenv("METRICS_CACHE_TTL", "300"))  # 5 minutes
 
 _ACA_PRIMARY_ID   = os.getenv("AWARD_ACA_PRIMARY_RESOURCE_ID", "")
 _ACA_SECONDARY_ID = os.getenv("AWARD_ACA_SECONDARY_RESOURCE_ID", "")
@@ -107,10 +108,15 @@ def _credential():
     return DefaultAzureCredential()
 
 
-def _query(client: LogsQueryClient, kql: str) -> list[dict]:
-    """Run a KQL query against the App Insights resource and return rows as dicts."""
+def _query(client: LogsQueryClient, kql: str, resource_id: str | None = None) -> list[dict]:
+    """Run a KQL query against an App Insights resource and return rows as dicts.
+
+    ``resource_id`` defaults to the backend API App Insights (RESOURCE_ID).
+    Pass an explicit value to target a different App Insights component
+    (e.g. the frontend one for pageViews data).
+    """
     response = client.query_resource(
-        resource_id=RESOURCE_ID,
+        resource_id=resource_id or RESOURCE_ID,
         query=kql,
         timespan=timedelta(hours=24),
     )
@@ -210,7 +216,10 @@ async def awards_metrics() -> dict:
         logs_client = LogsQueryClient(_credential())
         hourly        = _query(logs_client, _HOURLY_KQL)
         summary_rows  = _query(logs_client, _SUMMARY_KQL)
-        pv_rows       = _query(logs_client, _PAGEVIEWS_KQL)
+        # pageViews is emitted by the browser JS SDK — lives in the *frontend*
+        # App Insights resource, not the backend API one.
+        pv_resource   = FRONTEND_RESOURCE_ID if FRONTEND_RESOURCE_ID else RESOURCE_ID
+        pv_rows       = _query(logs_client, _PAGEVIEWS_KQL, resource_id=pv_resource)
         activity_rows = _query(logs_client, _ACTIVITY_KQL)
 
         summary = summary_rows[0]  if summary_rows  else _empty_summary

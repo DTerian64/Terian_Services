@@ -223,7 +223,7 @@ resource "azurerm_role_assignment" "uami_sql_db_reader" {
   principal_id         = azurerm_user_assigned_identity.backend.principal_id
 }
 
-# UAMI → Monitoring Reader on the App Insights component.
+# UAMI → Monitoring Reader on the Award Nomination backend App Insights component.
 resource "azurerm_role_assignment" "uami_app_insights_reader" {
   count                = var.app_insights_resource_id != "" ? 1 : 0
   scope                = var.app_insights_resource_id
@@ -231,12 +231,30 @@ resource "azurerm_role_assignment" "uami_app_insights_reader" {
   principal_id         = azurerm_user_assigned_identity.backend.principal_id
 }
 
-# UAMI → Monitoring Reader on the backing Log Analytics workspace.
+# UAMI → Monitoring Reader on the backing Log Analytics workspace (backend).
 # LogsQueryClient enforces RBAC at the workspace scope — the App Insights
 # component role alone is not sufficient to execute KQL queries.
 resource "azurerm_role_assignment" "uami_log_analytics_reader" {
   count                = var.app_insights_log_analytics_resource_id != "" ? 1 : 0
   scope                = var.app_insights_log_analytics_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
+# UAMI → Monitoring Reader on the Award Nomination *frontend* App Insights component.
+# pageViews telemetry (unique users, pages viewed) is emitted by the browser JS SDK
+# and lands in this separate resource, not in the backend API one.
+resource "azurerm_role_assignment" "uami_appi_frontend_reader" {
+  count                = var.award_appi_frontend_resource_id != "" ? 1 : 0
+  scope                = var.award_appi_frontend_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
+# UAMI → Monitoring Reader on the Log Analytics workspace backing the frontend App Insights.
+resource "azurerm_role_assignment" "uami_appi_frontend_log_analytics_reader" {
+  count                = var.award_appi_frontend_log_analytics_resource_id != "" ? 1 : 0
+  scope                = var.award_appi_frontend_log_analytics_resource_id
   role_definition_name = "Monitoring Reader"
   principal_id         = azurerm_user_assigned_identity.backend.principal_id
 }
@@ -345,6 +363,10 @@ resource "azurerm_container_app" "backend" {
       env {
         name  = "AWARD_SQL_DB_RESOURCE_ID"
         value = var.award_sql_db_resource_id
+      }
+      env {
+        name  = "AWARD_APPI_FRONTEND_RESOURCE_ID"
+        value = var.award_appi_frontend_resource_id
       }
       # Gmail SMTP — for contact form notification emails.
       env {

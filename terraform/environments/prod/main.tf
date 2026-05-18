@@ -275,6 +275,10 @@ module "container_app" {
   award_aca_secondary_resource_id = var.award_aca_secondary_resource_id
   award_sql_db_resource_id        = var.award_sql_db_resource_id
 
+  # Award Nomination frontend App Insights — for pageViews KQL (unique users, pages viewed)
+  award_appi_frontend_resource_id               = var.award_appi_frontend_resource_id
+  award_appi_frontend_log_analytics_resource_id = var.award_appi_frontend_log_analytics_resource_id
+
   # Data store — Cosmos DB + Blob Storage
   cosmos_endpoint        = module.data_store.cosmos_endpoint
   cosmos_database_name   = module.data_store.cosmos_database_name

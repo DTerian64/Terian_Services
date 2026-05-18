@@ -34,6 +34,12 @@ award_aca_primary_resource_id   = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d
 award_aca_secondary_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-secondary-sandbox"
 award_sql_db_resource_id        = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Sql/servers/david64-sql-sandbox/databases/AwardNominationsSandbox"
 
+# ── Award Nomination frontend App Insights (pageViews — unique users, pages viewed) ──
+# appi-award-frontend-sandbox is where the browser JS SDK ships pageViews telemetry.
+
+award_appi_frontend_resource_id               = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/components/appi-award-frontend-sandbox"
+award_appi_frontend_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-secondary-sandbox"
+
 # Admin user — david64.terian@terian-services.com
 # Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
 admin_principal_id = "3790e0a2-8fe4-4595-9173-a9f1e18c5ae2"

@@ -203,3 +203,15 @@ variable "award_sql_db_resource_id" {
   type        = string
   default     = ""
 }
+
+variable "award_appi_frontend_resource_id" {
+  description = "ARM resource ID of the Award Nomination *frontend* Application Insights component (appi-award-frontend-sandbox). Grants Monitoring Reader so the backend can query pageViews KQL against this resource. Leave empty to fall back to the backend App Insights resource."
+  type        = string
+  default     = ""
+}
+
+variable "award_appi_frontend_log_analytics_resource_id" {
+  description = "ARM resource ID of the Log Analytics workspace backing the frontend App Insights component. Grants Monitoring Reader at the workspace scope — required for LogsQueryClient to execute KQL queries."
+  type        = string
+  default     = ""
+}

@@ -234,6 +234,18 @@ variable "award_sql_db_resource_id" {
   default     = ""
 }
 
+variable "award_appi_frontend_resource_id" {
+  description = "ARM resource ID of the Award Nomination frontend App Insights component (appi-award-frontend-sandbox). Used for pageViews KQL queries."
+  type        = string
+  default     = ""
+}
+
+variable "award_appi_frontend_log_analytics_resource_id" {
+  description = "ARM resource ID of the Log Analytics workspace backing the frontend App Insights component. Required for Monitoring Reader role assignment."
+  type        = string
+  default     = ""
+}
+
 # ── Data store ───────────────────────────────────────────────────────────────
 
 variable "storage_account_name" {
