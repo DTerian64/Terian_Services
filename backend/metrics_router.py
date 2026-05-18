@@ -98,7 +98,9 @@ def _query(client: LogsQueryClient, kql: str) -> list[dict]:
     if not response.tables:
         return []
     table = response.tables[0]
-    cols = [col.name for col in table.columns]
+    # query_resource() returns columns as plain strings; query_workspace() returns
+    # LogsTableColumn objects with a .name attribute. Handle both.
+    cols = [col if isinstance(col, str) else col.name for col in table.columns]
     rows = []
     for row in table.rows:
         record = dict(zip(cols, row))
