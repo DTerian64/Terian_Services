@@ -35,7 +35,8 @@ from datetime import timedelta
 from typing import Any
 
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
-from azure.monitor.query import LogsQueryClient, LogsQueryStatus, MetricsQueryClient
+from azure.monitor.query import LogsQueryClient, LogsQueryStatus
+from azure.mgmt.monitor import MonitorManagementClient
 from fastapi import APIRouter, HTTPException
 
 logger = logging.getLogger(__name__)
@@ -133,30 +134,39 @@ def _query(client: LogsQueryClient, kql: str) -> list[dict]:
     return rows
 
 
-def _metric(resource_id: str, metric_name: str, aggregation: str = "average") -> float:
+def _metric(resource_id: str, metric_name: str, aggregation: str = "Average") -> float:
     """
-    Query a single Azure Monitor metric for the last day.
+    Query a single Azure Monitor metric for the last day via azure-mgmt-monitor.
     Returns 0.0 if the resource ID is not configured or the query fails.
-    aggregation: 'average' | 'maximum' | 'minimum' | 'total' | 'count'
+    aggregation: 'Average' | 'Maximum' | 'Minimum' | 'Total' | 'Count'
     """
     if not resource_id:
         return 0.0
     try:
-        client = MetricsQueryClient(_credential())
-        result = client.query_resource(
+        # Extract subscription ID from the ARM resource ID.
+        parts = resource_id.split("/")
+        sub_id = parts[parts.index("subscriptions") + 1]
+
+        from datetime import datetime, timezone as tz
+        end   = datetime.now(tz.utc)
+        start = end - timedelta(days=1)
+        timespan = f"{start.isoformat()}/{end.isoformat()}"
+
+        client = MonitorManagementClient(_credential(), sub_id)
+        result = client.metrics.list(
             resource_uri=resource_id,
-            metric_names=[metric_name],
-            timespan=timedelta(days=1),
-            granularity=timedelta(days=1),
-            aggregations=[aggregation.capitalize()],
+            metricnames=metric_name,
+            aggregation=aggregation,
+            timespan=timespan,
+            interval="P1D",
         )
-        if not result.metrics:
-            return 0.0
-        for ts in result.metrics[0].timeseries:
-            for dp in reversed(ts.data):
-                val = getattr(dp, aggregation.lower(), None)
-                if val is not None:
-                    return float(val)
+        attr = aggregation.lower()
+        for metric in result.value:
+            for ts in metric.timeseries:
+                for dp in reversed(ts.data):
+                    val = getattr(dp, attr, None)
+                    if val is not None:
+                        return float(val)
         return 0.0
     except Exception as exc:
         logger.warning("Azure Monitor metric unavailable (%s / %s): %s",
@@ -224,10 +234,10 @@ async def awards_metrics() -> dict:
 
     # ── Azure Monitor Metrics (ACA replicas + SQL storage) ───────────────────
     try:
-        sql_bytes = _metric(_SQL_DB_ID, "storage", "maximum")
+        sql_bytes = _metric(_SQL_DB_ID, "storage", "Maximum")
         compute: dict[str, Any] = {
-            "aca_primary":   int(round(_metric(_ACA_PRIMARY_ID,   "Replicas", "average"))),
-            "aca_secondary": int(round(_metric(_ACA_SECONDARY_ID, "Replicas", "average"))),
+            "aca_primary":   int(round(_metric(_ACA_PRIMARY_ID,   "Replicas", "Average"))),
+            "aca_secondary": int(round(_metric(_ACA_SECONDARY_ID, "Replicas", "Average"))),
             "sql_mb":        round(sql_bytes / (1024 * 1024), 2) if sql_bytes else 0.0,
         }
     except Exception as exc:
