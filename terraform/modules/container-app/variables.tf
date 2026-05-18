@@ -183,3 +183,23 @@ variable "gmail_app_password" {
   sensitive   = true
   default     = ""
 }
+
+# ── Award Nomination compute + database resource IDs ─────────────────────────
+
+variable "award_aca_primary_resource_id" {
+  description = "ARM resource ID of the Award Nomination primary ACA. Grants Monitoring Reader so the backend can query replica-count metrics."
+  type        = string
+  default     = ""
+}
+
+variable "award_aca_secondary_resource_id" {
+  description = "ARM resource ID of the Award Nomination secondary ACA. Grants Monitoring Reader so the backend can query replica-count metrics."
+  type        = string
+  default     = ""
+}
+
+variable "award_sql_db_resource_id" {
+  description = "ARM resource ID of the Award Nomination SQL database. Grants Monitoring Reader so the backend can query storage metrics."
+  type        = string
+  default     = ""
+}

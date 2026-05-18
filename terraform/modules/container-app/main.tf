@@ -199,6 +199,30 @@ resource "azurerm_role_assignment" "gha_aca_contributor" {
   principal_id         = var.github_actions_principal_id
 }
 
+# UAMI → Monitoring Reader on the Award Nomination ACA primary (replica metrics).
+resource "azurerm_role_assignment" "uami_aca_primary_reader" {
+  count                = var.award_aca_primary_resource_id != "" ? 1 : 0
+  scope                = var.award_aca_primary_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
+# UAMI → Monitoring Reader on the Award Nomination ACA secondary (replica metrics).
+resource "azurerm_role_assignment" "uami_aca_secondary_reader" {
+  count                = var.award_aca_secondary_resource_id != "" ? 1 : 0
+  scope                = var.award_aca_secondary_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
+# UAMI → Monitoring Reader on the Award Nomination SQL database (storage metrics).
+resource "azurerm_role_assignment" "uami_sql_db_reader" {
+  count                = var.award_sql_db_resource_id != "" ? 1 : 0
+  scope                = var.award_sql_db_resource_id
+  role_definition_name = "Monitoring Reader"
+  principal_id         = azurerm_user_assigned_identity.backend.principal_id
+}
+
 # UAMI → Monitoring Reader on the App Insights component.
 resource "azurerm_role_assignment" "uami_app_insights_reader" {
   count                = var.app_insights_resource_id != "" ? 1 : 0
@@ -308,6 +332,19 @@ resource "azurerm_container_app" "backend" {
       env {
         name  = "AZURE_STORAGE_BLOB_ENDPOINT"
         value = var.storage_blob_endpoint
+      }
+      # Award Nomination compute + database resource IDs — for Azure Monitor metrics.
+      env {
+        name  = "AWARD_ACA_PRIMARY_RESOURCE_ID"
+        value = var.award_aca_primary_resource_id
+      }
+      env {
+        name  = "AWARD_ACA_SECONDARY_RESOURCE_ID"
+        value = var.award_aca_secondary_resource_id
+      }
+      env {
+        name  = "AWARD_SQL_DB_RESOURCE_ID"
+        value = var.award_sql_db_resource_id
       }
       # Gmail SMTP — for contact form notification emails.
       env {

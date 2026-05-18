@@ -28,6 +28,12 @@ app_insights_workspace_id = "fd6f9a14-55e5-4df1-8d38-213f826b962a"
 
 app_insights_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-primary-sandbox"
 
+# ── Award Nomination compute + database (Azure Monitor metrics) ───────────────
+
+award_aca_primary_resource_id   = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-primary-sandbox"
+award_aca_secondary_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-secondary-sandbox"
+award_sql_db_resource_id        = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Sql/servers/david64-sql-sandbox/databases/AwardNominationsSandbox"
+
 # Admin user — david64.terian@terian-services.com
 # Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
 admin_principal_id = "3790e0a2-8fe4-4595-9173-a9f1e18c5ae2"

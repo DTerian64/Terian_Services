@@ -1,8 +1,12 @@
 /**
  * AwardMetrics.tsx
  * ────────────────
- * Fetches last-24h metrics from /api/metrics/awards (FastAPI → App Insights)
- * and renders KPI cards + an hourly request/failure line chart.
+ * Fetches last-24h metrics from /api/metrics/awards and renders:
+ *   • Health at a glance  — 6 KPI cards (requests, failure rate, P95, users,
+ *                           page views, nominations)
+ *   • Compute & Database  — 4 KPI cards (ACA primary/secondary replicas,
+ *                           SQL storage, sessions)
+ *   • Hourly chart        — requests + failures per hour (line chart)
  *
  * Fails silently: if the endpoint is unreachable the component renders nothing
  * so the marketing page is never broken by a monitoring outage.
@@ -19,7 +23,7 @@ import {
   YAxis,
 } from "recharts";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 type HourlyRow = {
   timestamp: string;
@@ -35,12 +39,30 @@ type Summary = {
   p95_ms: number;
 };
 
+type Health = {
+  total: number;
+  failures: number;
+  p95_ms: number;
+  unique_users: number;
+  pages_viewed: number;
+  nominations: number;
+  sessions: number;
+};
+
+type Compute = {
+  aca_primary: number;
+  aca_secondary: number;
+  sql_mb: number;
+};
+
 type MetricsData = {
   summary: Summary;
   hourly: HourlyRow[];
+  health: Health;
+  compute: Compute;
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
@@ -48,9 +70,9 @@ function formatHour(iso: string) {
   return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-function failureRate(summary: Summary): string {
-  if (!summary.total) return "—";
-  return `${((summary.failures / summary.total) * 100).toFixed(1)}%`;
+function failureRate(h: Health): string {
+  if (!h.total) return "—";
+  return `${((h.failures / h.total) * 100).toFixed(2)}%`;
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -68,6 +90,14 @@ function SkeletonCard() {
   return <div className="h-28 rounded-xl border-2 border-white/10 bg-[#0f0d18] animate-pulse" />;
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mt-10 mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+      {children}
+    </p>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function AwardMetrics() {
@@ -75,7 +105,7 @@ export default function AwardMetrics() {
   const [error, setError] = useState(false);
   const [showDiagram, setShowDiagram] = useState(false);
 
-  const openDiagram = useCallback(() => setShowDiagram(true), []);
+  const openDiagram  = useCallback(() => setShowDiagram(true),  []);
   const closeDiagram = useCallback(() => setShowDiagram(false), []);
 
   useEffect(() => {
@@ -111,39 +141,73 @@ export default function AwardMetrics() {
         Live telemetry from the Award Nomination System sandbox — refreshed every 5 minutes.
       </p>
 
-      {/* KPI cards */}
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── Health at a glance ── */}
+      <SectionLabel>Health at a glance</SectionLabel>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
-          <>
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </>
+          Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
         ) : error ? (
-          <div className="col-span-4 rounded-xl border-2 border-white/10 bg-[#0f0d18] px-6 py-10 text-center text-sm text-slate-500">
+          <div className="col-span-3 rounded-xl border-2 border-white/10 bg-[#0f0d18] px-6 py-10 text-center text-sm text-slate-500">
             Metrics are temporarily unavailable — live telemetry refreshes every 5 minutes.
           </div>
         ) : (
           <>
             <KpiCard
-              label="Total requests"
-              value={data!.summary.total != null ? data!.summary.total.toLocaleString() : "—"}
+              label="Total API requests"
+              value={data!.health.total.toLocaleString()}
             />
             <KpiCard
-              label="Median latency"
-              value={data!.summary.p50_ms != null ? `${data!.summary.p50_ms} ms` : "—"}
+              label="API failure rate"
+              value={failureRate(data!.health)}
             />
             <KpiCard
               label="P95 latency"
-              value={data!.summary.p95_ms != null ? `${data!.summary.p95_ms} ms` : "—"}
+              value={`${data!.health.p95_ms} ms`}
             />
-            <KpiCard label="Failure rate" value={failureRate(data!.summary)} />
+            <KpiCard
+              label="Unique users"
+              value={data!.health.unique_users.toLocaleString()}
+            />
+            <KpiCard
+              label="Pages viewed"
+              value={data!.health.pages_viewed.toLocaleString()}
+            />
+            <KpiCard
+              label="Nominations"
+              value={data!.health.nominations.toLocaleString()}
+            />
           </>
         )}
       </div>
 
-      {/* Time-series chart */}
+      {/* ── Compute & Database ── */}
+      <SectionLabel>Compute &amp; Database</SectionLabel>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : !error && (
+          <>
+            <KpiCard
+              label="ACA primary"
+              value={data!.compute.aca_primary.toString()}
+            />
+            <KpiCard
+              label="ACA secondary"
+              value={data!.compute.aca_secondary.toString()}
+            />
+            <KpiCard
+              label="SQL storage"
+              value={`${data!.compute.sql_mb} MB`}
+            />
+            <KpiCard
+              label="Sessions"
+              value={data!.health.sessions.toLocaleString()}
+            />
+          </>
+        )}
+      </div>
+
+      {/* ── Hourly chart ── */}
       {!isLoading && !error && data!.hourly.length > 0 && (
         <div className="mt-6 rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -196,8 +260,6 @@ export default function AwardMetrics() {
               />
             </LineChart>
           </ResponsiveContainer>
-
-          {/* Legend */}
           <div className="mt-4 flex gap-6">
             <span className="flex items-center gap-2 text-xs text-slate-400">
               <span className="inline-block h-0.5 w-6 rounded bg-teal-400" /> Requests
@@ -221,7 +283,6 @@ export default function AwardMetrics() {
               style={{ minWidth: "860px", maxWidth: "960px" }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
                   How live metrics work
@@ -233,7 +294,6 @@ export default function AwardMetrics() {
                   ✕ Close
                 </button>
               </div>
-              {/* SVG diagram — rendered at natural width, container scrolls horizontally on small screens */}
               <div className="overflow-x-auto">
                 <img
                   src="/award_live_metrics_workflow.svg"

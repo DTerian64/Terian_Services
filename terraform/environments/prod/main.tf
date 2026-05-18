@@ -270,6 +270,11 @@ module "container_app" {
   gmail_user         = var.gmail_user
   gmail_app_password = var.gmail_app_password
 
+  # Award Nomination compute + database (Azure Monitor metrics)
+  award_aca_primary_resource_id   = var.award_aca_primary_resource_id
+  award_aca_secondary_resource_id = var.award_aca_secondary_resource_id
+  award_sql_db_resource_id        = var.award_sql_db_resource_id
+
   # Data store — Cosmos DB + Blob Storage
   cosmos_endpoint        = module.data_store.cosmos_endpoint
   cosmos_database_name   = module.data_store.cosmos_database_name

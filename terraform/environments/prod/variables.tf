@@ -214,6 +214,26 @@ variable "gmail_app_password" {
   default     = ""
 }
 
+# ── Award Nomination compute + database ──────────────────────────────────────
+
+variable "award_aca_primary_resource_id" {
+  description = "ARM resource ID of the Award Nomination primary ACA (for replica count metrics)."
+  type        = string
+  default     = ""
+}
+
+variable "award_aca_secondary_resource_id" {
+  description = "ARM resource ID of the Award Nomination secondary ACA (for replica count metrics)."
+  type        = string
+  default     = ""
+}
+
+variable "award_sql_db_resource_id" {
+  description = "ARM resource ID of the Award Nomination SQL database (for storage metrics)."
+  type        = string
+  default     = ""
+}
+
 # ── Data store ───────────────────────────────────────────────────────────────
 
 variable "storage_account_name" {
