@@ -199,6 +199,21 @@ variable "app_insights_workspace_id" {
   default     = ""
 }
 
+# ── Gmail SMTP ───────────────────────────────────────────────────────────────
+
+variable "gmail_user" {
+  description = "Gmail address used as the SMTP sender for contact form notifications."
+  type        = string
+  default     = "david.terian@gmail.com"
+}
+
+variable "gmail_app_password" {
+  description = "Gmail App Password. Sensitive — inject via TF_VAR_gmail_app_password; never commit."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 # ── Data store ───────────────────────────────────────────────────────────────
 
 variable "storage_account_name" {

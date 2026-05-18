@@ -173,6 +173,21 @@ resource "azurerm_key_vault_secret" "openai_key" {
   ]
 }
 
+# ── Gmail App Password → Key Vault secret ────────────────────────────────────
+# Only created when gmail_app_password is supplied (count = 0 disables it).
+# Pass the value as TF_VAR_gmail_app_password or a GitHub Actions secret —
+# never commit it to terraform.tfvars.
+resource "azurerm_key_vault_secret" "gmail_app_password" {
+  count        = var.gmail_app_password != "" ? 1 : 0
+  name         = "gmail-app-password"
+  value        = var.gmail_app_password
+  key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [
+    time_sleep.kv_role_propagation,
+  ]
+}
+
 # GitHub Actions principal → Contributor on the Container App (so the workflow
 # can call `az containerapp update --image …` to roll a new revision).
 # Scoped to the container app resource directly — the environment is a sibling
@@ -230,6 +245,16 @@ resource "azurerm_container_app" "backend" {
     identity            = azurerm_user_assigned_identity.backend.id
   }
 
+  # GMAIL_APP_PASSWORD — only wired when the KV secret was created.
+  dynamic "secret" {
+    for_each = var.gmail_app_password != "" ? [1] : []
+    content {
+      name                = "gmail-app-password"
+      key_vault_secret_id = azurerm_key_vault_secret.gmail_app_password[0].versionless_id
+      identity            = azurerm_user_assigned_identity.backend.id
+    }
+  }
+
   template {
     min_replicas = var.min_replicas
     max_replicas = var.max_replicas
@@ -284,6 +309,18 @@ resource "azurerm_container_app" "backend" {
         name  = "AZURE_STORAGE_BLOB_ENDPOINT"
         value = var.storage_blob_endpoint
       }
+      # Gmail SMTP — for contact form notification emails.
+      env {
+        name  = "GMAIL_USER"
+        value = var.gmail_user
+      }
+      dynamic "env" {
+        for_each = var.gmail_app_password != "" ? [1] : []
+        content {
+          name        = "GMAIL_APP_PASSWORD"
+          secret_name = "gmail-app-password"
+        }
+      }
     }
   }
 
@@ -310,6 +347,7 @@ resource "azurerm_container_app" "backend" {
     azurerm_role_assignment.uami_kv_secrets_user,
     azurerm_role_assignment.uami_app_insights_reader,
     azurerm_key_vault_secret.openai_key,
+    azurerm_key_vault_secret.gmail_app_password,
     azurerm_cognitive_deployment.gpt,
   ]
 }

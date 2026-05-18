@@ -34,6 +34,7 @@ from pydantic import BaseModel, Field, field_validator
 load_dotenv()
 
 from agents import AskAgent          # noqa: E402  — must come after load_dotenv()
+from contact_router import router as contact_router  # noqa: E402
 from metrics_router import router as metrics_router  # noqa: E402
 from team_router import router as team_router        # noqa: E402
 
@@ -66,6 +67,7 @@ _allowed_origins = [
     if o.strip()
 ]
 
+app.include_router(contact_router)
 app.include_router(metrics_router)
 app.include_router(team_router)
 

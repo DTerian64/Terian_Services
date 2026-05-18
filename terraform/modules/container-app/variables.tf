@@ -168,3 +168,18 @@ variable "app_insights_workspace_id" {
   type        = string
   default     = ""
 }
+
+# ── Gmail SMTP (contact form notifications) ──────────────────────────────────
+
+variable "gmail_user" {
+  description = "Gmail address used as the SMTP sender for contact form notification emails."
+  type        = string
+  default     = "david.terian@gmail.com"
+}
+
+variable "gmail_app_password" {
+  description = "Gmail App Password for SMTP auth. Sensitive — pass via TF_VAR_gmail_app_password or a GitHub Actions secret; never commit to disk. Leave empty to disable email notifications."
+  type        = string
+  sensitive   = true
+  default     = ""
+}

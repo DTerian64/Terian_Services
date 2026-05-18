@@ -266,6 +266,10 @@ module "container_app" {
   app_insights_log_analytics_resource_id = var.app_insights_log_analytics_resource_id
   app_insights_workspace_id              = var.app_insights_workspace_id
 
+  # Gmail SMTP (contact form notifications)
+  gmail_user         = var.gmail_user
+  gmail_app_password = var.gmail_app_password
+
   # Data store — Cosmos DB + Blob Storage
   cosmos_endpoint        = module.data_store.cosmos_endpoint
   cosmos_database_name   = module.data_store.cosmos_database_name

@@ -97,3 +97,14 @@ resource "azurerm_cosmosdb_sql_container" "employees" {
   default_ttl = -1
 }
 
+resource "azurerm_cosmosdb_sql_container" "client_communications" {
+  name                = "client_communications"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/id"]
+
+  # Keep contact submissions indefinitely (no TTL).
+  default_ttl = -1
+}
+
