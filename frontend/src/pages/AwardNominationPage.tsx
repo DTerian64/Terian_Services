@@ -44,7 +44,7 @@ function ArchitectureModal({ onClose }: { onClose: () => void }) {
         {/* Diagram */}
         <div className="overflow-auto p-6">
           <img
-            src="/award_live_metrics_workflow.svg"
+            src="/award_nomination_architecture.svg"
             alt="Award Nomination System technical architecture diagram"
             className="mx-auto w-full"
           />
