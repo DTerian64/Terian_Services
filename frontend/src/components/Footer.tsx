@@ -30,7 +30,7 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-1">
             <a href="/" className="flex items-center gap-3 text-white no-underline">
-              <img src="/terian_services_logo.svg" alt="" className="h-10 w-auto object-contain" />
+              <img src="/logo.svg" alt="" className="h-10 w-auto object-contain" />
               <span className="text-lg font-bold">Terian Services</span>
             </a>
             <p className="mt-4 text-sm leading-6 text-white/60">
