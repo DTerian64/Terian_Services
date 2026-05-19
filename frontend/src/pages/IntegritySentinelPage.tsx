@@ -159,6 +159,23 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
+      {/* ── Platform banner ── */}
+      <section className="border-t border-white/10 bg-[#07060f]">
+        <div className="mx-auto max-w-6xl px-6 pt-10 pb-4 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+            Integrity Sentinel — Platform Overview
+          </p>
+        </div>
+        <div className="overflow-hidden">
+          <img
+            src="/terian-services-banner.png"
+            alt="Integrity Sentinel — AI-Powered Graph Intelligence for Risk, Trust & Integrity Analysis"
+            className="w-full object-cover"
+            style={{ maxHeight: "420px", objectPosition: "center 30%" }}
+          />
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div>
