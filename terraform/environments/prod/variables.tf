@@ -207,6 +207,12 @@ variable "gmail_user" {
   default     = "david.terian@gmail.com"
 }
 
+variable "contact_notify_email" {
+  description = "Destination inbox for contact form notifications (e.g. support@terian-services.com)."
+  type        = string
+  default     = ""
+}
+
 variable "gmail_app_password" {
   description = "Gmail App Password. Sensitive — inject via TF_VAR_gmail_app_password; never commit."
   type        = string

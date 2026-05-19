@@ -373,6 +373,10 @@ resource "azurerm_container_app" "backend" {
         name  = "GMAIL_USER"
         value = var.gmail_user
       }
+      env {
+        name  = "CONTACT_NOTIFY_EMAIL"
+        value = var.contact_notify_email != "" ? var.contact_notify_email : var.gmail_user
+      }
       dynamic "env" {
         for_each = var.gmail_app_password != "" ? [1] : []
         content {

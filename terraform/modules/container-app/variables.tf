@@ -177,6 +177,12 @@ variable "gmail_user" {
   default     = "david.terian@gmail.com"
 }
 
+variable "contact_notify_email" {
+  description = "Destination inbox for contact form notifications. Defaults to gmail_user if empty."
+  type        = string
+  default     = ""
+}
+
 variable "gmail_app_password" {
   description = "Gmail App Password for SMTP auth. Sensitive — pass via TF_VAR_gmail_app_password or a GitHub Actions secret; never commit to disk. Leave empty to disable email notifications."
   type        = string

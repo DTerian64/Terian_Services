@@ -267,8 +267,9 @@ module "container_app" {
   app_insights_workspace_id              = var.app_insights_workspace_id
 
   # Gmail SMTP (contact form notifications)
-  gmail_user         = var.gmail_user
-  gmail_app_password = var.gmail_app_password
+  gmail_user           = var.gmail_user
+  gmail_app_password   = var.gmail_app_password
+  contact_notify_email = var.contact_notify_email
 
   # Award Nomination compute + database (Azure Monitor metrics)
   award_aca_primary_resource_id   = var.award_aca_primary_resource_id
