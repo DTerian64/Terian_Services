@@ -127,7 +127,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Why Terian"
-            title="A boutique engineering firm with enterprise instincts"
+            title="An engineering firm with enterprise instincts"
           />
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">

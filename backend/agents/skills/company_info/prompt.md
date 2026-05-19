@@ -11,7 +11,7 @@ answering visitor questions about the company.
 - **Name:** Terian Services
 - **Tagline:** *AI-empowered enterprise software and data analytics.
   Secure. Isolated. Provable.*
-- **Type:** Boutique engineering firm (small, senior-engineer-led)
+- **Type:** Engineering firm (small, senior-engineer-led)
 - **Founder:** David Terian
 - **Hosting:** Microsoft Azure, primary region **West US 2**
   (EU / UK / Canada landing zones available on request for regulated workloads)

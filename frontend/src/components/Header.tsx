@@ -1,6 +1,15 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 
 type MenuItem = { label: string; href: string; badge?: string };
+type DropdownProps = {
+  label: string;
+  href?: string;
+  items: MenuItem[];
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  onOpen: () => void;
+  widthClass: string;
+};
 
 const PRODUCT_ITEMS: MenuItem[] = [
   { label: "Award Nomination System", href: "/products/award-nomination" },
@@ -39,6 +48,7 @@ export default function Header() {
         <nav className="hidden items-center gap-10 text-[15px] font-semibold text-white lg:flex" aria-label="Primary navigation">
           <Dropdown
             label="Products"
+            href="/products"
             items={PRODUCT_ITEMS}
             open={productsOpen}
             setOpen={setProductsOpen}
@@ -117,21 +127,7 @@ export default function Header() {
   );
 }
 
-function Dropdown({
-  label,
-  items,
-  open,
-  setOpen,
-  onOpen,
-  widthClass,
-}: {
-  label: string;
-  items: MenuItem[];
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  onOpen: () => void;
-  widthClass: string;
-}) {
+function Dropdown({ label, href, items, open, setOpen, onOpen, widthClass }: DropdownProps) {
   const showMenu = () => {
     onOpen();
     setOpen(true);
@@ -139,19 +135,26 @@ function Dropdown({
 
   return (
     <div className="relative" onMouseEnter={showMenu} onMouseLeave={() => setOpen(false)}>
-      <button
-        type="button"
-        className="flex items-center gap-2 rounded-md px-1 py-3 text-white transition hover:text-teal-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => {
-          onOpen();
-          setOpen((value) => !value);
-        }}
-      >
-        {label}
-        <ChevronDown className={open ? "rotate-180" : ""} />
-      </button>
+      {href ? (
+        <a
+          href={href}
+          className="flex items-center gap-2 rounded-md px-1 py-3 font-semibold text-white transition hover:text-teal-300"
+        >
+          {label}
+          <ChevronDown className={open ? "rotate-180" : ""} />
+        </a>
+      ) : (
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-md px-1 py-3 text-white transition hover:text-teal-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          onClick={() => { onOpen(); setOpen((value) => !value); }}
+        >
+          {label}
+          <ChevronDown className={open ? "rotate-180" : ""} />
+        </button>
+      )}
 
       {open && (
         <div className={`absolute left-0 top-full ${widthClass} rounded-md border border-white/10 bg-[#151321] p-2 shadow-2xl shadow-black/30`} role="menu">
