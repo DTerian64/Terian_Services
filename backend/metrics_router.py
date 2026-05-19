@@ -164,15 +164,20 @@ def _metric(resource_id: str, metric_name: str, aggregation: str = "Average") ->
             metricnames=metric_name,
             aggregation=aggregation,
             timespan=timespan,
-            interval="P1D",
+            interval="PT1H",   # 24 hourly buckets — P1D yields 1 bucket that's often null
         )
         attr = aggregation.lower()
+        resource_short = resource_id.split("/")[-1]
         for metric in result.value:
             for ts in metric.timeseries:
                 for dp in reversed(ts.data):
                     val = getattr(dp, attr, None)
                     if val is not None:
+                        logger.debug("metric %s/%s = %s", resource_short, metric_name, val)
                         return float(val)
+        # Call succeeded but every data point was null — metric may not have been
+        # emitted yet (e.g. ACA scaled to zero with no recent traffic).
+        logger.info("metric %s/%s: no non-null data points in last 24h", resource_short, metric_name)
         return 0.0
     except Exception as exc:
         logger.warning("Azure Monitor metric unavailable (%s / %s): %s",
