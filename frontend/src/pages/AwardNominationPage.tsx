@@ -1,12 +1,65 @@
+import { useState, useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 import AwardMetrics from "../components/AwardMetrics";
 
 const DEMO_REQUEST_URL = "https://demo-awards.terian-services.com/demo/request";
 
+function ArchitectureModal({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[#0f172a] shadow-2xl ring-1 ring-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+              Technical Architecture
+            </p>
+            <p className="mt-0.5 text-sm text-slate-400">
+              Award Nomination System · Azure infrastructure
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+            aria-label="Close architecture diagram"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        {/* Diagram */}
+        <div className="overflow-auto p-6">
+          <img
+            src="/award_live_metrics_workflow.svg"
+            alt="Award Nomination System technical architecture diagram"
+            className="mx-auto w-full"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AwardNominationPage() {
+  const [archOpen, setArchOpen] = useState(false);
+
   return (
     <PageLayout>
+      {archOpen && <ArchitectureModal onClose={() => setArchOpen(false)} />}
       <PageHero
         eyebrow="Product · AI/ML-assisted"
         title="Award Nomination System"
@@ -83,7 +136,16 @@ export default function AwardNominationPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How it works</p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How it works</p>
+          <span className="text-slate-600">·</span>
+          <button
+            onClick={() => setArchOpen(true)}
+            className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 transition hover:text-teal-400"
+          >
+            Technical Architecture
+          </button>
+        </div>
         <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
           Four steps from intent to paycheck.
         </h2>
