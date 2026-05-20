@@ -68,6 +68,23 @@ export default function AwardNominationPage() {
         secondaryCta={{ label: "Talk to engineering", href: "mailto:sales@terian-services.com" }}
       />
 
+      {/* ── Platform banner ── */}
+      <section className="border-t border-white/10 bg-[#07060f]">
+        <div className="mx-auto max-w-6xl px-6 pt-10 pb-4 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+            Award Nomination System — Platform Overview
+          </p>
+        </div>
+        <div className="overflow-hidden">
+          <img
+            src="/award-nomination-banner.svg"
+            alt="Award Nomination System — five-step workflow with ML intelligence, audit trail, and Azure integrations"
+            className="w-full object-cover"
+            style={{ maxHeight: "420px", objectPosition: "center 30%" }}
+          />
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">What it does</p>
         <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
