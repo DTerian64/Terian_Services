@@ -165,6 +165,32 @@ variable "azure_openai_api_version" {
   default     = "2024-12-01-preview"
 }
 
+# ── Azure OpenAI — classifier deployment ────────────────────────────────────
+
+variable "openai_classify_deployment_name" {
+  description = "Model deployment name for AgentRouter intent classification. Injected as AZURE_OPENAI_CLASSIFY_MODEL."
+  type        = string
+  default     = "gpt-4.1-mini"
+}
+
+variable "openai_classify_model_name" {
+  description = "Model family for the classifier deployment."
+  type        = string
+  default     = "gpt-4.1-mini"
+}
+
+variable "openai_classify_model_version" {
+  description = "Model snapshot version for the classifier deployment."
+  type        = string
+  default     = "2025-04-14"
+}
+
+variable "openai_classify_tpm_capacity" {
+  description = "Tokens-per-minute capacity in thousands for the classifier. 2 = 2,000 TPM — sufficient since classify() emits ≤ 10 tokens per call."
+  type        = number
+  default     = 2
+}
+
 variable "backend_allowed_origins" {
   description = "Comma-separated list of origins allowed to call /api/*."
   type        = string

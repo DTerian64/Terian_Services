@@ -123,6 +123,26 @@ resource "azurerm_cognitive_deployment" "gpt" {
   }
 }
 
+# Classifier deployment — intentionally minimal capacity.
+# AgentRouter.classify() emits ≤ 10 tokens per call; 2k TPM is more than
+# sufficient even at peak throughput.  Kept separate from the primary
+# deployment so quota exhaustion on one side doesn't affect the other.
+resource "azurerm_cognitive_deployment" "gpt_classify" {
+  name                 = var.openai_classify_deployment_name
+  cognitive_account_id = azurerm_cognitive_account.openai.id
+
+  model {
+    format  = "OpenAI"
+    name    = var.openai_classify_model_name
+    version = var.openai_classify_model_version
+  }
+
+  scale {
+    type     = "GlobalStandard"
+    capacity = var.openai_classify_tpm_capacity
+  }
+}
+
 # ── Key Vault (RBAC mode) ───────────────────────────────────────────────────
 resource "azurerm_key_vault" "kv" {
   name                       = var.key_vault_name
@@ -318,6 +338,10 @@ resource "azurerm_container_app" "backend" {
         value = azurerm_cognitive_deployment.gpt.name
       }
       env {
+        name  = "AZURE_OPENAI_CLASSIFY_MODEL"
+        value = azurerm_cognitive_deployment.gpt_classify.name
+      }
+      env {
         name  = "AZURE_OPENAI_API_VERSION"
         value = var.azure_openai_api_version
       }
@@ -412,5 +436,6 @@ resource "azurerm_container_app" "backend" {
     azurerm_key_vault_secret.openai_key,
     azurerm_key_vault_secret.gmail_app_password,
     azurerm_cognitive_deployment.gpt,
+    azurerm_cognitive_deployment.gpt_classify,
   ]
 }

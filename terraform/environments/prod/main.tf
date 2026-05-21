@@ -257,6 +257,12 @@ module "container_app" {
   openai_tpm_capacity          = var.openai_tpm_capacity
   azure_openai_api_version     = var.azure_openai_api_version
 
+  # Classifier deployment — cheap fast model for AgentRouter intent classification
+  openai_classify_deployment_name = var.openai_classify_deployment_name
+  openai_classify_model_name      = var.openai_classify_model_name
+  openai_classify_model_version   = var.openai_classify_model_version
+  openai_classify_tpm_capacity    = var.openai_classify_tpm_capacity
+
   allowed_origins              = var.backend_allowed_origins
 
   github_actions_principal_id  = var.github_actions_principal_id

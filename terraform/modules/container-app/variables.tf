@@ -99,6 +99,32 @@ variable "azure_openai_api_version" {
   type        = string
 }
 
+# ── Azure OpenAI — classifier (intent routing) ───────────────────────────────
+# A separate, smaller deployment used only by AgentRouter.classify().
+# Kept distinct from the primary deployment so TPM limits don't interfere and
+# the classifier model can be swapped independently of the chat model.
+
+variable "openai_classify_deployment_name" {
+  description = "Name of the classifier model deployment. Injected as AZURE_OPENAI_CLASSIFY_MODEL."
+  type        = string
+}
+
+variable "openai_classify_model_name" {
+  description = "Model family for the classifier (e.g. 'gpt-4.1-mini')."
+  type        = string
+}
+
+variable "openai_classify_model_version" {
+  description = "Model snapshot version for the classifier deployment."
+  type        = string
+}
+
+variable "openai_classify_tpm_capacity" {
+  description = "Tokens-per-minute capacity in thousands for the classifier deployment. Can be very low — the classifier emits at most 10 tokens per request."
+  type        = number
+  default     = 2
+}
+
 variable "tf_principal_object_id" {
   description = "Object ID of the principal running Terraform — granted Key Vault Secrets Officer so TF can write the OpenAI key. Pass data.azurerm_client_config.current.object_id."
   type        = string

@@ -1,0 +1,53 @@
+# terraform.tfvars.template — prod environment
+# ─────────────────────────────────────────────────────────────────────────────
+# Template for terraform.tfvars. Copy this file to terraform.tfvars and fill
+# in any values marked <place your own value>.
+#
+# terraform.tfvars is gitignored (contains secrets). This template is committed
+# so the required variable structure is always documented in source control.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── DNS — SWA apex domain verification ──────────────────────────────────────
+# Token from: Azure Portal → Static Web Apps → terian-services-frontend →
+#             Custom domains → terian-services.com → Verification token
+# Required to keep the asuid TXT record alive (removes it if left empty).
+
+swa_verification_token = "<place your own value>"
+
+# ── DevOps — GitHub Actions principal ────────────────────────────────────────
+# Object ID of the GHA OIDC service principal.
+# Grants: ACR Contributor (for az acr build) + ACA Contributor (for image rollout).
+
+github_actions_principal_id = "<place your own value>"
+
+# ── App Insights (Award Nomination System — read-only metrics) ───────────────
+
+app_insights_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/components/appi-award-api-sandbox"
+
+app_insights_workspace_id = "fd6f9a14-55e5-4df1-8d38-213f826b962a"
+
+app_insights_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-primary-sandbox"
+
+# ── Award Nomination compute + database (Azure Monitor metrics) ───────────────
+
+award_aca_primary_resource_id   = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-primary-sandbox"
+award_aca_secondary_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-secondary-sandbox"
+award_sql_db_resource_id        = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Sql/servers/david64-sql-sandbox/databases/AwardNominationsSandbox"
+
+# ── Award Nomination frontend App Insights (pageViews — unique users, pages viewed) ──
+# appi-award-frontend-sandbox is where the browser JS SDK ships pageViews telemetry.
+
+award_appi_frontend_resource_id               = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/components/appi-award-frontend-sandbox"
+award_appi_frontend_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-secondary-sandbox"
+
+# ── Contact form notifications ───────────────────────────────────────────────
+
+contact_notify_email = "support@terian-services.com"
+
+# Gmail App Password — generated at https://myaccount.google.com/apppasswords
+# (16-character password, no spaces). Never commit the real value.
+gmail_app_password = "<place your own value>"
+
+# Admin user — david64.terian@terian-services.com
+# Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
+admin_principal_id = "<place your own value>"
