@@ -54,12 +54,63 @@ function ArchitectureModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function WorkflowModal({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-[#0f172a] shadow-2xl ring-1 ring-white/10"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+              Approval Workflow
+            </p>
+            <p className="mt-0.5 text-sm text-slate-400">
+              Multi-step approval chain · HRBP fraud review routing
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+            aria-label="Close workflow diagram"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        {/* Diagram */}
+        <div className="overflow-auto p-6">
+          <img
+            src="/hrbp_fraud_review_workflow.svg"
+            alt="Multi-step approval chain — HRBP fraud review workflow diagram"
+            className="mx-auto w-full"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AwardNominationPage() {
   const [archOpen, setArchOpen] = useState(false);
+  const [workflowOpen, setWorkflowOpen] = useState(false);
 
   return (
     <PageLayout>
       {archOpen && <ArchitectureModal onClose={() => setArchOpen(false)} />}
+      {workflowOpen && <WorkflowModal onClose={() => setWorkflowOpen(false)} />}
       <PageHero
         eyebrow="Product · AI/ML-assisted"
         title="Award Nomination System"
@@ -99,6 +150,7 @@ export default function AwardNominationPage() {
           <Feature
             title="Multi-step approval chains"
             description="Manager → skip-level → HRBP → Comp partner. Routing, SLAs, and reminders built in."
+            onDetail={() => setWorkflowOpen(true)}
           />
           <Feature
             title="Real-time dashboards"
@@ -232,13 +284,32 @@ export default function AwardNominationPage() {
   );
 }
 
-function Feature({ title, description, href }: { title: string; description: string; href?: string }) {
+function Feature({
+  title,
+  description,
+  href,
+  onDetail,
+}: {
+  title: string;
+  description: string;
+  href?: string;
+  onDetail?: () => void;
+}) {
   const inner = (
     <>
       <h3 className="text-base font-bold text-slate-100">{title}</h3>
       <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
       {href && (
         <p className="mt-3 text-xs font-semibold text-teal-400">View live →</p>
+      )}
+      {onDetail && (
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDetail(); }}
+          className="mt-3 text-xs font-semibold text-teal-400 transition hover:text-teal-300"
+        >
+          View workflow →
+        </button>
       )}
     </>
   );
