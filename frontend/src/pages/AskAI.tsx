@@ -264,11 +264,10 @@ export default function AskAIPage() {
     <PageLayout hideFooter darkBg={false}>
       <section className="bg-slate-50 px-0 py-0 md:px-6 md:py-6">
         <div
-          className="mx-auto flex max-w-7xl gap-0 overflow-hidden rounded-none border border-gray-200 bg-white shadow-sm md:rounded-lg"
-          style={{ height: "calc(100vh - 5.4rem - 3rem)" }}
+          className="mx-auto flex max-w-7xl gap-0 overflow-hidden rounded-none border border-gray-200 bg-white shadow-sm md:rounded-lg h-[calc(100vh_-_5.4rem)] md:h-[calc(100vh_-_8.4rem)]"
         >
           {/* ── Conversation sidebar ── */}
-          <div className="flex w-64 shrink-0 flex-col border-r border-gray-100 bg-gray-50">
+          <div className="hidden md:flex w-64 shrink-0 flex-col border-r border-gray-100 bg-gray-50">
             <div className="flex gap-2 border-b border-gray-100 px-3 py-3">
               <button
                 type="button"
@@ -370,11 +369,11 @@ export default function AskAIPage() {
             <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
               {chatMessages.length === 0 && (
                 <div className="flex h-full flex-col items-center justify-center text-center">
-                  <SendIcon size={40} className="mb-4 text-gray-200" />
-                  <p className="mb-1 font-medium text-gray-500">
+                  <SendIcon size={40} className="mb-6 text-gray-300 md:mb-4 md:text-gray-200" />
+                  <p className="mb-2 text-xl font-semibold text-gray-800 md:mb-1 md:text-base md:font-medium md:text-gray-500">
                     Ask anything about Terian's products and services
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-500 md:text-gray-400">
                     Trends, fraud patterns, integrations, security posture — all in one conversation.
                   </p>
                 </div>
@@ -421,29 +420,85 @@ export default function AskAIPage() {
             </div>
 
             {/* Input bar */}
-            <div className="shrink-0 border-t border-gray-100 px-6 py-4">
-              <div className="flex items-end gap-2">
-                <textarea
-                  ref={questionInputRef}
-                  value={aiQuestion}
-                  onChange={(e) => setAiQuestion(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      if (!aiLoading) handleAskQuestion();
-                    }
-                  }}
-                  placeholder="Ask a follow-up or a new question… (Shift+Enter for new line)"
-                  rows={1}
-                  disabled={aiLoading}
-                  className="flex-1 resize-none overflow-hidden rounded-xl border border-gray-300 px-4 py-3 text-sm leading-relaxed focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                  style={{ maxHeight: "160px", overflowY: "auto" }}
-                />
+            <div className="shrink-0 border-t border-gray-100 px-4 py-3 md:px-6 md:py-4">
+              {/*
+                Mobile layout: outer rounded-2xl border wraps the textarea + action row.
+                  Action row inside the box: [+ / Investigate btn] on left, [send circle] on right.
+                Desktop layout: transparent flex-row wrapper; textarea has its own border,
+                  send button sits beside it.
+              */}
+              <div className="flex flex-col gap-0 md:flex-row md:items-end md:gap-2">
+                {/* Textarea container — provides the outer box border on mobile; md:contents removes it on desktop */}
+                <div
+                  className="flex flex-1 flex-col rounded-2xl border border-gray-200
+                             focus-within:border-gray-300 focus-within:ring-1 focus-within:ring-gray-100
+                             md:contents"
+                >
+                  <textarea
+                    ref={questionInputRef}
+                    value={aiQuestion}
+                    onChange={(e) => setAiQuestion(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!aiLoading) handleAskQuestion();
+                      }
+                    }}
+                    placeholder="Ask a question…"
+                    rows={1}
+                    disabled={aiLoading}
+                    className="flex-1 resize-none overflow-hidden bg-transparent px-4 py-3 text-sm
+                               leading-relaxed focus:outline-none
+                               md:rounded-xl md:border md:border-gray-300 md:bg-white
+                               md:focus:border-blue-500 md:focus:ring-2 md:focus:ring-blue-500"
+                    style={{ maxHeight: "160px", overflowY: "auto" }}
+                  />
+
+                  {/* Mobile-only action row — sits at the bottom inside the bordered box */}
+                  <div className="flex items-center justify-between px-3 pb-2 md:hidden">
+                    {/* + button: toggles Investigate mode */}
+                    <button
+                      type="button"
+                      onClick={() => setUseOrchestrator((prev) => !prev)}
+                      disabled={aiLoading}
+                      title="Toggle investigation mode"
+                      className={`flex items-center justify-center rounded-full p-1.5 transition-colors disabled:opacity-40 ${
+                        useOrchestrator
+                          ? "bg-purple-100 text-purple-600"
+                          : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      }`}
+                    >
+                      <PlusIcon size={20} />
+                    </button>
+
+                    {/* Send circle button */}
+                    <button
+                      type="button"
+                      onClick={handleAskQuestion}
+                      disabled={aiLoading || !aiQuestion.trim()}
+                      aria-label="Send message"
+                      className={`flex items-center justify-center rounded-full p-2 text-white transition-colors
+                                 disabled:cursor-not-allowed disabled:bg-gray-200 ${
+                        useOrchestrator
+                          ? "bg-purple-600 hover:bg-purple-700"
+                          : "bg-gray-900 hover:bg-gray-800"
+                      }`}
+                    >
+                      {aiLoading ? (
+                        <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        <ArrowUpIcon size={16} />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Desktop-only send button — beside the textarea */}
                 <button
                   type="button"
                   onClick={handleAskQuestion}
                   disabled={aiLoading || !aiQuestion.trim()}
-                  className={`flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 ${
+                  className={`hidden md:flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 ${
                     useOrchestrator
                       ? "bg-purple-600 hover:bg-purple-700"
                       : "bg-blue-600 hover:bg-blue-700"
@@ -544,6 +599,46 @@ function SparkleIcon({ size = 16, className }: IconProps) {
     >
       <path d="M12.4 3.1a.75.75 0 0 1 1.2 0l1.9 2.8a.75.75 0 0 0 .5.3l3.2.8a.75.75 0 0 1 .3 1.3l-2.1 1.8a.75.75 0 0 0-.2.7l.5 3.1a.75.75 0 0 1-1.1.8l-3-1.5a.75.75 0 0 0-.7 0l-3 1.5a.75.75 0 0 1-1.1-.8l.5-3.1a.75.75 0 0 0-.2-.7L7 8.3A.75.75 0 0 1 7.3 7l3.2-.8a.75.75 0 0 0 .5-.3l1.4-2.8Z" />
       <path d="M5.2 12.2a.6.6 0 0 1 1 0l.7 1.2a.6.6 0 0 0 .3.3l1.2.7a.6.6 0 0 1 0 1l-1.2.7a.6.6 0 0 0-.3.3l-.7 1.2a.6.6 0 0 1-1 0l-.7-1.2a.6.6 0 0 0-.3-.3L3 15.4a.6.6 0 0 1 0-1l1.2-.7a.6.6 0 0 0 .3-.3l.7-1.2ZM18.6 2.5a.5.5 0 0 1 .8 0l.4.7a.5.5 0 0 0 .2.2l.7.4a.5.5 0 0 1 0 .8l-.7.4a.5.5 0 0 0-.2.2l-.4.7a.5.5 0 0 1-.8 0l-.4-.7a.5.5 0 0 0-.2-.2l-.7-.4a.5.5 0 0 1 0-.8l.7-.4a.5.5 0 0 0 .2-.2l.4-.7Z" />
+    </svg>
+  );
+}
+
+function ArrowUpIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="5 12 12 5 19 12" />
+    </svg>
+  );
+}
+
+function PlusIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
 }
