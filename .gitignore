@@ -9,6 +9,7 @@ dist/
 *.tfstate.backup
 *.tfstate.lock.hcl
 .terraform.lock.hcl
+terraform.tfvars
 terraform.tfvars.json
 
 # OS
