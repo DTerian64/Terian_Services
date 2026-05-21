@@ -263,6 +263,9 @@ module "container_app" {
   openai_classify_model_version   = var.openai_classify_model_version
   openai_classify_tpm_capacity    = var.openai_classify_tpm_capacity
 
+  # Serper — LiveDataAgent web search tool
+  serper_api_key = var.serper_api_key
+
   allowed_origins              = var.backend_allowed_origins
 
   github_actions_principal_id  = var.github_actions_principal_id

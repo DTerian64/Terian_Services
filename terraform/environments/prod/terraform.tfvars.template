@@ -48,6 +48,11 @@ contact_notify_email = "support@terian-services.com"
 # (16-character password, no spaces). Never commit the real value.
 gmail_app_password = "<place your own value>"
 
+# ── Serper (web search for LiveDataAgent) ────────────────────────────────────
+# Sign up at https://serper.dev to get an API key (free tier: 2,500 searches/month).
+# Stored in Key Vault and injected as SERPER_API_KEY. Never commit the real value.
+serper_api_key = "<place your own value>"
+
 # Admin user — david64.terian@terian-services.com
 # Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
 admin_principal_id = "<place your own value>"

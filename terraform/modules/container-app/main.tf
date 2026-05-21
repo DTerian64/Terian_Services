@@ -193,6 +193,18 @@ resource "azurerm_key_vault_secret" "openai_key" {
   ]
 }
 
+# ── Serper API key → Key Vault secret ───────────────────────────────────────
+resource "azurerm_key_vault_secret" "serper_api_key" {
+  count        = var.serper_api_key != "" ? 1 : 0
+  name         = "serper-api-key"
+  value        = var.serper_api_key
+  key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [
+    time_sleep.kv_role_propagation,
+  ]
+}
+
 # ── Gmail App Password → Key Vault secret ────────────────────────────────────
 # Only created when gmail_app_password is supplied (count = 0 disables it).
 # Pass the value as TF_VAR_gmail_app_password or a GitHub Actions secret —
@@ -307,6 +319,16 @@ resource "azurerm_container_app" "backend" {
     identity            = azurerm_user_assigned_identity.backend.id
   }
 
+  # SERPER_API_KEY — only wired when the KV secret was created.
+  dynamic "secret" {
+    for_each = var.serper_api_key != "" ? [1] : []
+    content {
+      name                = "serper-api-key"
+      key_vault_secret_id = azurerm_key_vault_secret.serper_api_key[0].versionless_id
+      identity            = azurerm_user_assigned_identity.backend.id
+    }
+  }
+
   # GMAIL_APP_PASSWORD — only wired when the KV secret was created.
   dynamic "secret" {
     for_each = var.gmail_app_password != "" ? [1] : []
@@ -340,6 +362,13 @@ resource "azurerm_container_app" "backend" {
       env {
         name  = "AZURE_OPENAI_CLASSIFY_MODEL"
         value = azurerm_cognitive_deployment.gpt_classify.name
+      }
+      dynamic "env" {
+        for_each = var.serper_api_key != "" ? [1] : []
+        content {
+          name        = "SERPER_API_KEY"
+          secret_name = "serper-api-key"
+        }
       }
       env {
         name  = "AZURE_OPENAI_API_VERSION"
@@ -434,6 +463,7 @@ resource "azurerm_container_app" "backend" {
     azurerm_role_assignment.uami_kv_secrets_user,
     azurerm_role_assignment.uami_app_insights_reader,
     azurerm_key_vault_secret.openai_key,
+    azurerm_key_vault_secret.serper_api_key,
     azurerm_key_vault_secret.gmail_app_password,
     azurerm_cognitive_deployment.gpt,
     azurerm_cognitive_deployment.gpt_classify,

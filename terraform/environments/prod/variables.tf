@@ -191,6 +191,15 @@ variable "openai_classify_tpm_capacity" {
   default     = 2
 }
 
+# ── Serper (LiveDataAgent web search tool) ───────────────────────────────────
+
+variable "serper_api_key" {
+  description = "Serper API key for the search_web tool (https://serper.dev). Sensitive — inject via tfvars; never commit the real value."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "backend_allowed_origins" {
   description = "Comma-separated list of origins allowed to call /api/*."
   type        = string

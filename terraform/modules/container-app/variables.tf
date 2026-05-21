@@ -125,6 +125,15 @@ variable "openai_classify_tpm_capacity" {
   default     = 2
 }
 
+# ── Serper (LiveDataAgent web search tool) ───────────────────────────────────
+
+variable "serper_api_key" {
+  description = "Serper API key for the search_web tool (https://serper.dev). Sensitive — pass via tfvars or TF_VAR_serper_api_key; never commit. Leave empty to disable web search."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "tf_principal_object_id" {
   description = "Object ID of the principal running Terraform — granted Key Vault Secrets Officer so TF can write the OpenAI key. Pass data.azurerm_client_config.current.object_id."
   type        = string
