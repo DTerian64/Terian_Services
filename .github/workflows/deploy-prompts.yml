@@ -37,13 +37,14 @@ permissions:
 env:
   STORAGE_ACCOUNT:    stterianservices
   BLOB_CONTAINER:     ai-prompts
-  ACA_NAME:           terian-services-backend
-  ACA_RESOURCE_GROUP: rg_corporate
+  ACA_NAME:           ${{ vars.TERIAN_BACKEND_APP }}
+  ACA_RESOURCE_GROUP: ${{ vars.TERIAN_BACKEND_RG }}
 
 jobs:
   deploy-prompts:
     name: Upload prompts → Blob, restart ACA
     runs-on: ubuntu-latest
+    environment: prod   # reads AZURE_CLIENT_ID / TENANT_ID / SUBSCRIPTION_ID from the prod environment
 
     steps:
       - name: Checkout
