@@ -243,7 +243,6 @@ export default function AskAIPage() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [useOrchestrator, setUseOrchestrator] = useState(false);
   const nextMsgId = useRef(1);
 
   // ── File attachment ──────────────────────────────────────────────────────
@@ -373,9 +372,6 @@ export default function AskAIPage() {
     const question = aiQuestion.trim() || (attachedFile ? "Please analyze this image." : "");
     if (!question || aiLoading) return;
 
-    const isInvestigating = useOrchestrator;
-    if (isInvestigating) setUseOrchestrator(false);
-
     // Capture the file before clearing state
     const fileSnapshot = attachedFile;
 
@@ -469,11 +465,6 @@ export default function AskAIPage() {
   };
 
   // ── Derived ──────────────────────────────────────────────────────────────
-  const activeTitle =
-    activeConversationId
-      ? conversations.find((c) => c.id === activeConversationId)?.title ?? "Conversation"
-      : "Ask AI";
-
   const canSend = !aiLoading && (aiQuestion.trim().length > 0 || attachedFile !== null);
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -517,6 +508,7 @@ export default function AskAIPage() {
               </button>
             </div>
 
+            <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto py-2">
               {convLoading && (
                 <p className="py-4 text-center text-xs text-gray-400">Loading…</p>
@@ -568,18 +560,15 @@ export default function AskAIPage() {
                 </div>
               ))}
             </div>
+            {/* Sidebar footer */}
+            <div className="shrink-0 border-t border-gray-100 px-3 py-2">
+              <p className="text-center text-xs text-gray-400">Conversations saved automatically</p>
+            </div>
+            </div>
           </div>
 
           {/* ── Chat panel ── */}
           <div className="flex min-w-0 flex-1 flex-col">
-            {/* Header */}
-            <div className="shrink-0 border-b border-gray-100 px-6 py-4">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-gray-900">
-                <SendIcon size={16} />
-                {activeTitle}
-              </h2>
-            </div>
-
             {/* Messages — also the drag-and-drop target */}
             <div
               className={`flex-1 space-y-4 overflow-y-auto px-6 py-4 transition-colors ${
@@ -737,29 +726,14 @@ export default function AskAIPage() {
                       >
                         <PaperclipIcon size={18} />
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setUseOrchestrator((prev) => !prev)}
-                        disabled={aiLoading}
-                        title="Toggle investigation mode"
-                        className={`flex items-center justify-center rounded-full p-1.5 transition-colors disabled:opacity-40 ${
-                          useOrchestrator
-                            ? "bg-purple-100 text-purple-600"
-                            : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                        }`}
-                      >
-                        <PlusIcon size={20} />
-                      </button>
                     </div>
                     <button
                       type="button"
                       onClick={handleAskQuestion}
                       disabled={!canSend}
                       aria-label="Send message"
-                      className={`flex items-center justify-center rounded-full p-2 text-white transition-colors
-                                 disabled:cursor-not-allowed disabled:bg-gray-200 ${
-                        useOrchestrator ? "bg-purple-600 hover:bg-purple-700" : "bg-gray-900 hover:bg-gray-800"
-                      }`}
+                      className="flex items-center justify-center rounded-full p-2 text-white transition-colors
+                                 disabled:cursor-not-allowed disabled:bg-gray-200 bg-gray-900 hover:bg-gray-800"
                     >
                       {aiLoading ? (
                         <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -790,33 +764,13 @@ export default function AskAIPage() {
                   type="button"
                   onClick={handleAskQuestion}
                   disabled={!canSend}
-                  className={`hidden md:flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 ${
-                    useOrchestrator ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"
-                  }`}
+                  className="hidden md:flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 bg-blue-600 hover:bg-blue-700"
                 >
                   <SendIcon size={16} />
-                  {aiLoading ? (useOrchestrator ? "Investigating…" : "Thinking…") : "Send"}
+                  {aiLoading ? "Thinking…" : "Send"}
                 </button>
               </div>
 
-              {/* Footer row */}
-              <div className="mt-2 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => setUseOrchestrator((prev) => !prev)}
-                  disabled={aiLoading}
-                  title="Run a deep multi-agent investigation (one-shot — resets after submit)"
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-colors disabled:opacity-40 ${
-                    useOrchestrator
-                      ? "border border-purple-300 bg-purple-100 text-purple-700 hover:bg-purple-200"
-                      : "border border-transparent text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                  }`}
-                >
-                  <ShieldAlertIcon size={13} />
-                  {useOrchestrator ? "Investigate: ON" : "Investigate"}
-                </button>
-                <p className="text-xs text-gray-400">Conversations saved automatically</p>
-              </div>
             </div>
           </div>
         </div>
@@ -866,27 +820,6 @@ function ArrowUpIcon({ size = 16, className }: IconProps) {
       fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="12" y1="19" x2="12" y2="5" />
       <polyline points="5 12 12 5 19 12" />
-    </svg>
-  );
-}
-
-function PlusIcon({ size = 20, className }: IconProps) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} className={className}
-      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  );
-}
-
-function ShieldAlertIcon({ size = 13, className }: IconProps) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} className={className}
-      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   );
 }
