@@ -22,6 +22,7 @@ from .agent_router import AgentRouter
 from .image_processor_agent import ImageProcessorAgent
 from .pdf_processor_agent import PDFProcessorAgent
 from .csv_processor_agent import CSVProcessorAgent
+from .word_processor_agent import WordProcessorAgent
 from .agent_orchestrator import AgentOrchestrator
 
 __all__ = [
@@ -35,5 +36,6 @@ __all__ = [
     "ImageProcessorAgent",
     "PDFProcessorAgent",
     "CSVProcessorAgent",
+    "WordProcessorAgent",
     "AgentOrchestrator",
 ]

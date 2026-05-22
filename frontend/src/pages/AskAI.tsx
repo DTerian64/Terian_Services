@@ -80,7 +80,9 @@ type ChatMessage = {
   id: number;
   role: Role;
   content: string;
-  imagePreview?: string;  // data-URI shown in the user bubble when an image was attached
+  imagePreview?: string;    // data-URI for image preview in the user bubble
+  attachmentType?: string;  // MIME type of the attachment (to choose image vs badge)
+  attachmentName?: string;  // original filename for the document badge
 };
 
 type ConversationSummary = {
@@ -102,8 +104,29 @@ type AttachedFile = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB
-const ACCEPTED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+const MAX_IMAGE_BYTES    = 4  * 1024 * 1024; // 4 MB  — images
+const MAX_DOC_BYTES      = 10 * 1024 * 1024; // 10 MB — documents
+
+const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+const DOC_TYPES   = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  "application/msword",                                                        // .doc
+  "text/csv",
+  "application/vnd.ms-excel",                                                  // .xls
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",        // .xlsx
+]);
+const ACCEPTED_TYPES = new Set([...IMAGE_TYPES, ...DOC_TYPES]);
+
+/** Short label shown on the document badge. */
+function docLabel(mime: string): string {
+  if (mime === "application/pdf") return "PDF";
+  if (mime.includes("wordprocessingml") || mime === "application/msword") return "DOCX";
+  if (mime.includes("spreadsheetml")) return "XLSX";
+  if (mime === "application/vnd.ms-excel") return "XLS";
+  if (mime === "text/csv") return "CSV";
+  return "FILE";
+}
 
 const formatDay = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -274,12 +297,16 @@ export default function AskAIPage() {
   // ── File attachment handler ──────────────────────────────────────────────
 
   const handleFileAttach = useCallback((file: File) => {
-    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
-      alert("Only images are supported (PNG, JPEG, WEBP, GIF).");
+    const mime = file.type || "application/octet-stream";
+    if (!ACCEPTED_TYPES.has(mime)) {
+      alert("Supported file types: images (PNG, JPEG, WEBP, GIF), PDF, Word (.docx), CSV, Excel.");
       return;
     }
-    if (file.size > MAX_IMAGE_BYTES) {
-      alert("Image must be smaller than 4 MB.");
+    const isImage = IMAGE_TYPES.has(mime);
+    const maxBytes = isImage ? MAX_IMAGE_BYTES : MAX_DOC_BYTES;
+    const maxLabel = isImage ? "4 MB" : "10 MB";
+    if (file.size > maxBytes) {
+      alert(`File must be smaller than ${maxLabel}.`);
       return;
     }
     const reader = new FileReader();
@@ -409,7 +436,9 @@ export default function AskAIPage() {
       id: nextMsgId.current++,
       role: "user",
       content: question,
-      imagePreview: fileSnapshot?.preview,
+      imagePreview:    fileSnapshot?.preview,
+      attachmentType:  fileSnapshot?.type,
+      attachmentName:  fileSnapshot?.name,
     };
     const nextMessages = [...chatMessages, userMessage];
     setChatMessages(nextMessages);
@@ -474,7 +503,7 @@ export default function AskAIPage() {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
+        accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx,application/msword,.doc,text/csv,.csv,application/vnd.ms-excel,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xlsx"
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -619,13 +648,22 @@ export default function AskAIPage() {
                         : "rounded-bl-sm bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {/* Image thumbnail in user bubble */}
+                    {/* Attachment in user bubble */}
                     {msg.imagePreview && (
-                      <img
-                        src={msg.imagePreview}
-                        alt="Attached image"
-                        className="mb-2 max-h-48 max-w-xs rounded-lg object-contain"
-                      />
+                      IMAGE_TYPES.has(msg.attachmentType ?? "") ? (
+                        <img
+                          src={msg.imagePreview}
+                          alt="Attached image"
+                          className="mb-2 max-h-48 max-w-xs rounded-lg object-contain"
+                        />
+                      ) : (
+                        <div className="mb-2 flex items-center gap-1.5 rounded-lg bg-blue-500 px-2 py-1.5">
+                          <DocumentIcon size={14} className="shrink-0 text-blue-100" />
+                          <span className="text-xs text-blue-100 truncate max-w-[180px]">
+                            {msg.attachmentName ?? docLabel(msg.attachmentType ?? "")}
+                          </span>
+                        </div>
+                      )
                     )}
                     <MessageContent text={msg.content} isUser={msg.role === "user"} />
                   </div>
@@ -649,15 +687,24 @@ export default function AskAIPage() {
             {/* Input bar */}
             <div className="shrink-0 border-t border-gray-100 px-4 py-3 md:px-6 md:py-4">
 
-              {/* Attached image preview strip */}
+              {/* Attachment preview strip */}
               {attachedFile && (
                 <div className="mb-2 flex items-center gap-2">
                   <div className="relative shrink-0">
-                    <img
-                      src={attachedFile.preview}
-                      alt="Attachment preview"
-                      className="h-14 w-14 rounded-lg border border-gray-200 object-cover"
-                    />
+                    {IMAGE_TYPES.has(attachedFile.type) ? (
+                      <img
+                        src={attachedFile.preview}
+                        alt="Attachment preview"
+                        className="h-14 w-14 rounded-lg border border-gray-200 object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 flex-col items-center justify-center rounded-lg border border-gray-200 bg-gray-50 gap-0.5">
+                        <DocumentIcon size={22} className="text-gray-400" />
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          {docLabel(attachedFile.type)}
+                        </span>
+                      </div>
+                    )}
                     <button
                       type="button"
                       onClick={() => setAttachedFile(null)}
@@ -690,12 +737,14 @@ export default function AskAIPage() {
                       }
                     }}
                     onPaste={(e) => {
-                      // Support Ctrl+V image paste
+                      // Support Ctrl+V paste for images (clipboard screenshots etc.)
                       const items = Array.from(e.clipboardData.items);
-                      const imageItem = items.find((i) => i.type.startsWith("image/"));
-                      if (imageItem) {
+                      const fileItem = items.find(
+                        (i) => i.kind === "file" && ACCEPTED_TYPES.has(i.type)
+                      );
+                      if (fileItem) {
                         e.preventDefault();
-                        const file = imageItem.getAsFile();
+                        const file = fileItem.getAsFile();
                         if (file) handleFileAttach(file);
                       }
                     }}
@@ -820,6 +869,19 @@ function ArrowUpIcon({ size = 16, className }: IconProps) {
       fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="12" y1="19" x2="12" y2="5" />
       <polyline points="5 12 12 5 19 12" />
+    </svg>
+  );
+}
+
+function DocumentIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} className={className}
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
     </svg>
   );
 }

@@ -38,6 +38,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from agents import AgentOrchestrator, AskResult  # noqa: F401 (AskResult used for type clarity)
 import conversation_service as conv_svc
+import attachment_service as attach_svc
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +137,18 @@ async def ask(body: AskRequest) -> AskResponse:
         result.error,
         bool(body.file_data),
     )
+
+    # ── Persist attachment (fire-and-forget) ──────────────────────────────────
+    # Save the raw file to Blob Storage before persisting messages so the blob
+    # path could be stored alongside the message in a future schema update.
+    if body.file_data and body.file_type and body.conversation_id:
+        asyncio.ensure_future(
+            attach_svc.save_attachment(
+                conversation_id=body.conversation_id,
+                file_data=body.file_data,
+                file_type=body.file_type,
+            )
+        )
 
     # ── Persist messages (fire-and-forget) ───────────────────────────────────
     # Only when both visitor_id and conversation_id are provided by the client.

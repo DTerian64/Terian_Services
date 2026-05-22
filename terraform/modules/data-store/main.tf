@@ -57,6 +57,17 @@ resource "azurerm_storage_container" "ai_prompts" {
   container_access_type = "private"
 }
 
+# Blob container for Ask AI file attachments (images, PDFs, Word docs, CSVs).
+# Always private — written by the backend UAMI at request time; never served
+# directly to the browser.
+# Path convention: {conversation_id}/{timestamp_ms}.{ext}
+# This lets you list all attachments for a conversation with a single prefix query.
+resource "azurerm_storage_container" "ai_attachments" {
+  name                  = "ai-attachments"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "private"
+}
+
 
 # ── Cosmos DB account ────────────────────────────────────────────────────────
 

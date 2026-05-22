@@ -40,13 +40,23 @@ from agents.ask_agent import AskResult
 from agents.image_processor_agent import ImageProcessorAgent
 from agents.pdf_processor_agent import PDFProcessorAgent
 from agents.csv_processor_agent import CSVProcessorAgent
+from agents.word_processor_agent import WordProcessorAgent
 
 logger = logging.getLogger(__name__)
 
 # MIME types handled by each preprocessor
 _IMAGE_MIMES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 _PDF_MIMES   = {"application/pdf"}
-_CSV_MIMES   = {"text/csv", "application/vnd.ms-excel", "text/plain"}
+_WORD_MIMES  = {
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # .docx
+    "application/msword",                                                        # .doc
+}
+_CSV_MIMES   = {
+    "text/csv",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xlsx
+    "text/plain",
+}
 
 
 class AgentOrchestrator:
@@ -134,6 +144,10 @@ class AgentOrchestrator:
         if mime in _PDF_MIMES:
             logger.info("AgentOrchestrator: preprocessing PDF")
             return await PDFProcessorAgent().process(file_data)
+
+        if mime in _WORD_MIMES:
+            logger.info("AgentOrchestrator: preprocessing Word document (%s)", mime)
+            return await WordProcessorAgent().process(file_data)
 
         if mime in _CSV_MIMES:
             logger.info("AgentOrchestrator: preprocessing CSV (%s)", mime)
