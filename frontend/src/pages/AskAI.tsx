@@ -1,5 +1,7 @@
 import PageLayout from "../components/PageLayout";
 import { useEffect, useRef, useState, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /**
  * AskAI page
@@ -88,25 +90,113 @@ const titleFromQuestion = (q: string) => {
   return cleaned.length > 120 ? cleaned.slice(0, 117) + "…" : cleaned || "New conversation";
 };
 
-const URL_RE = /(https?:\/\/[^\s]+)/g;
-
+/**
+ * Renders a chat message.
+ *
+ * User messages — plain text with clickable URLs (users type plain text).
+ * Assistant messages — full markdown via react-markdown + remark-gfm so
+ *   headers, bold, bullets, tables, and code blocks all render properly.
+ */
 function MessageContent({ text, isUser }: { text: string; isUser: boolean }) {
-  const linkClass = isUser
-    ? "underline text-blue-200 hover:text-white"
-    : "underline text-blue-600 hover:text-blue-800";
-  const parts = text.split(URL_RE);
+  if (isUser) {
+    // Plain text + URL linkification for user bubbles.
+    const URL_RE = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(URL_RE);
+    return (
+      <p className="whitespace-pre-wrap text-sm leading-relaxed">
+        {parts.map((part, i) =>
+          URL_RE.test(part) ? (
+            <a key={i} href={part} target="_blank" rel="noopener noreferrer"
+               className="underline text-blue-200 hover:text-white">
+              {part}
+            </a>
+          ) : part
+        )}
+      </p>
+    );
+  }
+
+  // Assistant messages — rendered markdown.
   return (
-    <p className="whitespace-pre-wrap text-sm leading-relaxed">
-      {parts.map((part, i) =>
-        URL_RE.test(part) ? (
-          <a key={i} href={part} target="_blank" rel="noopener noreferrer" className={linkClass}>
-            {part}
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        // Paragraphs
+        p: ({ children }) => (
+          <p className="text-sm leading-relaxed mb-2 last:mb-0">{children}</p>
+        ),
+        // Headings
+        h1: ({ children }) => (
+          <h1 className="text-base font-bold mt-3 mb-1 first:mt-0">{children}</h1>
+        ),
+        h2: ({ children }) => (
+          <h2 className="text-sm font-bold mt-3 mb-1 first:mt-0">{children}</h2>
+        ),
+        h3: ({ children }) => (
+          <h3 className="text-sm font-semibold mt-2 mb-1 first:mt-0">{children}</h3>
+        ),
+        // Lists
+        ul: ({ children }) => (
+          <ul className="list-disc list-outside pl-4 mb-2 space-y-0.5 text-sm">{children}</ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="list-decimal list-outside pl-4 mb-2 space-y-0.5 text-sm">{children}</ol>
+        ),
+        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+        // Emphasis
+        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+        em: ({ children }) => <em className="italic">{children}</em>,
+        // Horizontal rule
+        hr: () => <hr className="my-2 border-gray-300" />,
+        // Links
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer"
+             className="underline text-blue-600 hover:text-blue-800">
+            {children}
           </a>
-        ) : (
-          part
-        )
-      )}
-    </p>
+        ),
+        // Inline code
+        code: ({ children, className }) => {
+          const isBlock = className?.includes("language-");
+          return isBlock ? (
+            <code className={`${className} block`}>{children}</code>
+          ) : (
+            <code className="rounded bg-gray-200 px-1 py-0.5 text-xs font-mono text-gray-800">
+              {children}
+            </code>
+          );
+        },
+        // Code blocks
+        pre: ({ children }) => (
+          <pre className="my-2 overflow-x-auto rounded-lg bg-gray-800 p-3 text-xs text-gray-100 font-mono leading-relaxed">
+            {children}
+          </pre>
+        ),
+        // Tables (remark-gfm)
+        table: ({ children }) => (
+          <div className="my-2 overflow-x-auto">
+            <table className="min-w-full border-collapse text-sm">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead className="bg-gray-200">{children}</thead>,
+        th: ({ children }) => (
+          <th className="border border-gray-300 px-3 py-1.5 text-left font-semibold text-xs">
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td className="border border-gray-300 px-3 py-1.5 text-xs">{children}</td>
+        ),
+        // Blockquotes
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-4 border-gray-300 pl-3 italic text-gray-600 my-2 text-sm">
+            {children}
+          </blockquote>
+        ),
+      }}
+    >
+      {text}
+    </ReactMarkdown>
   );
 }
 
