@@ -3,7 +3,8 @@
 # Persistent data layer for Terian Services:
 #
 #   Storage Account (stterianservices)
-#     └── Blob container: team-photos   (public blob read; images served directly to frontend)
+#     ├── Blob container: team-photos   (public blob read; images served directly to frontend)
+#     └── Blob container: ai-prompts    (private; agent prompt.md files read by backend UAMI)
 #
 #   Cosmos DB account (terian-services-cosmos-db) — Serverless, SQL API
 #     └── Database: terian-services
@@ -44,6 +45,16 @@ resource "azurerm_storage_container" "team_photos" {
   name                  = "team-photos"
   storage_account_name  = azurerm_storage_account.media.name
   container_access_type = "blob"   # public read for blobs; no container listing
+}
+
+# Blob container for AI agent prompt files (base, company_info, product, web_search)
+# Always private — the backend reads these via the UAMI (Storage Blob Data Reader).
+# The GitHub Actions deploy-prompts workflow writes here via Storage Blob Data Contributor.
+# Source of truth: ai_prompts/<skill>/prompt.md in this repo.
+resource "azurerm_storage_container" "ai_prompts" {
+  name                  = "ai-prompts"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "private"
 }
 
 

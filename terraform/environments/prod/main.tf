@@ -211,6 +211,18 @@ resource "azurerm_cosmosdb_sql_role_assignment" "uami_cosmos_contributor" {
   scope               = module.data_store.cosmos_account_id
 }
 
+# ── GitHub Actions — Blob contributor for prompt upload ─────────────────────
+# The deploy-prompts workflow uploads ai_prompts/**  to the ai-prompts
+# Blob container.  Storage Blob Data Contributor on the storage account
+# allows upload-batch writes without needing the storage account key.
+
+resource "azurerm_role_assignment" "gha_blob_contributor" {
+  count                = var.github_actions_principal_id != "" ? 1 : 0
+  scope                = module.data_store.storage_account_id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = var.github_actions_principal_id
+}
+
 # ── Admin user access (david64.terian@terian-services.com) ──────────────────
 
 resource "azurerm_role_assignment" "admin_blob_contributor" {

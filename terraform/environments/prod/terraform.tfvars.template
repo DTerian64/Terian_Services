@@ -56,3 +56,7 @@ serper_api_key = "<place your own value>"
 # Admin user — david64.terian@terian-services.com
 # Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
 admin_principal_id = "<place your own value>"
+
+# Serper API key — sign up at https://serper.dev to obtain.
+# Stored in Key Vault and injected as SERPER_API_KEY. Never commit the real value.
+serper_api_key = "<place your own value>" #https://serper.dev/api-keys

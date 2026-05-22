@@ -19,16 +19,32 @@ Flow (decided by the LLM at runtime, not by Python):
     │                                                     │
     └─► AskResult  (returned to main.py)                  │
 
-Skill layout — each skill owns both its prompt context and its tools:
+Skill layout — each skill owns its tools (Python stays on disk) while
+prompts live in Azure Blob Storage (container: ai-prompts):
 
     agents/skills/
-      base/         prompt.md            (prompt-only — tone & guardrails)
-      company_info/ prompt.md            (prompt-only — company facts)
-      <future>/     prompt.md [+ tools.py]
+      base/         (no tools.py — prompt-only skill)
+      company_info/ (no tools.py — prompt-only skill)
+      web_search/   tools.py  (SCHEMAS + IMPLEMENTATIONS for fetch/search)
 
-Adding a new skill is just dropping a directory in agents/skills/ with a
-prompt.md (required) and an optional tools.py exporting SCHEMAS and
-IMPLEMENTATIONS.  This file does not need to change.
+    Azure Blob Storage  ai-prompts/<skill>/prompt.md
+      base/prompt.md
+      company_info/prompt.md
+      product/prompt.md
+      web_search/prompt.md
+
+Prompts are read from Blob at startup using DefaultAzureCredential
+(UAMI via AZURE_CLIENT_ID in ACA; az-cli credential locally via `az login`).
+The container app is restarted by the deploy-prompts GitHub Actions workflow
+after any prompt update, so every replica picks up the latest content.
+
+Required environment variable:
+    AZURE_STORAGE_BLOB_ENDPOINT   e.g. https://stterianservices.blob.core.windows.net/
+
+Adding a new skill: drop a tools.py in agents/skills/<name>/ (optional),
+push a prompt.md to ai-prompts/<name>/prompt.md in Blob Storage, and add
+the name to _DEFAULT_SKILLS or pass it explicitly. No Python changes needed
+for prompt-only skills.
 
 main.py contract:
     from agents import AskAgent, AskResult
@@ -48,6 +64,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, cast
 
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
 from openai import AzureOpenAI
 from openai.types.chat import (
     ChatCompletionMessage,
@@ -64,12 +82,57 @@ logger = logging.getLogger(__name__)
 # Max tool-call iterations per request — prevents runaway loops.
 _MAX_ITERATIONS = 8
 
-# Skills directory — one subdirectory per skill.
+# Skills directory — one subdirectory per skill (tools.py lives here; prompts are in Blob).
 _SKILLS_DIR = Path(__file__).parent / "skills"
+
+# Blob Storage container that holds all skill prompt.md files.
+_BLOB_CONTAINER = "ai-prompts"
 
 # Default skill set for the public Ask agent (order matters — base always first).
 # Add new skills here as they are created.
-_DEFAULT_SKILLS = ["base", "company_info"]
+_DEFAULT_SKILLS = ["base", "company_info", "product", "web_search"]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Blob prompt loader
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _fetch_blob_prompt(skill_name: str) -> str:
+    """
+    Download <skill_name>/prompt.md from the ai-prompts Blob container.
+
+    Uses DefaultAzureCredential — in ACA this resolves to the UAMI
+    (AZURE_CLIENT_ID is already set as a container env var); locally it
+    falls through to az-cli / env-var credentials.
+
+    Requires AZURE_STORAGE_BLOB_ENDPOINT to be set (e.g.
+    https://stterianservices.blob.core.windows.net/).
+
+    Raises:
+        EnvironmentError  — AZURE_STORAGE_BLOB_ENDPOINT is not set
+        RuntimeError      — blob download failed (missing blob, auth error, etc.)
+    """
+    blob_endpoint = os.environ.get("AZURE_STORAGE_BLOB_ENDPOINT", "").rstrip("/")
+    if not blob_endpoint:
+        raise EnvironmentError(
+            "AZURE_STORAGE_BLOB_ENDPOINT is required but not set. "
+            "Set it to the storage account's primary blob endpoint "
+            "(e.g. https://stterianservices.blob.core.windows.net/)."
+        )
+
+    blob_path = f"{skill_name}/prompt.md"
+    try:
+        credential = DefaultAzureCredential()
+        service = BlobServiceClient(account_url=blob_endpoint, credential=credential)
+        blob = service.get_blob_client(container=_BLOB_CONTAINER, blob=blob_path)
+        content: bytes = blob.download_blob().readall()
+        logger.debug("ask_agent: downloaded blob %s/%s (%d bytes)", _BLOB_CONTAINER, blob_path, len(content))
+        return content.decode("utf-8")
+    except Exception as exc:
+        raise RuntimeError(
+            f"Failed to load prompt for skill '{skill_name}' "
+            f"from {blob_endpoint}/{_BLOB_CONTAINER}/{blob_path}: {exc}"
+        ) from exc
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -80,51 +143,36 @@ def _load_skills(
     skill_names: list[str],
 ) -> tuple[str, list[dict], dict[str, Callable]]:
     """
-    Load skills from agents/skills/<name>/ directories.
+    Load skills: prompts from Azure Blob Storage, tools from disk.
 
-    Each skill directory may contain:
-      prompt.md  — natural-language instructions appended to the system prompt
-                   (REQUIRED)
-      tools.py   — optional; must export
-                     SCHEMAS         (list[dict] of OpenAI tool schemas)
-                     IMPLEMENTATIONS (dict[str, async callable])
+    For each skill name:
+      prompt.md  — downloaded from Blob Storage (ai-prompts/<name>/prompt.md).
+                   Fails hard if the blob is unreachable.
+      tools.py   — loaded from agents/skills/<name>/tools.py if it exists;
+                   silently skipped for prompt-only skills (base, company_info).
+                   Must export SCHEMAS (list[dict]) and IMPLEMENTATIONS (dict).
 
     Returns:
       prompt      — concatenated system prompt (all skills, separated by ---)
       all_schemas — flat list of OpenAI tool schemas from every skill's tools.py
       all_impls   — merged dict mapping tool name → async callable
 
-    Raises FileNotFoundError if a named skill directory or its prompt.md is
-    missing.  A missing tools.py is silently treated as "no tools" so
-    prompt-only skills (like company_info) work without a tools file.
-    Raises ValueError if two skills register the same tool name.
+    Raises:
+      EnvironmentError  — AZURE_STORAGE_BLOB_ENDPOINT is not set
+      RuntimeError      — a blob download failed
+      ValueError        — two skills register the same tool name
     """
     prompt_sections: list[str] = []
     all_schemas: list[dict] = []
     all_impls: dict[str, Callable] = {}
 
     for name in skill_names:
-        skill_dir = _SKILLS_DIR / name
-        if not skill_dir.is_dir():
-            available = (
-                [p.name for p in _SKILLS_DIR.iterdir() if p.is_dir()]
-                if _SKILLS_DIR.exists() else []
-            )
-            raise FileNotFoundError(
-                f"Skill '{name}' not found at: {skill_dir}\n"
-                f"Available skills: {available}"
-            )
+        # ── Prompt (from Blob Storage — required) ────────────────────────────
+        prompt_text = _fetch_blob_prompt(name)
+        prompt_sections.append(prompt_text.strip())
 
-        # ── Prompt (required) ────────────────────────────────────────────────
-        prompt_path = skill_dir / "prompt.md"
-        if not prompt_path.exists():
-            raise FileNotFoundError(
-                f"Skill '{name}' is missing prompt.md at: {prompt_path}"
-            )
-        prompt_sections.append(prompt_path.read_text(encoding="utf-8").strip())
-
-        # ── Tools (optional) ─────────────────────────────────────────────────
-        tools_path = skill_dir / "tools.py"
+        # ── Tools (from disk — optional) ─────────────────────────────────────
+        tools_path = _SKILLS_DIR / name / "tools.py"
         if tools_path.exists():
             spec = importlib.util.spec_from_file_location(
                 f"agents.skills.{name}.tools", tools_path

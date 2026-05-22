@@ -1,0 +1,86 @@
+# .github/workflows/deploy-prompts.yml
+# ─────────────────────────────────────────────────────────────────────────────
+# Prompt Update Pipeline
+#
+# Triggered by: any push to main that touches ai_prompts/**
+#
+# Steps:
+#   1. Upload changed prompt files to Azure Blob Storage (ai-prompts container)
+#   2. Trigger a rolling restart of the Container App so every replica
+#      picks up the new prompts on its next startup.
+#
+# Auth: OIDC federated identity — no long-lived secrets.
+#   Required GitHub secrets:
+#     AZURE_TENANT_ID        — Azure AD tenant ID
+#     AZURE_SUBSCRIPTION_ID  — Subscription ID
+#     AZURE_CLIENT_ID        — GHA OIDC app registration client ID
+#                              (same principal used for ACR + ACA deployments)
+#
+# Required Azure role assignments on the GHA principal (managed in Terraform):
+#   Storage Blob Data Contributor — scope: stterianservices storage account
+#   Container Apps Contributor    — scope: terian-services-backend (existing)
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Deploy AI Prompts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "ai_prompts/**"
+
+permissions:
+  id-token: write   # required for OIDC token issuance
+  contents: read
+
+env:
+  STORAGE_ACCOUNT:    stterianservices
+  BLOB_CONTAINER:     ai-prompts
+  ACA_NAME:           terian-services-backend
+  ACA_RESOURCE_GROUP: rg_corporate
+
+jobs:
+  deploy-prompts:
+    name: Upload prompts → Blob, restart ACA
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Azure login (OIDC — no stored credentials) ──────────────────────────
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+
+      # ── Upload all prompt files to Blob Storage ──────────────────────────────
+      # upload-batch syncs ai_prompts/ → ai-prompts container.
+      # Blob paths become  <skill>/prompt.md  (e.g. base/prompt.md).
+      # --overwrite true replaces existing blobs; new blobs are created as-is.
+      - name: Upload prompts to Blob Storage
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ env.STORAGE_ACCOUNT }} \
+            --auth-mode    login \
+            --destination  ${{ env.BLOB_CONTAINER }} \
+            --source       ai_prompts \
+            --overwrite    true
+
+      # ── Rolling restart — new revision picks up fresh prompts from Blob ──────
+      # Creating a new revision (via --revision-suffix) causes ACA to spin up
+      # replicas with the new suffix, then drain the old ones gracefully.
+      # New replicas always load prompts from Blob at startup, so they get the
+      # just-uploaded content. This works for 1 or N replicas with no extra
+      # coordination.
+      - name: Restart Container App (rolling)
+        run: |
+          SUFFIX="prompts-$(date +%s)"
+          az containerapp update \
+            --name           ${{ env.ACA_NAME }} \
+            --resource-group ${{ env.ACA_RESOURCE_GROUP }} \
+            --revision-suffix "${SUFFIX}"
+          echo "New revision suffix: ${SUFFIX}"
