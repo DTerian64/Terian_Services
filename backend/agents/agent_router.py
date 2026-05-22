@@ -55,9 +55,13 @@ company_info  — general questions about Terian: who we are, the team, services
                 we offer, pricing, contact details, culture, or partnerships.
 product       — specific questions about product features, technical architecture,
                 ML capabilities, integrations, demos, or the Award Nomination System.
-live_data     — questions requiring real-time or external information: current
-                events, live pricing, recent news, or anything beyond Terian's
-                own content.
+live_data     — ANY question that asks to fetch, read, summarize, or browse a URL
+                or web page (regardless of whose site it is); or questions requiring
+                real-time / external information such as current events, live pricing,
+                recent news, or competitor comparisons.
+
+When the user provides a URL or asks to "summarize this page", "read this link",
+"check the site", or similar — always classify as live_data.
 
 Reply with ONLY the category name. No punctuation, no explanation.\
 """
