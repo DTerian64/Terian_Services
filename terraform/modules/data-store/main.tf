@@ -119,3 +119,29 @@ resource "azurerm_cosmosdb_sql_container" "client_communications" {
   default_ttl = -1
 }
 
+# ── Ask AI conversation storage ───────────────────────────────────────────────
+# Two containers mirror the Award Nomination AskConversations / AskMessages
+# pattern, adapted for anonymous visitors (visitor_id replaces UserId+TenantId).
+
+resource "azurerm_cosmosdb_sql_container" "ai_conversations" {
+  name                = "ai_conversations"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  # Partition by visitor so listing a user's conversations is a single-partition query.
+  partition_key_paths = ["/visitor_id"]
+
+  default_ttl = -1
+}
+
+resource "azurerm_cosmosdb_sql_container" "ai_messages" {
+  name                = "ai_messages"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  # Partition by conversation so loading all messages is a single-partition query.
+  partition_key_paths = ["/conversation_id"]
+
+  default_ttl = -1
+}
+

@@ -27,6 +27,7 @@ multi-turn context.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Optional
 
@@ -34,6 +35,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 
 from agents import AgentRouter, AskResult  # noqa: F401 (AskResult used for type clarity)
+import conversation_service as conv_svc
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +71,9 @@ class HistoryTurn(BaseModel):
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
     history: list[HistoryTurn] = Field(default_factory=list)
+    # Persistence — both optional; if omitted, the exchange is not saved.
+    visitor_id: Optional[str] = Field(default=None, max_length=36)
+    conversation_id: Optional[str] = Field(default=None, max_length=36)
 
     @field_validator("history")
     @classmethod
@@ -83,6 +88,7 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     question: str
     answer: str
+    intent: Optional[str] = None
     error: Optional[str] = None
 
 
@@ -116,17 +122,38 @@ async def ask(body: AskRequest) -> AskResponse:
         result.error,
     )
 
+    # ── Persist messages (fire-and-forget) ───────────────────────────────────
+    # Only when both visitor_id and conversation_id are provided by the client.
+    # Runs as a background task so a Cosmos hiccup never blocks the response.
+    if body.visitor_id and body.conversation_id and result.answer:
+        tool_calls = (
+            [{"name": tc.name, "args": tc.args, "result": tc.result} for tc in result.tool_calls]
+            if result.tool_calls else None
+        )
+        asyncio.ensure_future(
+            conv_svc.append_messages(
+                conversation_id=body.conversation_id,
+                visitor_id=body.visitor_id,
+                user_content=body.question,
+                assistant_content=result.answer,
+                intent=result.intent,
+                tool_calls=tool_calls,
+            )
+        )
+
     if result.error and not result.answer:
         # Agent produced no usable answer — surface a friendly message but
         # keep the technical detail in `error` for the client to log.
         return AskResponse(
             question=result.question,
             answer="Sorry, I couldn't generate a response right now. Please try again in a moment, or email support@terian-services.com.",
+            intent=result.intent,
             error=result.error,
         )
 
     return AskResponse(
         question=result.question,
         answer=result.answer,
+        intent=result.intent,
         error=result.error,
     )
