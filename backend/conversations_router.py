@@ -56,12 +56,22 @@ def _validate_uuid(value: str, field: str) -> str:
 class CreateConversationRequest(BaseModel):
     visitor_id: str = Field(..., min_length=36, max_length=36)
     title: str = Field(default="New conversation", max_length=120)
+    # The frontend proposes its own UUID so messages and conversation share the
+    # same ID without a round-trip.  If omitted, the server generates one.
+    id: str | None = Field(default=None, max_length=36)
 
     @field_validator("visitor_id")
     @classmethod
     def _visitor_uuid(cls, v: str) -> str:
         if not _UUID_RE.match(v):
             raise ValueError("visitor_id must be a valid UUID")
+        return v
+
+    @field_validator("id")
+    @classmethod
+    def _id_uuid(cls, v: str | None) -> str | None:
+        if v is not None and not _UUID_RE.match(v):
+            raise ValueError("id must be a valid UUID")
         return v
 
 
@@ -97,6 +107,7 @@ async def create_conversation(body: CreateConversationRequest) -> ConversationDo
         doc = await svc.create_conversation(
             visitor_id=body.visitor_id,
             title=body.title,
+            conversation_id=body.id,
         )
         return ConversationDoc(**doc)
     except Exception as exc:

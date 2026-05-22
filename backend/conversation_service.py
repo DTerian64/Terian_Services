@@ -61,16 +61,23 @@ async def _cosmos_context():
 # Conversations
 # ─────────────────────────────────────────────────────────────────────────────
 
-async def create_conversation(visitor_id: str, title: str) -> dict:
+async def create_conversation(
+    visitor_id: str,
+    title: str,
+    conversation_id: str | None = None,
+) -> dict:
     """
     Insert a new conversation document and return it.
 
-    title — first 120 chars of the opening user message (caller truncates).
+    conversation_id — use the caller's UUID when provided (keeps messages and
+                      conversation in sync without a round-trip).  A fresh UUID
+                      is generated when omitted.
+    title           — first 120 chars of the opening user message.
     """
     endpoint, db_name = await _cosmos_context()
     now = _now_iso()
     doc = {
-        "id":         str(uuid.uuid4()),
+        "id":         conversation_id or str(uuid.uuid4()),
         "visitor_id": visitor_id,
         "title":      title[:120] if title else "New conversation",
         "created_at": now,
