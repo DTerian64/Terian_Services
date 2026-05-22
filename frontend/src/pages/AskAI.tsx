@@ -24,6 +24,14 @@ import remarkGfm from "remark-gfm";
  *
  * All subsequent sends within the same conversation pass the same
  * conversation_id; the backend appends messages to Cosmos DB.
+ *
+ * File attachments
+ * ────────────────
+ * Images only (PNG, JPEG, WEBP, GIF ≤ 4 MB).
+ * Three entry points: paperclip button, drag-and-drop onto chat area, or paste.
+ * The image is base64-encoded in the browser and sent as file_data + file_type
+ * alongside the question. The backend routes it through ImageProcessorAgent
+ * before the specialist agent answers.
  */
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
@@ -72,6 +80,7 @@ type ChatMessage = {
   id: number;
   role: Role;
   content: string;
+  imagePreview?: string;  // data-URI shown in the user bubble when an image was attached
 };
 
 type ConversationSummary = {
@@ -80,7 +89,21 @@ type ConversationSummary = {
   updated_at: string;
 };
 
+type AttachedFile = {
+  /** Raw base64 bytes — no data-URI prefix. Sent to the backend. */
+  data: string;
+  /** MIME type, e.g. "image/png". */
+  type: string;
+  /** Original filename shown in the preview strip. */
+  name: string;
+  /** Full data-URI used for the <img> preview. */
+  preview: string;
+};
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024; // 4 MB
+const ACCEPTED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
 const formatDay = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -223,6 +246,11 @@ export default function AskAIPage() {
   const [useOrchestrator, setUseOrchestrator] = useState(false);
   const nextMsgId = useRef(1);
 
+  // ── File attachment ──────────────────────────────────────────────────────
+  const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // ── Rename state ─────────────────────────────────────────────────────────
   const [editingConvId, setEditingConvId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -243,6 +271,31 @@ export default function AskAIPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [chatMessages, aiLoading]);
+
+  // ── File attachment handler ──────────────────────────────────────────────
+
+  const handleFileAttach = useCallback((file: File) => {
+    if (!ACCEPTED_IMAGE_TYPES.has(file.type)) {
+      alert("Only images are supported (PNG, JPEG, WEBP, GIF).");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      alert("Image must be smaller than 4 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      // dataUrl format: "data:<mime>;base64,<data>"
+      const commaIdx = dataUrl.indexOf(",");
+      const header = dataUrl.slice(0, commaIdx);
+      const base64Data = dataUrl.slice(commaIdx + 1);
+      const mimeMatch = header.match(/data:([^;]+)/);
+      const mime = mimeMatch ? mimeMatch[1] : file.type;
+      setAttachedFile({ data: base64Data, type: mime, name: file.name, preview: dataUrl });
+    };
+    reader.readAsDataURL(file);
+  }, []);
 
   // ── API helpers ──────────────────────────────────────────────────────────
 
@@ -275,6 +328,7 @@ export default function AskAIPage() {
     setActiveConversationId(null);
     setChatMessages([]);
     setAiQuestion("");
+    setAttachedFile(null);
     nextMsgId.current = 1;
     questionInputRef.current?.focus();
     if (questionInputRef.current) questionInputRef.current.style.height = "auto";
@@ -316,11 +370,14 @@ export default function AskAIPage() {
   // ── Ask handler ──────────────────────────────────────────────────────────
 
   const handleAskQuestion = async () => {
-    const question = aiQuestion.trim();
+    const question = aiQuestion.trim() || (attachedFile ? "Please analyze this image." : "");
     if (!question || aiLoading) return;
 
     const isInvestigating = useOrchestrator;
     if (isInvestigating) setUseOrchestrator(false);
+
+    // Capture the file before clearing state
+    const fileSnapshot = attachedFile;
 
     // ── Ensure we have a conversation ID ────────────────────────────────────
     let convId = activeConversationRef.current;
@@ -332,7 +389,7 @@ export default function AskAIPage() {
 
     // ── Create conversation in DB on first message ───────────────────────────
     if (!conversationCreated.current) {
-      conversationCreated.current = true; // optimistic — prevent double-create
+      conversationCreated.current = true;
       const title = titleFromQuestion(question);
       try {
         await fetch(`${API_BASE}/api/conversations`, {
@@ -340,23 +397,28 @@ export default function AskAIPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ visitor_id: visitorId.current, title, id: convId }),
         });
-        // Prepend to sidebar immediately (optimistic UI)
         setConversations((prev) => [
           { id: convId!, title, updated_at: new Date().toISOString() },
           ...prev.filter((c) => c.id !== convId),
         ]);
       } catch (err) {
         console.error("Failed to create conversation:", err);
-        conversationCreated.current = false; // allow retry
+        conversationCreated.current = false;
       }
     }
 
     // ── Append user message to chat ──────────────────────────────────────────
     const historyForApi = chatMessages.map(({ role, content }) => ({ role, content }));
-    const userMessage: ChatMessage = { id: nextMsgId.current++, role: "user", content: question };
+    const userMessage: ChatMessage = {
+      id: nextMsgId.current++,
+      role: "user",
+      content: question,
+      imagePreview: fileSnapshot?.preview,
+    };
     const nextMessages = [...chatMessages, userMessage];
     setChatMessages(nextMessages);
     setAiQuestion("");
+    setAttachedFile(null);
     if (questionInputRef.current) {
       questionInputRef.current.style.height = "auto";
       questionInputRef.current.focus();
@@ -372,6 +434,8 @@ export default function AskAIPage() {
           history: historyForApi,
           visitor_id: visitorId.current,
           conversation_id: convId,
+          file_data: fileSnapshot?.data ?? null,
+          file_type: fileSnapshot?.type ?? null,
         }),
       });
 
@@ -385,7 +449,6 @@ export default function AskAIPage() {
       };
       setChatMessages([...nextMessages, assistantMessage]);
 
-      // Bump updated_at in sidebar
       setConversations((prev) =>
         prev.map((c) =>
           c.id === convId ? { ...c, updated_at: new Date().toISOString() } : c
@@ -411,9 +474,24 @@ export default function AskAIPage() {
       ? conversations.find((c) => c.id === activeConversationId)?.title ?? "Conversation"
       : "Ask AI";
 
+  const canSend = !aiLoading && (aiQuestion.trim().length > 0 || attachedFile !== null);
+
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <PageLayout hideFooter darkBg={false}>
+      {/* Hidden file input — triggered by paperclip button */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleFileAttach(f);
+          e.target.value = ""; // allow re-selecting same file
+        }}
+      />
+
       <section className="bg-slate-50 px-0 py-0 md:px-6 md:py-6">
         <div className="mx-auto flex max-w-7xl gap-0 overflow-hidden rounded-none border border-gray-200 bg-white shadow-sm md:rounded-lg h-[calc(100vh_-_5.4rem)] md:h-[calc(100vh_-_8.4rem)]">
 
@@ -502,9 +580,26 @@ export default function AskAIPage() {
               </h2>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-              {chatMessages.length === 0 && (
+            {/* Messages — also the drag-and-drop target */}
+            <div
+              className={`flex-1 space-y-4 overflow-y-auto px-6 py-4 transition-colors ${
+                isDragOver ? "bg-blue-50 ring-2 ring-inset ring-blue-300" : ""
+              }`}
+              onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+              onDragLeave={(e) => {
+                // Only clear when leaving the container itself, not a child
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setIsDragOver(false);
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragOver(false);
+                const file = e.dataTransfer.files[0];
+                if (file) handleFileAttach(file);
+              }}
+            >
+              {chatMessages.length === 0 && !isDragOver && (
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <SendIcon size={40} className="mb-6 text-gray-300 md:mb-4 md:text-gray-200" />
                   <p className="mb-2 text-xl font-semibold text-gray-800 md:mb-1 md:text-base md:font-medium md:text-gray-500">
@@ -516,7 +611,14 @@ export default function AskAIPage() {
                 </div>
               )}
 
-              {chatMessages.map((msg) => (
+              {isDragOver && (
+                <div className="flex h-full flex-col items-center justify-center text-center pointer-events-none">
+                  <PaperclipIcon size={40} className="mb-3 text-blue-400" />
+                  <p className="text-base font-medium text-blue-600">Drop image to attach</p>
+                </div>
+              )}
+
+              {!isDragOver && chatMessages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
@@ -528,6 +630,14 @@ export default function AskAIPage() {
                         : "rounded-bl-sm bg-gray-100 text-gray-800"
                     }`}
                   >
+                    {/* Image thumbnail in user bubble */}
+                    {msg.imagePreview && (
+                      <img
+                        src={msg.imagePreview}
+                        alt="Attached image"
+                        className="mb-2 max-h-48 max-w-xs rounded-lg object-contain"
+                      />
+                    )}
                     <MessageContent text={msg.content} isUser={msg.role === "user"} />
                   </div>
                 </div>
@@ -549,6 +659,31 @@ export default function AskAIPage() {
 
             {/* Input bar */}
             <div className="shrink-0 border-t border-gray-100 px-4 py-3 md:px-6 md:py-4">
+
+              {/* Attached image preview strip */}
+              {attachedFile && (
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="relative shrink-0">
+                    <img
+                      src={attachedFile.preview}
+                      alt="Attachment preview"
+                      className="h-14 w-14 rounded-lg border border-gray-200 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAttachedFile(null)}
+                      className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-gray-700 text-white hover:bg-gray-900"
+                      aria-label="Remove attachment"
+                    >
+                      <XIcon size={8} />
+                    </button>
+                  </div>
+                  <span className="truncate text-xs text-gray-500 max-w-[200px]">
+                    {attachedFile.name}
+                  </span>
+                </div>
+              )}
+
               <div className="flex flex-col gap-0 md:flex-row md:items-end md:gap-2">
                 <div
                   className="flex flex-1 flex-col rounded-2xl border border-gray-200
@@ -562,10 +697,20 @@ export default function AskAIPage() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        if (!aiLoading) handleAskQuestion();
+                        if (canSend) handleAskQuestion();
                       }
                     }}
-                    placeholder="Ask a question…"
+                    onPaste={(e) => {
+                      // Support Ctrl+V image paste
+                      const items = Array.from(e.clipboardData.items);
+                      const imageItem = items.find((i) => i.type.startsWith("image/"));
+                      if (imageItem) {
+                        e.preventDefault();
+                        const file = imageItem.getAsFile();
+                        if (file) handleFileAttach(file);
+                      }
+                    }}
+                    placeholder={attachedFile ? "Add a question about this image…" : "Ask a question…"}
                     rows={1}
                     disabled={aiLoading}
                     className="flex-1 resize-none overflow-hidden bg-transparent px-4 py-3 text-sm
@@ -577,23 +722,39 @@ export default function AskAIPage() {
 
                   {/* Mobile-only action row */}
                   <div className="flex items-center justify-between px-3 pb-2 md:hidden">
-                    <button
-                      type="button"
-                      onClick={() => setUseOrchestrator((prev) => !prev)}
-                      disabled={aiLoading}
-                      title="Toggle investigation mode"
-                      className={`flex items-center justify-center rounded-full p-1.5 transition-colors disabled:opacity-40 ${
-                        useOrchestrator
-                          ? "bg-purple-100 text-purple-600"
-                          : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                      }`}
-                    >
-                      <PlusIcon size={20} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {/* Paperclip — mobile */}
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={aiLoading}
+                        title="Attach image"
+                        className={`flex items-center justify-center rounded-full p-1.5 transition-colors disabled:opacity-40 ${
+                          attachedFile
+                            ? "bg-blue-100 text-blue-600"
+                            : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                        }`}
+                      >
+                        <PaperclipIcon size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUseOrchestrator((prev) => !prev)}
+                        disabled={aiLoading}
+                        title="Toggle investigation mode"
+                        className={`flex items-center justify-center rounded-full p-1.5 transition-colors disabled:opacity-40 ${
+                          useOrchestrator
+                            ? "bg-purple-100 text-purple-600"
+                            : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                        }`}
+                      >
+                        <PlusIcon size={20} />
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={handleAskQuestion}
-                      disabled={aiLoading || !aiQuestion.trim()}
+                      disabled={!canSend}
                       aria-label="Send message"
                       className={`flex items-center justify-center rounded-full p-2 text-white transition-colors
                                  disabled:cursor-not-allowed disabled:bg-gray-200 ${
@@ -609,11 +770,26 @@ export default function AskAIPage() {
                   </div>
                 </div>
 
+                {/* Desktop: paperclip button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={aiLoading}
+                  title="Attach image (or drag and drop)"
+                  className={`hidden md:flex items-center justify-center rounded-xl p-3 transition-colors disabled:opacity-40 ${
+                    attachedFile
+                      ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                      : "border border-gray-300 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  }`}
+                >
+                  <PaperclipIcon size={18} />
+                </button>
+
                 {/* Desktop send button */}
                 <button
                   type="button"
                   onClick={handleAskQuestion}
-                  disabled={aiLoading || !aiQuestion.trim()}
+                  disabled={!canSend}
                   className={`hidden md:flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 ${
                     useOrchestrator ? "bg-purple-600 hover:bg-purple-700" : "bg-blue-600 hover:bg-blue-700"
                   }`}
@@ -711,6 +887,25 @@ function ShieldAlertIcon({ size = 13, className }: IconProps) {
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       <line x1="12" y1="8" x2="12" y2="12" />
       <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+  );
+}
+
+function PaperclipIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} className={className}
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+    </svg>
+  );
+}
+
+function XIcon({ size = 10, className }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} className={className}
+      fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
   );
 }

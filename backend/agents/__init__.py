@@ -3,13 +3,15 @@ agents/__init__.py
 ──────────────────
 Public interface of the agents package.
 
-ask_ai_router.py imports AgentRouter as the single entry point:
+ask_ai_router.py imports AgentOrchestrator as the single entry point:
 
-    from agents import AgentRouter, AskResult
+    from agents import AgentOrchestrator, AskResult
 
 Individual agent classes are also exported for testing and direct use:
 
     from agents import CompanyInfoAgent, ProductAgent, LiveDataAgent
+    from agents import ImageProcessorAgent, PDFProcessorAgent, CSVProcessorAgent
+    from agents import AgentRouter   # internal; prefer AgentOrchestrator
 """
 
 from .ask_agent import AskAgent, AskResult, ToolCall
@@ -17,6 +19,10 @@ from .company_info_agent import CompanyInfoAgent
 from .live_data_agent import LiveDataAgent
 from .product_agent import ProductAgent
 from .agent_router import AgentRouter
+from .image_processor_agent import ImageProcessorAgent
+from .pdf_processor_agent import PDFProcessorAgent
+from .csv_processor_agent import CSVProcessorAgent
+from .agent_orchestrator import AgentOrchestrator
 
 __all__ = [
     "AskAgent",
@@ -26,4 +32,8 @@ __all__ = [
     "LiveDataAgent",
     "ProductAgent",
     "AgentRouter",
+    "ImageProcessorAgent",
+    "PDFProcessorAgent",
+    "CSVProcessorAgent",
+    "AgentOrchestrator",
 ]

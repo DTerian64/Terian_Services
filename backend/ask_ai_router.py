@@ -9,17 +9,19 @@ via:
   • an Azure Front Door / API Management rate limit in front,
   • or a per-IP throttle middleware before this app goes live.
 
-Routing
-───────
-Every request is first classified by AgentRouter using a cheap fast model
-call, then dispatched to the appropriate specialist agent:
+Pipeline
+────────
+Every request is handled by AgentOrchestrator, which:
 
-  company_info → CompanyInfoAgent   (static FAQ, no tools, single LLM call)
-  product      → ProductAgent       (product deep-dives, no tools initially)
-  live_data    → LiveDataAgent      (web search tools when tools.py is added)
+  1. Detects an optional file attachment (image, PDF, CSV).
+  2. Routes the file to the appropriate preprocessor agent for a text
+     description / extraction.
+  3. Enriches the user question with that context.
+  4. Passes the enriched question to AgentRouter for specialist dispatch:
 
-The /api/ask endpoint itself is unaware of which agent handles the request —
-that is an internal routing detail.
+       company_info → CompanyInfoAgent   (static FAQ, no tools)
+       product      → ProductAgent       (product deep-dives)
+       live_data    → LiveDataAgent      (web search + fetch tools)
 
 Stateless — callers pass prior conversation turns in `history` to get
 multi-turn context.
@@ -34,7 +36,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 
-from agents import AgentRouter, AskResult  # noqa: F401 (AskResult used for type clarity)
+from agents import AgentOrchestrator, AskResult  # noqa: F401 (AskResult used for type clarity)
 import conversation_service as conv_svc
 
 logger = logging.getLogger(__name__)
@@ -42,17 +44,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-# ── AgentRouter singleton ─────────────────────────────────────────────────────
+# ── AgentOrchestrator singleton ───────────────────────────────────────────────
 # Constructed lazily so import-time errors (missing skill files, bad env vars)
 # surface as 503s on first call rather than crashing the process at boot.
-_router: Optional[AgentRouter] = None
+_orchestrator: Optional[AgentOrchestrator] = None
 
 
-def _get_router() -> AgentRouter:
-    global _router
-    if _router is None:
-        _router = AgentRouter()
-    return _router
+def _get_orchestrator() -> AgentOrchestrator:
+    global _orchestrator
+    if _orchestrator is None:
+        _orchestrator = AgentOrchestrator()
+    return _orchestrator
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -74,6 +76,11 @@ class AskRequest(BaseModel):
     # Persistence — both optional; if omitted, the exchange is not saved.
     visitor_id: Optional[str] = Field(default=None, max_length=36)
     conversation_id: Optional[str] = Field(default=None, max_length=36)
+    # File attachment — both must be present together to be processed.
+    # file_data: raw base64-encoded file bytes (no data-URI prefix).
+    # file_type: MIME type, e.g. "image/png", "application/pdf", "text/csv".
+    file_data: Optional[str] = Field(default=None)
+    file_type: Optional[str] = Field(default=None, max_length=100)
 
     @field_validator("history")
     @classmethod
@@ -98,28 +105,36 @@ async def ask(body: AskRequest) -> AskResponse:
     """
     Public Ask AI endpoint.
 
-    The AgentRouter classifies the question and delegates to the appropriate
-    specialist agent.  Stateless — pass prior conversation in `history` for
-    multi-turn context.  Returns `error` set when the agent failed to produce
-    a usable answer; HTTP status stays 200 so the SPA can show it inline.
+    The AgentOrchestrator preprocesses any file attachment, enriches the
+    question with extracted context, then delegates to AgentRouter for
+    specialist dispatch.  Stateless — pass prior conversation in `history`
+    for multi-turn context.  Returns `error` set when the agent failed to
+    produce a usable answer; HTTP status stays 200 so the SPA can show it
+    inline.
     """
     try:
-        agent_router = _get_router()
+        orchestrator = _get_orchestrator()
     except Exception as exc:
-        logger.exception("AgentRouter failed to initialise: %s", exc)
+        logger.exception("AgentOrchestrator failed to initialise: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Ask AI is temporarily unavailable. Please try again shortly.",
         )
 
     history = [t.model_dump() for t in body.history]
-    result = await agent_router.ask(body.question, history=history)
+    result = await orchestrator.ask(
+        body.question,
+        history=history,
+        file_data=body.file_data,
+        file_type=body.file_type,
+    )
 
     logger.info(
-        "ask: intent=%s tool_calls=%d error=%s",
+        "ask: intent=%s tool_calls=%d error=%s has_file=%s",
         result.intent,
         len(result.tool_calls),
         result.error,
+        bool(body.file_data),
     )
 
     # ── Persist messages (fire-and-forget) ───────────────────────────────────
