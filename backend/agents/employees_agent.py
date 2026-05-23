@@ -31,11 +31,12 @@ Flow
 
 Cosmos DB document shape (expected fields — all optional except `id`):
     {
-        "id":        "<slug or UUID>",
-        "name":      "Full Name",
-        "role":      "Job title",
-        "bio":       "One-paragraph description",
-        "expertise": ["Area 1", "Area 2", ...]   # list or comma-sep string
+        "id":         "<slug or UUID>",
+        "name":       "Full Name",
+        "title":      "Job title",
+        "bio":        "One-paragraph description",
+        "expertise":  ["Area 1", "Area 2", ...]   # list or comma-sep string
+        "sort_order": 1                            # controls display order
     }
 
 Auth
@@ -94,9 +95,11 @@ async def _fetch_employees() -> list[dict]:
                     .get_database_client(database_name)
                     .get_container_client(_CONTAINER_EMPLOYEES)
                 )
+                # SELECT * to avoid issues with missing/renamed fields.
+                # No partition_key arg → SDK performs a cross-partition
+                # query automatically for a single-partition-key container.
                 async for doc in container.query_items(
-                    query="SELECT c.name, c.role, c.bio, c.expertise FROM c",
-                    enable_cross_partition_query=True,
+                    query="SELECT * FROM c ORDER BY c.sort_order",
                 ):
                     results.append(doc)
 
@@ -125,7 +128,7 @@ def _format_roster(employees: list[dict]) -> str:
 
         lines.append(f"Name: {name}")
 
-        role = emp.get("role", "").strip()
+        role = emp.get("title", emp.get("role", "")).strip()
         if role:
             lines.append(f"Role: {role}")
 
