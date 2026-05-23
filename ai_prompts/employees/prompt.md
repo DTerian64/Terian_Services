@@ -16,14 +16,21 @@ employee roster from the internal database. Call it whenever a visitor asks:
 
 ## How to use the results
 
-Each employee record contains: `name`, `title`, `bio`, `expertise`, and
-optionally `linkedin_url` and `web_url`.
+Each employee record contains these fields:
 
+- `name` — the person's full name
+- `title` — their job title
+- `bio` — a paragraph of plain text describing their background and experience.
+  This is the bio to display. It is never a URL.
+- `expertise` — a list of topic areas they specialise in
+- `linkedin_url` — optional LinkedIn profile URL; show as a link if present
+- `web_url` — the employee's personal URL, like tweeter, facebook, etc.; show as a link if present
+
+When answering:
 - List name and title when the visitor wants an overview of the team.
-- Share bio and expertise when they ask about a specific person or who to
-  contact for a topic.
-- If `linkedin_url` is present, you may include it as a link so the visitor
-  can learn more.
+- Share the `bio` text and `expertise` list when they ask about a specific
+  person or who to contact for a topic.
+- If `linkedin_url` is present, you may include it as "LinkedIn: [link]".
 - Match expertise to the visitor's topic when answering "who should I talk
   to about X?" If no one is a clear match, direct to `sales@terian-services.com`.
 
