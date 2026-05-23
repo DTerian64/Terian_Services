@@ -39,20 +39,24 @@ from openai import AzureOpenAI
 
 from agents.ask_agent import AskResult
 from agents.company_info_agent import CompanyInfoAgent
+from agents.employees_agent import EmployeesAgent
 from agents.live_data_agent import LiveDataAgent
 from agents.product_agent import ProductAgent
 
 logger = logging.getLogger(__name__)
 
-_VALID_INTENTS = frozenset({"company_info", "product", "live_data"})
+_VALID_INTENTS = frozenset({"company_info", "employees", "product", "live_data"})
 _DEFAULT_INTENT = "company_info"
 
 _CLASSIFY_SYSTEM = """\
 You are an intent classifier for Terian Services, a B2B software company.
 Classify the user question into exactly one of these categories:
 
-company_info  — general questions about Terian: who we are, the team, services
+company_info  — general questions about Terian Services: who we are, what services
                 we offer, pricing, contact details, culture, or partnerships.
+employees     — questions specifically about the people at Terian Services: who works
+                here, team members, the founder, individual bios, areas of expertise,
+                or "who should I talk to about X?".
 product       — specific questions about product features, technical architecture,
                 ML capabilities, integrations, demos, or the Award Nomination System.
 live_data     — ANY question that asks to fetch, read, summarize, or browse a URL
@@ -87,6 +91,7 @@ class AgentRouter:
 
         # Specialist agents — constructed lazily on first use.
         self._company_info: Optional[CompanyInfoAgent] = None
+        self._employees: Optional[EmployeesAgent] = None
         self._product: Optional[ProductAgent] = None
         self._live_data: Optional[LiveDataAgent] = None
 
@@ -113,6 +118,11 @@ class AgentRouter:
         if self._company_info is None:
             self._company_info = CompanyInfoAgent(openai_client=self._get_client())
         return self._company_info
+
+    def _get_employees(self) -> EmployeesAgent:
+        if self._employees is None:
+            self._employees = EmployeesAgent(openai_client=self._get_client())
+        return self._employees
 
     def _get_product(self) -> ProductAgent:
         if self._product is None:
@@ -180,6 +190,7 @@ class AgentRouter:
 
         _agent_map = {
             "company_info": self._get_company_info,
+            "employees":    self._get_employees,
             "product":      self._get_product,
             "live_data":    self._get_live_data,
         }

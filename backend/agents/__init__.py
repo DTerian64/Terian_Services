@@ -16,6 +16,7 @@ Individual agent classes are also exported for testing and direct use:
 
 from .ask_agent import AskAgent, AskResult, ToolCall
 from .company_info_agent import CompanyInfoAgent
+from .employees_agent import EmployeesAgent
 from .live_data_agent import LiveDataAgent
 from .product_agent import ProductAgent
 from .agent_router import AgentRouter
@@ -30,6 +31,7 @@ __all__ = [
     "AskResult",
     "ToolCall",
     "CompanyInfoAgent",
+    "EmployeesAgent",
     "LiveDataAgent",
     "ProductAgent",
     "AgentRouter",

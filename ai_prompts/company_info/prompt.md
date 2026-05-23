@@ -181,9 +181,9 @@ Exportable for SOX, internal audit, and regulator review.
 stays in the elected region. EU / UK / Canada landing zones available on
 request for regulated workloads.
 
-**Compliance** — Terian inherits the Microsoft Azure compliance posture
+**Compliance** — Terian Services inherits the Microsoft Azure compliance posture
 (SOC 2, ISO 27001, HIPAA, FedRAMP — see Microsoft Trust Center). For
-Terian-owned products, the company is working toward independent **SOC 2
+Terian Services-owned products, the company is working toward independent **SOC 2
 Type II attestation**. Specific control documentation is available under
 NDA. Vulnerability reports: `security@terian-services.com` (acknowledged
 within one business day).
