@@ -268,6 +268,10 @@ export default function AskAIPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const nextMsgId = useRef(1);
 
+  // ── Intent indicator ─────────────────────────────────────────────────────
+  const [lastIntent, setLastIntent] = useState<string | null>(null);
+  const [intentVisible, setIntentVisible] = useState(false);
+
   // ── File attachment ──────────────────────────────────────────────────────
   const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -355,6 +359,8 @@ export default function AskAIPage() {
     setChatMessages([]);
     setAiQuestion("");
     setAttachedFile(null);
+    setLastIntent(null);
+    setIntentVisible(false);
     nextMsgId.current = 1;
     questionInputRef.current?.focus();
     if (questionInputRef.current) questionInputRef.current.style.height = "auto";
@@ -367,6 +373,8 @@ export default function AskAIPage() {
     setActiveConversationId(convId);
     setChatMessages([]);
     setAiLoading(false);
+    setLastIntent(null);
+    setIntentVisible(false);
     try {
       const res = await fetch(
         `${API_BASE}/api/conversations/${encodeURIComponent(convId)}/messages` +
@@ -449,6 +457,7 @@ export default function AskAIPage() {
       questionInputRef.current.focus();
     }
     setAiLoading(true);
+    setIntentVisible(false);
 
     try {
       const res = await fetch(`${API_BASE}/api/ask`, {
@@ -465,7 +474,7 @@ export default function AskAIPage() {
       });
 
       if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const data: { answer: string; error?: string | null } = await res.json();
+      const data: { answer: string; intent?: string | null; agent_label?: string | null; error?: string | null } = await res.json();
 
       const assistantMessage: ChatMessage = {
         id: nextMsgId.current++,
@@ -473,6 +482,10 @@ export default function AskAIPage() {
         content: data.answer || "Sorry, I couldn't generate a response. Please try again.",
       };
       setChatMessages([...nextMessages, assistantMessage]);
+      if (data.agent_label) {
+        setLastIntent(data.agent_label);
+        setIntentVisible(true);
+      }
 
       setConversations((prev) =>
         prev.map((c) =>
@@ -687,6 +700,16 @@ export default function AskAIPage() {
             {/* Input bar */}
             <div className="shrink-0 border-t border-gray-100 px-4 py-3 md:px-6 md:py-4">
 
+              {/* Intent indicator pill */}
+              {intentVisible && lastIntent && (
+                <div className="mb-2 flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs text-gray-500 transition-opacity duration-200">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
+                    {lastIntent}
+                  </span>
+                </div>
+              )}
+
               {/* Attachment preview strip */}
               {attachedFile && (
                 <div className="mb-2 flex items-center gap-2">
@@ -729,7 +752,10 @@ export default function AskAIPage() {
                   <textarea
                     ref={questionInputRef}
                     value={aiQuestion}
-                    onChange={(e) => setAiQuestion(e.target.value)}
+                    onChange={(e) => {
+                      setAiQuestion(e.target.value);
+                      if (intentVisible) setIntentVisible(false);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();

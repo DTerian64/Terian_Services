@@ -49,6 +49,16 @@ logger = logging.getLogger(__name__)
 _VALID_INTENTS = frozenset({"company_info", "contact", "employees", "product", "live_data"})
 _DEFAULT_INTENT = "company_info"
 
+# Human-readable agent labels returned to the frontend in AskResponse.agent_label.
+# When a new agent is added, add its intent → label here — no frontend changes needed.
+_AGENT_LABELS: dict[str, str] = {
+    "company_info": "Company Info Agent",
+    "product":      "Product Agent",
+    "employees":    "Team & People Agent",
+    "contact":      "Contact Agent",
+    "live_data":    "Web Search Agent",
+}
+
 _CLASSIFY_SYSTEM = """\
 You are an intent classifier for Terian Services, a B2B software company.
 Classify the user question into exactly one of these categories:
@@ -209,4 +219,5 @@ class AgentRouter:
 
         result = await agent.ask(question, history=history)
         result.intent = intent
+        result.agent_label = _AGENT_LABELS.get(intent)
         return result

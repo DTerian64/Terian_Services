@@ -234,7 +234,8 @@ class AskResult:
     answer: str
     tool_calls: list[ToolCall] = field(default_factory=list)
     error: str | None = None
-    intent: str | None = None   # set by AgentRouter after routing; None when agent called directly
+    intent: str | None = None        # set by AgentRouter after routing; None when agent called directly
+    agent_label: str | None = None   # human-readable agent name, set alongside intent
 
 
 # ─────────────────────────────────────────────────────────────────────────────

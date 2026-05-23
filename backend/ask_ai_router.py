@@ -97,6 +97,7 @@ class AskResponse(BaseModel):
     question: str
     answer: str
     intent: Optional[str] = None
+    agent_label: Optional[str] = None   # human-readable name of the agent that answered
     error: Optional[str] = None
 
 
@@ -176,6 +177,7 @@ async def ask(body: AskRequest) -> AskResponse:
             question=result.question,
             answer="Sorry, I couldn't generate a response right now. Please try again in a moment, or email support@terian-services.com.",
             intent=result.intent,
+            agent_label=result.agent_label,
             error=result.error,
         )
 
@@ -183,5 +185,6 @@ async def ask(body: AskRequest) -> AskResponse:
         question=result.question,
         answer=result.answer,
         intent=result.intent,
+        agent_label=result.agent_label,
         error=result.error,
     )
