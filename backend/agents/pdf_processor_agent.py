@@ -21,8 +21,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Hard cap on extracted text passed to the specialist agent.
-# ~8 000 chars ≈ ~2 000 tokens — enough for a dense 4-page document.
-_MAX_CHARS = 8_000
+# ~16 000 chars ≈ ~4 000 tokens — enough for a dense 10-12 page document
+# or a detailed multi-role resume.
+_MAX_CHARS = 16_000
 
 
 class PDFProcessorAgent:

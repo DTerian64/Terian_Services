@@ -197,9 +197,9 @@ module "data_store" {
 # data_store outputs flow into container_app, so data_store must not depend
 # on container_app's outputs (i.e. the UAMI principal ID).
 
-resource "azurerm_role_assignment" "uami_blob_reader" {
+resource "azurerm_role_assignment" "uami_blob_contributor" {
   scope                = module.data_store.storage_account_id
-  role_definition_name = "Storage Blob Data Reader"
+  role_definition_name = "Storage Blob Data Contributor"
   principal_id         = module.container_app.uami_principal_id
 }
 
