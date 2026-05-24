@@ -698,13 +698,13 @@ export default function AskAIPage() {
             </div>
 
             {/* Input bar */}
-            <div className="shrink-0 border-t border-gray-100 px-4 py-3 md:px-6 md:py-4">
+            <div className="shrink-0 border-t border-gray-100 px-4 py-2 md:px-6 md:py-3">
 
               {/* Intent indicator pill */}
               {intentVisible && lastIntent && (
-                <div className="mb-2 flex items-center gap-1.5">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-xs text-gray-500 transition-opacity duration-200">
-                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
+                <div className="mb-0.5 flex items-center">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-1.5 py-px text-[0.6rem] leading-none text-gray-400">
+                    <span className="h-1 w-1 rounded-full bg-blue-400 shrink-0" />
                     {lastIntent}
                   </span>
                 </div>
