@@ -698,7 +698,7 @@ export default function AskAIPage() {
             </div>
 
             {/* Input bar */}
-            <div className="shrink-0 border-t border-gray-100 px-4 py-2 md:px-6 md:py-3">
+            <div className="shrink-0 border-t border-gray-100 px-3 pb-2 pt-1.5 md:px-4 md:pb-3 md:pt-2">
 
               {/* Intent indicator pill */}
               {intentVisible && lastIntent && (
