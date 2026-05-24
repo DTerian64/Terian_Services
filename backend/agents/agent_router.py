@@ -41,12 +41,13 @@ from agents.ask_agent import AskResult
 from agents.company_info_agent import CompanyInfoAgent
 from agents.contact_agent import ContactAgent
 from agents.employees_agent import EmployeesAgent
+from agents.legal_agent import LegalAgent
 from agents.live_data_agent import LiveDataAgent
 from agents.product_agent import ProductAgent
 
 logger = logging.getLogger(__name__)
 
-_VALID_INTENTS = frozenset({"company_info", "contact", "employees", "product", "live_data"})
+_VALID_INTENTS = frozenset({"company_info", "contact", "employees", "legal", "product", "live_data"})
 _DEFAULT_INTENT = "company_info"
 
 # Human-readable agent labels returned to the frontend in AskResponse.agent_label.
@@ -56,6 +57,7 @@ _AGENT_LABELS: dict[str, str] = {
     "product":      "Product Agent",
     "employees":    "Team & People Agent",
     "contact":      "Contact Agent",
+    "legal":        "Legal Agent",
     "live_data":    "Web Search Agent",
 }
 
@@ -73,6 +75,10 @@ employees     — questions about the people AND partner firms associated with T
                 partners, the founder, individual or company bios, areas of expertise,
                 "who should I talk to about X?", or "does Terian Services have any
                 partners / collaborators / contractors?".
+legal         — questions about contracts, agreements, or legal templates: "do you
+                have an NDA", "can I see your MSA", "what are your terms", "do you
+                have a DPA", "SaaS subscription agreement", "contract templates",
+                or any request to view or download a legal document.
 product       — specific questions about product features, technical architecture,
                 ML capabilities, integrations, demos, or the Award Nomination System.
 live_data     — ANY question that asks to fetch, read, summarize, or browse a URL
@@ -109,6 +115,7 @@ class AgentRouter:
         self._company_info: Optional[CompanyInfoAgent] = None
         self._contact: Optional[ContactAgent] = None
         self._employees: Optional[EmployeesAgent] = None
+        self._legal: Optional[LegalAgent] = None
         self._product: Optional[ProductAgent] = None
         self._live_data: Optional[LiveDataAgent] = None
 
@@ -145,6 +152,11 @@ class AgentRouter:
         if self._employees is None:
             self._employees = EmployeesAgent(openai_client=self._get_client())
         return self._employees
+
+    def _get_legal(self) -> LegalAgent:
+        if self._legal is None:
+            self._legal = LegalAgent(openai_client=self._get_client())
+        return self._legal
 
     def _get_product(self) -> ProductAgent:
         if self._product is None:
@@ -214,6 +226,7 @@ class AgentRouter:
             "company_info": self._get_company_info,
             "contact":      self._get_contact,
             "employees":    self._get_employees,
+            "legal":        self._get_legal,
             "product":      self._get_product,
             "live_data":    self._get_live_data,
         }

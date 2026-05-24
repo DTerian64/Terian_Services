@@ -18,6 +18,7 @@ from .ask_agent import AskAgent, AskResult, ToolCall
 from .company_info_agent import CompanyInfoAgent
 from .contact_agent import ContactAgent
 from .employees_agent import EmployeesAgent
+from .legal_agent import LegalAgent
 from .live_data_agent import LiveDataAgent
 from .product_agent import ProductAgent
 from .agent_router import AgentRouter
@@ -34,6 +35,7 @@ __all__ = [
     "CompanyInfoAgent",
     "ContactAgent",
     "EmployeesAgent",
+    "LegalAgent",
     "LiveDataAgent",
     "ProductAgent",
     "AgentRouter",

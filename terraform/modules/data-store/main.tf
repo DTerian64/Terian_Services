@@ -68,6 +68,17 @@ resource "azurerm_storage_container" "ai_attachments" {
   container_access_type = "private"
 }
 
+# Blob container for public legal template PDFs (MSA, NDA, SaaS Subscription Agreement).
+# container_access_type = "blob" allows anonymous GET on individual blobs
+# (no container listing) — right for documents intentionally published to prospects.
+# The GitHub Actions deploy-legal-templates workflow in Terian_Services_Legal writes here.
+# Source of truth: Legal/Templates/Customer/*.docx in the Terian_Services_Legal repo.
+resource "azurerm_storage_container" "legal_templates" {
+  name                  = "legal-templates"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "blob"   # public read for blobs; no container listing
+}
+
 
 # ── Cosmos DB account ────────────────────────────────────────────────────────
 
