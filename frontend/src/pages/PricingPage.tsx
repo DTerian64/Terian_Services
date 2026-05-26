@@ -73,10 +73,13 @@ function TierCard({ tier, showAnnual }: { tier: Tier; showAnnual: boolean }) {
       {/* Description */}
       <p className="mt-4 text-sm leading-6 text-slate-300">{tier.description}</p>
 
-      {/* Price */}
-      <div className="mt-8 border-t border-white/10 pt-8">
+      {/* Price — fixed min-height keeps the CTA button vertically aligned across all cards */}
+      <div className="mt-8 min-h-[88px] border-t border-white/10 pt-8">
         {isEnterprise ? (
-          <p className="font-playfair text-4xl font-bold text-slate-100">Custom</p>
+          <>
+            <p className="font-playfair text-4xl font-bold text-slate-100">Custom</p>
+            <p className="mt-1.5 text-xs text-slate-600">Pricing tailored to your organization</p>
+          </>
         ) : (
           <>
             <div className="flex items-end gap-1.5">

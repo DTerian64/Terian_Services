@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageLayout from "../components/PageLayout";
+import PageHero from "../components/PageHero";
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
@@ -32,8 +33,9 @@ function Field({
   );
 }
 
+// Match the site's input style exactly (same as ContactPage)
 const inputCls =
-  "w-full rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-sm text-slate-100 placeholder-slate-600 outline-none transition focus:border-teal-400 focus:ring-1 focus:ring-teal-400";
+  "w-full rounded-md border border-white/20 bg-[#0f0d18] px-3 py-2 text-sm text-slate-100 placeholder-slate-400 focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-400 disabled:opacity-50";
 
 // ── Step 1: Account ───────────────────────────────────────────────────────────
 
@@ -129,7 +131,7 @@ function Step1({
       <button
         type="button"
         onClick={handleNext}
-        className="mt-2 w-full rounded-lg bg-teal-400 px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-teal-300"
+        className="mt-2 w-full rounded-md bg-teal-400 px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-teal-300"
       >
         Continue →
       </button>
@@ -165,11 +167,13 @@ function Step2({
   onChange,
   onNext,
   onBack,
+  submitting,
 }: {
   data: Step2Data;
   onChange: (d: Partial<Step2Data>) => void;
   onNext: () => void;
   onBack: () => void;
+  submitting: boolean;
 }) {
   const [errors, setErrors] = useState<Partial<Record<keyof Step2Data, string>>>({});
 
@@ -266,16 +270,18 @@ function Step2({
         <button
           type="button"
           onClick={onBack}
-          className="w-1/3 rounded-lg border border-white/20 px-6 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10"
+          disabled={submitting}
+          className="w-1/3 rounded-md border border-white/20 px-6 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/10 disabled:opacity-50"
         >
           ← Back
         </button>
         <button
           type="button"
           onClick={handleNext}
-          className="flex-1 rounded-lg bg-teal-400 px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-teal-300"
+          disabled={submitting}
+          className="flex-1 rounded-md bg-teal-400 px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-teal-300 disabled:opacity-50"
         >
-          Submit request →
+          {submitting ? "Submitting…" : "Submit request →"}
         </button>
       </div>
     </div>
@@ -287,7 +293,6 @@ function Step2({
 function Step3({ orgName }: { orgName: string }) {
   return (
     <div className="flex flex-col items-center py-8 text-center">
-      {/* Checkmark */}
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-400/15">
         <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8 text-teal-400">
           <path
@@ -311,13 +316,13 @@ function Step3({ orgName }: { orgName: string }) {
       <div className="mt-10 flex flex-wrap justify-center gap-4">
         <a
           href="/"
-          className="rounded-lg border border-white/20 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+          className="rounded-md border border-white/20 px-6 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
         >
           Back to home
         </a>
         <a
           href="/contact"
-          className="rounded-lg bg-teal-400 px-6 py-3 text-sm font-bold text-[#0f0d18] transition hover:bg-teal-300"
+          className="rounded-md bg-teal-400 px-6 py-2.5 text-sm font-bold text-[#0f0d18] transition hover:bg-teal-300"
         >
           Contact us directly
         </a>
@@ -331,7 +336,7 @@ function Step3({ orgName }: { orgName: string }) {
 function StepIndicator({ current }: { current: number }) {
   const steps = ["Create account", "Organization", "Confirmed"];
   return (
-    <ol className="flex items-center gap-0">
+    <ol className="flex items-center">
       {steps.map((label, i) => {
         const n = i + 1;
         const done = n < current;
@@ -411,7 +416,7 @@ export default function NewEngagementPage() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const res = await fetch(`${API_BASE}/api/engagement/register`, {
+      const res = await fetch(`${API_BASE}/api/accounts/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -438,67 +443,94 @@ export default function NewEngagementPage() {
     }
   };
 
-  const stepTitles: Record<number, { eyebrow: string; heading: string }> = {
-    1: { eyebrow: "Step 1 of 2", heading: "Create your account" },
-    2: { eyebrow: "Step 2 of 2", heading: "Tell us about your organization" },
-    3: { eyebrow: "Request submitted", heading: "We'll be in touch" },
+  const heroProps: Record<number, { eyebrow: string; title: string; description: string }> = {
+    1: {
+      eyebrow: "Get started · Step 1 of 2",
+      title: "Create your account.",
+      description: "A free account lets us tie your engagement request to your organization and keep you updated on next steps.",
+    },
+    2: {
+      eyebrow: "Get started · Step 2 of 2",
+      title: "Tell us about your organization.",
+      description: "A few details help us prepare the right engagement letter and reach out with relevant context.",
+    },
+    3: {
+      eyebrow: "Request submitted",
+      title: "We'll be in touch.",
+      description: "Your request is in our queue. We review every submission and reply within one business day.",
+    },
   };
 
-  const { eyebrow, heading } = stepTitles[step] ?? stepTitles[1];
+  const hero = heroProps[step] ?? heroProps[1];
 
   return (
     <PageLayout>
-      <section className="mx-auto max-w-xl px-6 py-20 lg:px-0">
+      <PageHero
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
+      />
 
-        {/* Engagement type badge */}
-        {step < 3 && step2.engagement_type && (
-          <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-400/10 px-3 py-1 text-xs font-semibold text-teal-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
-            {step2.engagement_type}
-            {step2.tier_interest ? ` · ${step2.tier_interest}` : ""}
-          </p>
-        )}
+      <section className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
+        <div className="grid gap-10 lg:grid-cols-3">
 
-        {/* Step indicator */}
-        {step < 3 && (
-          <div className="mb-8">
-            <StepIndicator current={step} />
+          {/* Left: step indicator + engagement badge */}
+          <div className="lg:col-span-1">
+            {step < 3 && (
+              <>
+                <StepIndicator current={step} />
+
+                {step2.engagement_type && (
+                  <div className="mt-8 rounded-md border border-white/10 bg-white/[0.03] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
+                      Selected
+                    </p>
+                    <p className="mt-2 text-sm font-semibold text-slate-200">
+                      {step2.engagement_type}
+                    </p>
+                    {step2.tier_interest && (
+                      <p className="mt-1 text-sm text-teal-400">{step2.tier_interest} tier</p>
+                    )}
+                    <a
+                      href="/pricing"
+                      className="mt-3 block text-xs text-slate-500 transition hover:text-teal-400"
+                    >
+                      ← Change plan
+                    </a>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        )}
 
-        {/* Heading */}
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-400">{eyebrow}</p>
-        <h1 className="mt-2 font-playfair text-3xl font-bold tracking-tight text-slate-100">
-          {heading}
-        </h1>
-
-        <div className="mt-10">
-          {step === 1 && (
-            <Step1
-              data={step1}
-              onChange={(d) => setStep1((prev) => ({ ...prev, ...d }))}
-              onNext={() => setStep(2)}
-            />
-          )}
-
-          {step === 2 && (
-            <>
-              <Step2
-                data={step2}
-                onChange={(d) => setStep2((prev) => ({ ...prev, ...d }))}
-                onNext={handleSubmit}
-                onBack={() => setStep(1)}
+          {/* Right: form */}
+          <div className="lg:col-span-2">
+            {step === 1 && (
+              <Step1
+                data={step1}
+                onChange={(d) => setStep1((prev) => ({ ...prev, ...d }))}
+                onNext={() => setStep(2)}
               />
-              {submitting && (
-                <p className="mt-4 text-center text-sm text-slate-400">Submitting…</p>
-              )}
-              {submitError && (
-                <p className="mt-4 text-center text-sm text-red-400">{submitError}</p>
-              )}
-            </>
-          )}
+            )}
 
-          {step === 3 && <Step3 orgName={step2.org_name} />}
+            {step === 2 && (
+              <>
+                <Step2
+                  data={step2}
+                  onChange={(d) => setStep2((prev) => ({ ...prev, ...d }))}
+                  onNext={handleSubmit}
+                  onBack={() => setStep(1)}
+                  submitting={submitting}
+                />
+                {submitError && (
+                  <p className="mt-4 text-sm text-red-400">{submitError}</p>
+                )}
+              </>
+            )}
+
+            {step === 3 && <Step3 orgName={step2.org_name} />}
+          </div>
+
         </div>
       </section>
     </PageLayout>

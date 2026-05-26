@@ -1,7 +1,7 @@
 """
 engagement_intake_router.py
 ───────────────────────────
-POST /api/engagement/register
+POST /api/accounts/register
 
 Three-step new-engagement intake flow:
 
@@ -286,7 +286,7 @@ def _send_email_sync(body: EngagementRegisterRequest, account_id: str, engagemen
 
 # ── Endpoint ──────────────────────────────────────────────────────────────────
 
-@router.post("/api/engagement/register", response_model=EngagementRegisterResponse)
+@router.post("/api/accounts/register", response_model=EngagementRegisterResponse)
 async def register_engagement(body: EngagementRegisterRequest) -> EngagementRegisterResponse:
     """
     Complete the new-engagement intake in one call:

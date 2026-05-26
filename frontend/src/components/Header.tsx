@@ -24,10 +24,14 @@ const SERVICE_ITEMS: MenuItem[] = [
   { label: "MLOps & Model Governance", href: "/services/mlops" },
 ];
 
+const PRICING_ITEMS: MenuItem[] = [
+  { label: "Award Nomination", href: "/pricing" },
+  // { label: "Professional Services", href: "/pricing/professional-services" },  // coming soon
+];
+
 const NAV_ITEMS: MenuItem[] = [
   { label: "About", href: "/about" },
   { label: "Trust", href: "/trust" },
-  // { label: "Pricing", href: "/pricing" },  // hidden until page design is finalised
   { label: "Contact", href: "/contact" },
 ];
 
@@ -37,6 +41,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0f0d18] text-white">
@@ -53,7 +58,7 @@ export default function Header() {
             items={PRODUCT_ITEMS}
             open={productsOpen}
             setOpen={setProductsOpen}
-            onOpen={() => setServicesOpen(false)}
+            onOpen={() => { setServicesOpen(false); setPricingOpen(false); }}
             widthClass="w-80"
           />
           <Dropdown
@@ -61,8 +66,16 @@ export default function Header() {
             items={SERVICE_ITEMS}
             open={servicesOpen}
             setOpen={setServicesOpen}
-            onOpen={() => setProductsOpen(false)}
+            onOpen={() => { setProductsOpen(false); setPricingOpen(false); }}
             widthClass="w-[22rem]"
+          />
+          <Dropdown
+            label="Pricing"
+            items={PRICING_ITEMS}
+            open={pricingOpen}
+            setOpen={setPricingOpen}
+            onOpen={() => { setProductsOpen(false); setServicesOpen(false); }}
+            widthClass="w-64"
           />
 
           {NAV_ITEMS.map((item) => (
@@ -101,6 +114,7 @@ export default function Header() {
           <div className="mx-auto max-w-7xl space-y-1">
             <MobileGroup label="Products" items={PRODUCT_ITEMS} onNavigate={() => setMenuOpen(false)} />
             <MobileGroup label="Services" items={SERVICE_ITEMS} onNavigate={() => setMenuOpen(false)} />
+            <MobileGroup label="Pricing" items={PRICING_ITEMS} onNavigate={() => setMenuOpen(false)} />
 
             {NAV_ITEMS.map((item) => (
               <a
