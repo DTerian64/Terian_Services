@@ -25,7 +25,7 @@ const SERVICE_ITEMS: MenuItem[] = [
 ];
 
 const PRICING_ITEMS: MenuItem[] = [
-  { label: "Award Nomination", href: "/pricing" },
+  { label: "Award Nomination", href: "/pricing/award-nomination" },
   // { label: "Professional Services", href: "/pricing/professional-services" },  // coming soon
 ];
 
