@@ -205,8 +205,7 @@ export default function PricingPage() {
   const [annual, setAnnual] = useState(true);
 
   useEffect(() => {
-    const apiBase =
-      (import.meta as any).env?.VITE_API_BASE_URL ?? "http://localhost:8000";
+    const apiBase = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
     fetch(`${apiBase}/api/engagement/award-nomination`)
       .then((r) => {
