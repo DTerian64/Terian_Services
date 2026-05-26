@@ -3,6 +3,9 @@ node_modules/
 dist/
 .vite/
 
+# Env
+**/.env
+
 # Terraform
 **/.terraform/
 *.tfstate
