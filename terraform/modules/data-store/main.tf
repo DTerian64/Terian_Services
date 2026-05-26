@@ -181,3 +181,32 @@ resource "azurerm_cosmosdb_sql_container" "engagement_details" {
   default_ttl = -1
 }
 
+# ── Engagement intake — accounts & engagements ────────────────────────────────
+# accounts: one document per registrant. Partition by /email so lookups by
+# email address (login, de-dupe check) are single-partition reads.
+#
+# client_engagements: one document per engagement request, linked to an account
+# via account_id. Partition by /account_id so listing all requests for a given
+# account is a single-partition query. request_status drives the admin workflow:
+# pending_review → contacted → proposal_sent → active | declined.
+
+resource "azurerm_cosmosdb_sql_container" "accounts" {
+  name                = "accounts"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/email"]
+
+  default_ttl = -1
+}
+
+resource "azurerm_cosmosdb_sql_container" "client_engagements" {
+  name                = "client_engagements"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/account_id"]
+
+  default_ttl = -1
+}
+

@@ -28,8 +28,9 @@ load_dotenv()
 from ask_ai_router import router as ask_ai_router                # noqa: E402
 from contact_router import router as contact_router              # noqa: E402
 from conversations_router import router as conversations_router  # noqa: E402
-from engagement_router import router as engagement_router        # noqa: E402
-from metrics_router import router as metrics_router              # noqa: E402
+from engagement_router import router as engagement_router                # noqa: E402
+from engagement_intake_router import router as engagement_intake_router  # noqa: E402
+from metrics_router import router as metrics_router                      # noqa: E402
 from team_router import router as team_router                    # noqa: E402
 
 # ── Logging ──────────────────────────────────────────────────────────────────
@@ -73,6 +74,7 @@ app.include_router(ask_ai_router)
 app.include_router(contact_router)
 app.include_router(conversations_router)
 app.include_router(engagement_router)
+app.include_router(engagement_intake_router)
 app.include_router(metrics_router)
 app.include_router(team_router)
 

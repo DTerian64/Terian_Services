@@ -9,6 +9,8 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 interface Tier {
   name: string;
   user_range: string;
+  description: string;
+  features: string[];
   price_monthly: number | null;
   price_annual: number | null;
   highlight: boolean;
@@ -16,54 +18,29 @@ interface Tier {
   cta_href: string;
 }
 
-interface Feature {
-  name: string;
-  [tier: string]: string | boolean | null;
-}
-
-interface FeatureGroup {
-  name: string;
-  features: Feature[];
-}
-
 interface EngagementDoc {
   service: string;
   tagline: string;
   tiers: Tier[];
-  feature_groups: FeatureGroup[];
   services_note: string;
 }
 
-// ── Feature cell ──────────────────────────────────────────────────────────────
+// ── Check icon ─────────────────────────────────────────────────────────────────
 
-function FeatureCell({ value }: { value: string | boolean | null }) {
-  if (value === true) {
-    return (
-      <span className="flex justify-center">
-        <svg
-          aria-label="Included"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          className="h-5 w-5 text-teal-400"
-        >
-          <path
-            fillRule="evenodd"
-            d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </span>
-    );
-  }
-  if (value === false || value === null) {
-    return (
-      <span className="flex justify-center text-slate-600" aria-label="Not included">
-        —
-      </span>
-    );
-  }
+function CheckIcon() {
   return (
-    <span className="block text-center text-sm leading-6 text-slate-300">{value}</span>
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      className="mt-0.5 h-4 w-4 shrink-0 text-teal-400"
+    >
+      <path
+        fillRule="evenodd"
+        d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+        clipRule="evenodd"
+      />
+    </svg>
   );
 }
 
@@ -75,46 +52,52 @@ function TierCard({ tier, showAnnual }: { tier: Tier; showAnnual: boolean }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-xl border-2 p-6 transition ${
+      className={`relative flex flex-col rounded-2xl p-8 transition-all duration-200 ${
         tier.highlight
-          ? "border-teal-400 bg-[#0f0d18]"
-          : "border-white/10 bg-[#0f0d18] hover:border-teal-400"
+          ? "border-2 border-teal-400 bg-[#0f1a19]"
+          : "border border-white/10 bg-[#0f0d18] hover:border-white/25"
       }`}
     >
       {tier.highlight && (
-        <span className="absolute -top-3.5 left-6 rounded-full bg-teal-400 px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-[#0f0d18]">
+        <span className="absolute -top-3.5 left-8 rounded-full bg-teal-400 px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest text-[#0f0d18]">
           Most popular
         </span>
       )}
 
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+      {/* Tier name + range */}
+      <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-400">
         {tier.name}
       </p>
-      <p className="mt-1 text-sm text-slate-400">{tier.user_range}</p>
+      <p className="mt-1 text-sm text-slate-500">{tier.user_range}</p>
 
-      <div className="mt-6">
+      {/* Description */}
+      <p className="mt-4 text-sm leading-6 text-slate-300">{tier.description}</p>
+
+      {/* Price */}
+      <div className="mt-8 border-t border-white/10 pt-8">
         {isEnterprise ? (
-          <p className="font-playfair text-3xl font-bold text-slate-100">Custom</p>
+          <p className="font-playfair text-4xl font-bold text-slate-100">Custom</p>
         ) : (
           <>
-            <div className="flex items-end gap-1">
-              <span className="font-playfair text-4xl font-bold text-slate-100">
+            <div className="flex items-end gap-1.5">
+              <span className="font-playfair text-5xl font-bold tracking-tight text-slate-100">
                 ${displayPrice}
               </span>
-              <span className="mb-1.5 text-sm text-slate-400">/mo</span>
+              <span className="mb-2 text-sm text-slate-500">/mo</span>
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1.5 text-xs text-slate-600">
               {showAnnual
                 ? `Billed annually · $${tier.price_monthly}/mo billed monthly`
-                : "Billed monthly"}
+                : "Billed monthly · save ~20% with annual billing"}
             </p>
           </>
         )}
       </div>
 
+      {/* CTA */}
       <a
         href={tier.cta_href}
-        className={`mt-8 inline-flex items-center justify-center rounded-md px-5 py-2.5 text-sm font-bold uppercase tracking-wider transition ${
+        className={`mt-8 flex w-full items-center justify-center rounded-lg px-5 py-3 text-sm font-bold uppercase tracking-wider transition ${
           tier.highlight
             ? "bg-teal-400 text-[#0f0d18] hover:bg-teal-300"
             : "border border-white/20 text-slate-100 hover:bg-white/10"
@@ -122,69 +105,16 @@ function TierCard({ tier, showAnnual }: { tier: Tier; showAnnual: boolean }) {
       >
         {tier.cta_label}
       </a>
-    </div>
-  );
-}
 
-// ── Feature table ─────────────────────────────────────────────────────────────
-
-function FeatureTable({
-  tiers,
-  feature_groups,
-}: {
-  tiers: Tier[];
-  feature_groups: FeatureGroup[];
-}) {
-  const tierNames = tiers.map((t) => t.name);
-
-  return (
-    <div className="mt-16 overflow-x-auto">
-      <table className="w-full min-w-[640px] border-collapse text-sm">
-        <thead>
-          <tr>
-            <th className="pb-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Features
-            </th>
-            {tiers.map((t) => (
-              <th
-                key={t.name}
-                className={`pb-4 text-center text-xs font-semibold uppercase tracking-[0.18em] ${
-                  t.highlight ? "text-teal-400" : "text-slate-500"
-                }`}
-              >
-                {t.name}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {feature_groups.map((group) => (
-            <>
-              <tr key={`group-${group.name}`}>
-                <td
-                  colSpan={tierNames.length + 1}
-                  className="border-t border-white/10 pb-2 pt-8 text-xs font-semibold uppercase tracking-[0.18em] text-teal-400"
-                >
-                  {group.name}
-                </td>
-              </tr>
-              {group.features.map((feature) => (
-                <tr
-                  key={feature.name}
-                  className="border-t border-white/[0.06] hover:bg-white/[0.02]"
-                >
-                  <td className="py-3 pr-6 text-sm text-slate-300">{feature.name}</td>
-                  {tierNames.map((tierName) => (
-                    <td key={tierName} className="py-3 text-center">
-                      <FeatureCell value={feature[tierName] ?? false} />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </>
-          ))}
-        </tbody>
-      </table>
+      {/* Feature list */}
+      <ul className="mt-8 space-y-3">
+        {tier.features.map((f) => (
+          <li key={f} className="flex items-start gap-3 text-sm text-slate-300">
+            <CheckIcon />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -230,7 +160,7 @@ export default function PricingPage() {
         {doc && (
           <>
             {/* Product label + tagline */}
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-400">
               {doc.service}
             </p>
             <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -245,7 +175,7 @@ export default function PricingPage() {
               <button
                 type="button"
                 onClick={() => setAnnual((v) => !v)}
-                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition ${
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition ${
                   annual ? "bg-teal-500" : "bg-white/20"
                 }`}
                 aria-label="Toggle billing period"
@@ -265,30 +195,27 @@ export default function PricingPage() {
             </div>
 
             {/* Tier cards */}
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <div className="mt-10 grid gap-6 lg:grid-cols-3">
               {doc.tiers.map((tier) => (
                 <TierCard key={tier.name} tier={tier} showAnnual={annual} />
               ))}
             </div>
 
-            {/* Feature comparison table */}
-            <FeatureTable tiers={doc.tiers} feature_groups={doc.feature_groups} />
-
             {/* Professional services note */}
             {doc.services_note && (
-              <div className="mt-20">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">
+              <div className="mt-24 border-t border-white/10 pt-16">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-400">
                   Professional Services
                 </p>
                 <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
                   Need a custom engagement?
                 </h2>
-                <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
+                <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
                   {doc.services_note}
                 </p>
                 <a
                   href="/contact"
-                  className="mt-6 inline-flex items-center justify-center rounded-md border border-white/20 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-white/10"
+                  className="mt-6 inline-flex items-center justify-center rounded-lg border border-white/20 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-white/10"
                 >
                   Start a conversation →
                 </a>
