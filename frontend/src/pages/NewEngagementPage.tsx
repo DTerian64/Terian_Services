@@ -472,39 +472,41 @@ export default function NewEngagementPage() {
       />
 
       <section className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
-        <div className="grid gap-10 lg:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3">
 
-          {/* Left: step indicator + engagement badge */}
+          {/* Left: engagement badge only */}
           <div className="lg:col-span-1">
-            {step < 3 && (
-              <>
-                <StepIndicator current={step} />
-
-                {step2.engagement_type && (
-                  <div className="mt-8 rounded-md border border-white/10 bg-white/[0.03] p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
-                      Selected
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-slate-200">
-                      {step2.engagement_type}
-                    </p>
-                    {step2.tier_interest && (
-                      <p className="mt-1 text-sm text-teal-400">{step2.tier_interest} tier</p>
-                    )}
-                    <a
-                      href="/pricing"
-                      className="mt-3 block text-xs text-slate-500 transition hover:text-teal-400"
-                    >
-                      ← Change plan
-                    </a>
-                  </div>
+            {step < 3 && step2.engagement_type && (
+              <div className="rounded-md border border-white/10 bg-[#0f0d18] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">
+                  Selected
+                </p>
+                <p className="mt-2 text-sm font-semibold text-slate-200">
+                  {step2.engagement_type}
+                </p>
+                {step2.tier_interest && (
+                  <p className="mt-1 text-sm text-teal-400">{step2.tier_interest} tier</p>
                 )}
-              </>
+                <a
+                  href="/pricing/award-nomination"
+                  className="mt-3 block text-xs text-slate-500 transition hover:text-teal-400"
+                >
+                  ← Change plan
+                </a>
+              </div>
             )}
           </div>
 
-          {/* Right: form */}
+          {/* Right: step indicator card + form */}
           <div className="lg:col-span-2">
+
+            {/* Step indicator — in its own card, above the form fields */}
+            {step < 3 && (
+              <div className="mb-8 rounded-md border border-white/10 bg-[#0f0d18] px-6 py-5">
+                <StepIndicator current={step} />
+              </div>
+            )}
+
             {step === 1 && (
               <Step1
                 data={step1}
