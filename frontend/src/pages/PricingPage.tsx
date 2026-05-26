@@ -108,7 +108,7 @@ function TierCard({ tier, showAnnual }: { tier: Tier; showAnnual: boolean }) {
 
       {/* Feature list */}
       <ul className="mt-8 space-y-3">
-        {tier.features.map((f) => (
+        {(tier.features ?? []).map((f) => (
           <li key={f} className="flex items-start gap-3 text-sm text-slate-300">
             <CheckIcon />
             <span>{f}</span>
