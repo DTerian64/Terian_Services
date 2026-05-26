@@ -167,3 +167,17 @@ resource "azurerm_cosmosdb_sql_container" "ai_messages" {
   default_ttl = -1
 }
 
+# ── Engagement / Pricing data ─────────────────────────────────────────────────
+# One document per product/service (e.g. "award-nomination", "integrity-sentinel").
+# Partition key /service allows future cross-service queries if needed.
+
+resource "azurerm_cosmosdb_sql_container" "engagement_details" {
+  name                = "engagement_details"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/service"]
+
+  default_ttl = -1
+}
+

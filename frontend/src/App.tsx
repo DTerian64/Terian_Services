@@ -15,6 +15,7 @@ import IntegrityFraudPage from "./pages/IntegrityFraudPage";
 import DataMiningPage from "./pages/DataMiningPage";
 import CloudMigrationPage from "./pages/CloudMigrationPage";
 import MLOpsPage from "./pages/MLOpsPage";
+import PricingPage from "./pages/PricingPage";
 
 type RouteEntry = {
   match: (path: string) => boolean;
@@ -27,6 +28,7 @@ const routes: RouteEntry[] = [
   { match: (p) => p === "/contact", component: ContactPage },
   { match: (p) => p === "/ask-ai", component: AskAIPage },
   { match: (p) => p === "/trust", component: TrustPage },
+  { match: (p) => p === "/pricing" || p === "/pricing/", component: PricingPage },
   { match: (p) => p === "/privacy" || p === "/privacy.html", component: PrivacyPage },
 
   // Products

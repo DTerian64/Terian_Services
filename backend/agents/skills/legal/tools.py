@@ -11,11 +11,6 @@ new template is added:
   2. Ensure the corresponding PDF is uploaded to the legal-templates blob
      container (the deploy-legal-templates GHA workflow handles this on push
      to Terian_Services_Legal/main).
-
-BLOB_BASE is derived from AZURE_STORAGE_BLOB_ENDPOINT at import time —
-the same env var used by ask_agent.py for prompt loading.
-e.g. https://stterianservices.blob.core.windows.net/ → blob base becomes
-     https://stterianservices.blob.core.windows.net/legal-templates
 """
 
 from __future__ import annotations

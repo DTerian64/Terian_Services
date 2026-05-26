@@ -27,6 +27,7 @@ const SERVICE_ITEMS: MenuItem[] = [
 const NAV_ITEMS: MenuItem[] = [
   { label: "About", href: "/about" },
   { label: "Trust", href: "/trust" },
+  { label: "Pricing", href: "/pricing" },
   { label: "Contact", href: "/contact" },
 ];
 
