@@ -27,7 +27,7 @@ const SERVICE_ITEMS: MenuItem[] = [
 const NAV_ITEMS: MenuItem[] = [
   { label: "About", href: "/about" },
   { label: "Trust", href: "/trust" },
-  { label: "Pricing", href: "/pricing" },
+  // { label: "Pricing", href: "/pricing" },  // hidden until page design is finalised
   { label: "Contact", href: "/contact" },
 ];
 
