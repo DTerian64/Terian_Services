@@ -253,7 +253,7 @@ class PresentationAgent(AskAgent):
         )
 
         return await generate_from_template(
-            template_name="award_nomination_onboarding.pptx",
+            template_name="award_nomination_onboarding_template.pptx",
             tokens=tokens,
             engagement_id=job.get("engagement_id"),
         )
