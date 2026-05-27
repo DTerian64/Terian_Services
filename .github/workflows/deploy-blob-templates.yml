@@ -1,0 +1,84 @@
+# .github/workflows/deploy-blob-templates.yml
+# ─────────────────────────────────────────────────────────────────────────────
+# Blob Template Deployment Pipeline
+#
+# Triggered by: any push to main that touches blob_templates/**
+#
+# Steps:
+#   1. Upload all files in blob_templates/ to the blob-templates Blob container.
+#      Existing blobs are overwritten; new blobs are created.
+#      No ACA restart needed — templates are downloaded per-request by the
+#      engagement worker, not cached at container startup.
+#
+# Auth: OIDC federated identity — no long-lived secrets.
+#   Required GitHub secrets (shared with other deploy workflows):
+#     AZURE_TENANT_ID        — Azure AD tenant ID
+#     AZURE_SUBSCRIPTION_ID  — Subscription ID
+#     AZURE_CLIENT_ID        — GHA OIDC app registration client ID
+#
+# Required Azure role assignments on the GHA principal (managed in Terraform):
+#   Storage Blob Data Contributor — scope: stterianservices storage account
+#
+# Path convention in blob-templates container:
+#   award_nomination_onboarding.pptx  — Award Nomination onboarding template
+#   <service>_onboarding.pptx         — future service templates follow same pattern
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Deploy Blob Templates
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "blob_templates/**"
+
+permissions:
+  id-token: write   # required for OIDC token issuance
+  contents: read
+
+env:
+  STORAGE_ACCOUNT: stterianservices
+  BLOB_CONTAINER:  blob-templates
+
+jobs:
+  deploy-templates:
+    name: Upload templates → Blob
+    runs-on: ubuntu-latest
+    environment: prod   # reads AZURE_CLIENT_ID / TENANT_ID / SUBSCRIPTION_ID from the prod environment
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Azure login (OIDC — no stored credentials) ──────────────────────────
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
+
+      # ── Upload all template files to Blob Storage ────────────────────────────
+      # upload-batch syncs blob_templates/ → blob-templates container.
+      # Blob paths mirror the local filenames directly (no subdirectory prefix).
+      # --overwrite true replaces existing blobs; new blobs are created as-is.
+      - name: Upload templates to Blob Storage
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ env.STORAGE_ACCOUNT }} \
+            --auth-mode    login \
+            --destination  ${{ env.BLOB_CONTAINER }} \
+            --source       blob_templates \
+            --overwrite    true
+
+      - name: Summary
+        run: |
+          echo "### Blob Templates Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Container: \`${{ env.BLOB_CONTAINER }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Files uploaded:" >> $GITHUB_STEP_SUMMARY
+          for f in blob_templates/*; do
+            echo "- \`$(basename $f)\`" >> $GITHUB_STEP_SUMMARY
+          done
