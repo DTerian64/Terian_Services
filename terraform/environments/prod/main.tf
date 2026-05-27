@@ -203,6 +203,15 @@ resource "azurerm_role_assignment" "uami_blob_contributor" {
   principal_id         = module.container_app.uami_principal_id
 }
 
+# Storage Blob Delegator — required for the PresentationAgent to generate
+# User Delegation SAS tokens (time-limited download links) without needing
+# the storage account key.
+resource "azurerm_role_assignment" "uami_blob_delegator" {
+  scope                = module.data_store.storage_account_id
+  role_definition_name = "Storage Blob Delegator"
+  principal_id         = module.container_app.uami_principal_id
+}
+
 resource "azurerm_cosmosdb_sql_role_assignment" "uami_cosmos_contributor" {
   resource_group_name = azurerm_resource_group.corporate.name
   account_name        = module.data_store.cosmos_account_name
@@ -301,10 +310,13 @@ module "container_app" {
   award_appi_frontend_resource_id               = var.award_appi_frontend_resource_id
   award_appi_frontend_log_analytics_resource_id = var.award_appi_frontend_log_analytics_resource_id
 
-  # Data store — Cosmos DB + Blob Storage
-  cosmos_endpoint        = module.data_store.cosmos_endpoint
-  cosmos_database_name   = module.data_store.cosmos_database_name
-  storage_blob_endpoint  = module.data_store.storage_blob_endpoint
+  # Data store — Cosmos DB + Blob Storage + Queue
+  cosmos_endpoint                  = module.data_store.cosmos_endpoint
+  cosmos_database_name             = module.data_store.cosmos_database_name
+  storage_blob_endpoint            = module.data_store.storage_blob_endpoint
+  storage_queue_endpoint           = module.data_store.storage_queue_endpoint
+  engagement_intake_queue_name     = module.data_store.engagement_intake_queue_name
+  engagement_assets_container_name = module.data_store.engagement_assets_container_name
 
   tags = local.tags
 }

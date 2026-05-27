@@ -404,6 +404,18 @@ resource "azurerm_container_app" "backend" {
         name  = "AZURE_STORAGE_BLOB_ENDPOINT"
         value = var.storage_blob_endpoint
       }
+      env {
+        name  = "AZURE_STORAGE_QUEUE_ENDPOINT"
+        value = var.storage_queue_endpoint
+      }
+      env {
+        name  = "ENGAGEMENT_INTAKE_QUEUE_NAME"
+        value = var.engagement_intake_queue_name
+      }
+      env {
+        name  = "ENGAGEMENT_ASSETS_CONTAINER"
+        value = var.engagement_assets_container_name
+      }
       # Award Nomination compute + database resource IDs — for Azure Monitor metrics.
       env {
         name  = "AWARD_ACA_PRIMARY_RESOURCE_ID"

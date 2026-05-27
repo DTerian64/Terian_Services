@@ -210,3 +210,63 @@ resource "azurerm_cosmosdb_sql_container" "client_engagements" {
   default_ttl = -1
 }
 
+# ── Engagement worker dead-letter store ──────────────────────────────────────
+# One document per job that exhausted all delivery attempts.
+# The worker writes here and alerts sales@ so a human can follow up.
+# Partition key /engagement_id keeps each failure self-contained.
+
+resource "azurerm_cosmosdb_sql_container" "failed_engagement_jobs" {
+  name                = "failed_engagement_jobs"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/engagement_id"]
+
+  default_ttl = -1
+}
+
+# ── Email templates ───────────────────────────────────────────────────────────
+# One document per email template, keyed by template_type.
+# The backend reads the subject and html_body at send time so templates can be
+# updated without a backend redeploy. Tokens ({{first_name}}, {{org_name}}, …)
+# are substituted server-side before dispatch.
+#
+# Initial template_types:
+#   "engagement_receive_confirmation" — internal notification to sales@
+#   "welcome_to_terian_services"      — requester welcome / confirmation
+
+resource "azurerm_cosmosdb_sql_container" "email_templates" {
+  name                = "email_templates"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/template_type"]
+
+  default_ttl = -1
+}
+
+# ── Engagement async worker infrastructure ────────────────────────────────────
+# Storage Queue: engagement-intake
+#   Producers: POST /api/accounts/register drops a message after CosmosDB write.
+#   Consumer:  async worker polls, generates PPTX via LLM + python-pptx,
+#              uploads to engagement-assets blob, sends Email #2 to requester.
+#   Delivery guarantee: at-least-once via visibility timeouts (30 s default).
+#   Dead-letter: worker writes a failed_engagement_jobs document to CosmosDB
+#                and alerts sales@ if max retries are exhausted.
+
+resource "azurerm_storage_queue" "engagement_intake" {
+  name                 = "engagement-intake"
+  storage_account_name = azurerm_storage_account.media.name
+}
+
+# Blob container for generated PPTX presentations.
+# Always private — the backend UAMI writes here; Email #2 attaches the blob
+# directly (downloaded server-side, not linked). No public access needed.
+# Path convention: engagement-assets/{engagement_id}/onboarding.pptx
+
+resource "azurerm_storage_container" "engagement_assets" {
+  name                  = "engagement-assets"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "private"
+}
+

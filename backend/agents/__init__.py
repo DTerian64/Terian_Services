@@ -20,6 +20,7 @@ from .contact_agent import ContactAgent
 from .employees_agent import EmployeesAgent
 from .legal_agent import LegalAgent
 from .live_data_agent import LiveDataAgent
+from .presentation_agent import PresentationAgent
 from .product_agent import ProductAgent
 from .agent_router import AgentRouter
 from .image_processor_agent import ImageProcessorAgent
@@ -37,6 +38,7 @@ __all__ = [
     "EmployeesAgent",
     "LegalAgent",
     "LiveDataAgent",
+    "PresentationAgent",
     "ProductAgent",
     "AgentRouter",
     "ImageProcessorAgent",

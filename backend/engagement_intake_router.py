@@ -31,6 +31,7 @@ Environment variables
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import os
 import smtplib
@@ -44,6 +45,7 @@ import bcrypt
 from azure.cosmos.aio import CosmosClient
 from azure.cosmos.exceptions import CosmosResourceNotFoundError
 from azure.identity.aio import DefaultAzureCredential, ManagedIdentityCredential
+from azure.storage.queue.aio import QueueClient
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
@@ -58,9 +60,12 @@ _COSMOS_DATABASE   = os.getenv("AZURE_COSMOS_DATABASE", "terian-services")
 _ACCOUNTS_CTR      = "accounts"
 _ENGAGEMENTS_CTR   = "client_engagements"
 
+_QUEUE_ENDPOINT = os.getenv("AZURE_STORAGE_QUEUE_ENDPOINT", "")
+_QUEUE_NAME     = os.getenv("ENGAGEMENT_INTAKE_QUEUE_NAME", "engagement-intake")
+
 _GMAIL_USER    = os.getenv("GMAIL_USER", "david.terian@gmail.com")
 _GMAIL_APP_PWD = os.getenv("GMAIL_APP_PASSWORD")
-_NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", _GMAIL_USER)
+_NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", "sales@terian-services.com")
 _FROM_NAME     = "Terian Services"
 _SMTP_HOST     = "smtp.gmail.com"
 _SMTP_PORT     = 587
@@ -284,6 +289,185 @@ def _send_email_sync(body: EngagementRegisterRequest, account_id: str, engagemen
     )
 
 
+def _send_welcome_email_sync(body: EngagementRegisterRequest, engagement_id: str) -> None:
+    """Welcome/confirmation email to the requester — called via asyncio.to_thread."""
+    if not _GMAIL_APP_PWD:
+        logger.warning("GMAIL_APP_PASSWORD not set — skipping welcome email")
+        return
+
+    subject = f"Welcome to Terian Services — we've received your request"
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0"
+         style="background:#f3f4f6;padding:40px 0;">
+    <tr><td align="center">
+      <table width="580" cellpadding="0" cellspacing="0"
+             style="background:#ffffff;border-radius:12px;overflow:hidden;
+                    box-shadow:0 2px 8px rgba(0,0,0,.08);max-width:580px;">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);
+                     padding:32px 40px;">
+            <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;
+                       letter-spacing:-0.3px;">Welcome to Terian Services</h1>
+            <p style="margin:6px 0 0;color:#99f6e4;font-size:13px;">
+              terian-services.com
+            </p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:32px 40px;">
+
+            <p style="margin:0 0 20px;font-size:15px;color:#111827;line-height:1.6;">
+              Hi {body.full_name.split()[0]},
+            </p>
+            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
+              Thank you for reaching out — we're glad you're here. We've received your engagement
+              request for <strong style="color:#111827;">{body.org_name}</strong> and our team
+              will be in touch shortly to discuss next steps.
+            </p>
+
+            <!-- Summary card -->
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="border:1px solid #e5e7eb;border-radius:8px;
+                          overflow:hidden;margin-bottom:24px;">
+              <tr style="background:#f9fafb;">
+                <td colspan="2"
+                    style="padding:12px 16px;font-size:11px;font-weight:700;
+                           color:#6b7280;text-transform:uppercase;
+                           letter-spacing:0.5px;">Your Request Summary</td>
+              </tr>
+              <tr style="border-top:1px solid #e5e7eb;">
+                <td style="padding:10px 16px;color:#6b7280;font-size:13px;width:140px;">Engagement</td>
+                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#0d9488;">{body.engagement_type}</td>
+              </tr>
+              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
+                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Tier</td>
+                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#111827;">{body.tier_interest}</td>
+              </tr>
+              <tr style="border-top:1px solid #e5e7eb;">
+                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Organization</td>
+                <td style="padding:10px 16px;font-size:13px;color:#111827;">{body.org_name}</td>
+              </tr>
+              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
+                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Est. Users</td>
+                <td style="padding:10px 16px;font-size:13px;color:#111827;">{body.user_count:,}</td>
+              </tr>
+            </table>
+
+            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
+              We're preparing a personalized overview of how Terian Services can address your
+              needs. You'll receive it via a follow-up email shortly — keep an eye on your inbox.
+            </p>
+
+            <p style="margin:0 0 8px;font-size:15px;color:#374151;line-height:1.6;">
+              In the meantime, feel free to reach us at
+              <a href="mailto:sales@terian-services.com"
+                 style="color:#0d9488;text-decoration:none;">sales@terian-services.com</a>
+              with any questions.
+            </p>
+
+            <p style="margin:28px 0 0;font-size:15px;color:#374151;line-height:1.6;">
+              Warm regards,<br>
+              <strong style="color:#111827;">The Terian Services Team</strong>
+            </p>
+
+            <p style="margin:24px 0 0;font-size:11px;color:#d1d5db;">
+              Reference: {engagement_id}
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:16px 40px;border-top:1px solid #e5e7eb;
+                     background:#f9fafb;text-align:center;">
+            <p style="margin:0;font-size:12px;color:#9ca3af;">
+              Terian Services · terian-services.com
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
+    msg["To"]      = str(body.email)
+    msg.attach(MIMEText(html, "html"))
+
+    with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
+        server.starttls()
+        server.login(_GMAIL_USER, _GMAIL_APP_PWD)
+        server.sendmail(_GMAIL_USER, [str(body.email)], msg.as_string())
+
+    logger.info(
+        "Welcome email sent: engagement_id=%s to=%s",
+        engagement_id, body.email,
+    )
+
+
+# ── Queue producer ────────────────────────────────────────────────────────────
+
+async def _enqueue_engagement_job(
+    body: EngagementRegisterRequest,
+    account_id: str,
+    engagement_id: str,
+) -> None:
+    """
+    Drop a JSON message on the Storage Queue so the async worker can generate
+    the personalised PPTX and send Email #2.
+
+    The message is a compact JSON object — the worker needs no other context.
+    Fire-and-forget: caller wraps in try/except so a queue failure never rolls
+    back the already-persisted CosmosDB records.
+
+    No-op if AZURE_STORAGE_QUEUE_ENDPOINT is unset (local / test environments).
+    """
+    if not _QUEUE_ENDPOINT:
+        logger.warning("AZURE_STORAGE_QUEUE_ENDPOINT not set — skipping queue enqueue")
+        return
+
+    message = json.dumps({
+        "engagement_id":   engagement_id,
+        "account_id":      account_id,
+        "email":           str(body.email),
+        "full_name":       body.full_name,
+        "org_name":        body.org_name,
+        "industry":        body.industry,
+        "user_count":      body.user_count,
+        "use_case":        body.use_case,
+        "tier_interest":   body.tier_interest,
+        "engagement_type": body.engagement_type,
+        "submitted_at":    datetime.now(timezone.utc).isoformat(),
+    })
+
+    async with _credential() as credential:
+        async with QueueClient(
+            account_url=_QUEUE_ENDPOINT,
+            queue_name=_QUEUE_NAME,
+            credential=credential,
+        ) as queue:
+            await queue.send_message(message)
+
+    logger.info(
+        "Engagement job enqueued: engagement_id=%s queue=%s",
+        engagement_id, _QUEUE_NAME,
+    )
+
+
 # ── Endpoint ──────────────────────────────────────────────────────────────────
 
 @router.post("/api/accounts/register", response_model=EngagementRegisterResponse)
@@ -320,5 +504,15 @@ async def register_engagement(body: EngagementRegisterRequest) -> EngagementRegi
         await asyncio.to_thread(_send_email_sync, body, account_id, engagement_id)
     except Exception as exc:
         logger.warning("Engagement email notification failed (records saved): %s", exc)
+
+    try:
+        await asyncio.to_thread(_send_welcome_email_sync, body, engagement_id)
+    except Exception as exc:
+        logger.warning("Requester welcome email failed (records saved): %s", exc)
+
+    try:
+        await _enqueue_engagement_job(body, account_id, engagement_id)
+    except Exception as exc:
+        logger.warning("Engagement queue enqueue failed (records saved): %s", exc)
 
     return EngagementRegisterResponse(ok=True, account_id=account_id, engagement_id=engagement_id)

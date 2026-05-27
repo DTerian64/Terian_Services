@@ -43,22 +43,24 @@ from agents.contact_agent import ContactAgent
 from agents.employees_agent import EmployeesAgent
 from agents.legal_agent import LegalAgent
 from agents.live_data_agent import LiveDataAgent
+from agents.presentation_agent import PresentationAgent
 from agents.product_agent import ProductAgent
 
 logger = logging.getLogger(__name__)
 
-_VALID_INTENTS = frozenset({"company_info", "contact", "employees", "legal", "product", "live_data"})
+_VALID_INTENTS = frozenset({"company_info", "contact", "employees", "legal", "presentation", "product", "live_data"})
 _DEFAULT_INTENT = "company_info"
 
 # Human-readable agent labels returned to the frontend in AskResponse.agent_label.
 # When a new agent is added, add its intent → label here — no frontend changes needed.
 _AGENT_LABELS: dict[str, str] = {
-    "company_info": "Company Info Agent",
-    "product":      "Product Agent",
-    "employees":    "Team & People Agent",
-    "contact":      "Contact Agent",
-    "legal":        "Legal Agent",
-    "live_data":    "Web Search Agent",
+    "company_info":  "Company Info Agent",
+    "product":       "Product Agent",
+    "employees":     "Team & People Agent",
+    "contact":       "Contact Agent",
+    "legal":         "Legal Agent",
+    "presentation":  "Presentation Agent",
+    "live_data":     "Web Search Agent",
 }
 
 _CLASSIFY_SYSTEM = """\
@@ -81,6 +83,9 @@ legal         — questions about contracts, agreements, or legal templates: "do
                 or any request to view or download a legal document.
 product       — specific questions about product features, technical architecture,
                 ML capabilities, integrations, demos, or the Award Nomination System.
+presentation  — requests to generate, create, or download a presentation, deck,
+                slides, or onboarding overview: "can you make a deck", "generate
+                a presentation", "I'd like slides about", "send me a PowerPoint".
 live_data     — ANY question that asks to fetch, read, summarize, or browse a URL
                 or web page (regardless of whose site it is); or questions requiring
                 real-time / external information such as current events, live pricing,
@@ -116,6 +121,7 @@ class AgentRouter:
         self._contact: Optional[ContactAgent] = None
         self._employees: Optional[EmployeesAgent] = None
         self._legal: Optional[LegalAgent] = None
+        self._presentation: Optional[PresentationAgent] = None
         self._product: Optional[ProductAgent] = None
         self._live_data: Optional[LiveDataAgent] = None
 
@@ -157,6 +163,11 @@ class AgentRouter:
         if self._legal is None:
             self._legal = LegalAgent(openai_client=self._get_client())
         return self._legal
+
+    def _get_presentation(self) -> PresentationAgent:
+        if self._presentation is None:
+            self._presentation = PresentationAgent(openai_client=self._get_client())
+        return self._presentation
 
     def _get_product(self) -> ProductAgent:
         if self._product is None:
@@ -227,6 +238,7 @@ class AgentRouter:
             "contact":      self._get_contact,
             "employees":    self._get_employees,
             "legal":        self._get_legal,
+            "presentation": self._get_presentation,
             "product":      self._get_product,
             "live_data":    self._get_live_data,
         }

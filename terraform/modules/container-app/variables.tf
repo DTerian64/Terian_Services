@@ -192,6 +192,24 @@ variable "storage_blob_endpoint" {
   default     = ""
 }
 
+variable "storage_queue_endpoint" {
+  description = "Storage Account primary queue endpoint. Injected as AZURE_STORAGE_QUEUE_ENDPOINT. Leave empty to skip."
+  type        = string
+  default     = ""
+}
+
+variable "engagement_intake_queue_name" {
+  description = "Name of the Storage Queue for async engagement jobs. Injected as ENGAGEMENT_INTAKE_QUEUE_NAME."
+  type        = string
+  default     = "engagement-intake"
+}
+
+variable "engagement_assets_container_name" {
+  description = "Blob container name for generated PPTX presentations. Injected as ENGAGEMENT_ASSETS_CONTAINER."
+  type        = string
+  default     = "engagement-assets"
+}
+
 variable "app_insights_log_analytics_resource_id" {
   description = "Full resource ID of the Log Analytics workspace that backs the App Insights instance (providers/Microsoft.OperationalInsights/workspaces/<name>). Grants Monitoring Reader at the workspace scope — required for LogsQueryClient to execute KQL queries."
   type        = string

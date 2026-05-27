@@ -39,3 +39,18 @@ output "cosmos_database_name" {
   description = "Cosmos DB SQL database name."
   value       = azurerm_cosmosdb_sql_database.main.name
 }
+
+output "storage_queue_endpoint" {
+  description = "Primary queue service endpoint (e.g. https://stterianservices.queue.core.windows.net/) — injected into the backend as AZURE_STORAGE_QUEUE_ENDPOINT."
+  value       = azurerm_storage_account.media.primary_queue_endpoint
+}
+
+output "engagement_intake_queue_name" {
+  description = "Name of the Storage Queue used for async engagement jobs — injected into the backend as ENGAGEMENT_INTAKE_QUEUE_NAME."
+  value       = azurerm_storage_queue.engagement_intake.name
+}
+
+output "engagement_assets_container_name" {
+  description = "Blob container name for generated PPTX presentations — injected into the backend as ENGAGEMENT_ASSETS_CONTAINER."
+  value       = azurerm_storage_container.engagement_assets.name
+}

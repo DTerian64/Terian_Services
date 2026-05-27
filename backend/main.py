@@ -14,8 +14,10 @@ separated).  Defaults to terian-services.com plus localhost dev origins.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
+from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -30,6 +32,7 @@ from contact_router import router as contact_router              # noqa: E402
 from conversations_router import router as conversations_router  # noqa: E402
 from engagement_router import router as engagement_router                # noqa: E402
 from engagement_intake_router import router as engagement_intake_router  # noqa: E402
+from engagement_worker import run_worker                                  # noqa: E402
 from metrics_router import router as metrics_router                      # noqa: E402
 from team_router import router as team_router                    # noqa: E402
 
@@ -41,11 +44,32 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# ── Lifespan ─────────────────────────────────────────────────────────────────
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Start background workers on startup; stop them cleanly on shutdown."""
+    stop_event = asyncio.Event()
+    worker_task = asyncio.create_task(run_worker(stop_event))
+    logger.info("main: engagement worker task started")
+    try:
+        yield
+    finally:
+        stop_event.set()
+        try:
+            await asyncio.wait_for(worker_task, timeout=15)
+        except asyncio.TimeoutError:
+            logger.warning("main: engagement worker did not stop within 15 s — cancelling")
+            worker_task.cancel()
+        logger.info("main: engagement worker stopped")
+
+
 # ── App ──────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title="Terian Services — Public API",
     description="Public-site backend (Ask AI, etc.) for terian-services.com.",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 
