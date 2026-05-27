@@ -212,6 +212,15 @@ resource "azurerm_role_assignment" "uami_blob_delegator" {
   principal_id         = module.container_app.uami_principal_id
 }
 
+# Storage Queue Data Contributor — required for the engagement intake router
+# to send messages (send_message) and for the engagement worker to receive
+# and delete them (receive_messages, delete_message).
+resource "azurerm_role_assignment" "uami_queue_contributor" {
+  scope                = module.data_store.storage_account_id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = module.container_app.uami_principal_id
+}
+
 resource "azurerm_cosmosdb_sql_role_assignment" "uami_cosmos_contributor" {
   resource_group_name = azurerm_resource_group.corporate.name
   account_name        = module.data_store.cosmos_account_name

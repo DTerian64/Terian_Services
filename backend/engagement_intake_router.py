@@ -169,14 +169,26 @@ async def _create_engagement(db_client, account_id: str, body: EngagementRegiste
     return engagement_id
 
 
-def _send_email_sync(body: EngagementRegisterRequest, account_id: str, engagement_id: str) -> None:
-    """Blocking SMTP send — called via asyncio.to_thread."""
+def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engagement_id: str) -> None:
+    """
+    Send both outbound emails in a SINGLE SMTP session to avoid Gmail
+    throttling two rapid back-to-back connections from the same App Password.
+
+      Msg 1 → _NOTIFY_TO   : [New Engagement] internal notification for sales@
+      Msg 2 → body.email   : Welcome / confirmation to the requester
+
+    Called via asyncio.to_thread.
+    """
     if not _GMAIL_APP_PWD:
-        logger.warning("GMAIL_APP_PASSWORD not set — skipping email notification")
+        logger.warning("GMAIL_APP_PASSWORD not set — skipping all outbound emails")
         return
 
-    subject = f"[New Engagement] {body.org_name} — {body.engagement_type}"
-    html = f"""<!DOCTYPE html>
+    from_header = f"{_FROM_NAME} <{_GMAIL_USER}>"
+
+    # ── Message 1: internal notification ─────────────────────────────────────
+
+    notify_subject = f"[New Engagement] {body.org_name} — {body.engagement_type}"
+    notify_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -272,31 +284,17 @@ def _send_email_sync(body: EngagementRegisterRequest, account_id: str, engagemen
 </body>
 </html>"""
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
-    msg["To"]      = _NOTIFY_TO
-    msg.attach(MIMEText(html, "html"))
+    notify_msg = MIMEMultipart("alternative")
+    notify_msg["Subject"] = notify_subject
+    notify_msg["From"]    = from_header
+    notify_msg["To"]      = _NOTIFY_TO
+    notify_msg.attach(MIMEText(notify_html, "html"))
 
-    with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
-        server.starttls()
-        server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-        server.sendmail(_GMAIL_USER, [_NOTIFY_TO], msg.as_string())
+    # ── Message 2: requester welcome ──────────────────────────────────────────
 
-    logger.info(
-        "Engagement notification sent: engagement_id=%s org=%s",
-        engagement_id, body.org_name,
-    )
-
-
-def _send_welcome_email_sync(body: EngagementRegisterRequest, engagement_id: str) -> None:
-    """Welcome/confirmation email to the requester — called via asyncio.to_thread."""
-    if not _GMAIL_APP_PWD:
-        logger.warning("GMAIL_APP_PASSWORD not set — skipping welcome email")
-        return
-
-    subject = f"Welcome to Terian Services — we've received your request"
-    html = f"""<!DOCTYPE html>
+    first_name = body.full_name.split()[0]
+    welcome_subject = "Welcome to Terian Services — we've received your request"
+    welcome_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -327,7 +325,7 @@ def _send_welcome_email_sync(body: EngagementRegisterRequest, engagement_id: str
           <td style="padding:32px 40px;">
 
             <p style="margin:0 0 20px;font-size:15px;color:#111827;line-height:1.6;">
-              Hi {body.full_name.split()[0]},
+              Hi {first_name},
             </p>
             <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
               Thank you for reaching out — we're glad you're here. We've received your engagement
@@ -364,7 +362,7 @@ def _send_welcome_email_sync(body: EngagementRegisterRequest, engagement_id: str
             </table>
 
             <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              We're preparing a personalized overview of how Terian Services can address your
+              We're preparing a personalised overview of how Terian Services can address your
               needs. You'll receive it via a follow-up email shortly — keep an eye on your inbox.
             </p>
 
@@ -402,20 +400,23 @@ def _send_welcome_email_sync(body: EngagementRegisterRequest, engagement_id: str
 </body>
 </html>"""
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
-    msg["To"]      = str(body.email)
-    msg.attach(MIMEText(html, "html"))
+    welcome_msg = MIMEMultipart("alternative")
+    welcome_msg["Subject"] = welcome_subject
+    welcome_msg["From"]    = from_header
+    welcome_msg["To"]      = str(body.email)
+    welcome_msg.attach(MIMEText(welcome_html, "html"))
+
+    # ── Single SMTP session — send both messages ───────────────────────────────
 
     with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
         server.starttls()
         server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-        server.sendmail(_GMAIL_USER, [str(body.email)], msg.as_string())
+        server.sendmail(_GMAIL_USER, [_NOTIFY_TO], notify_msg.as_string())
+        server.sendmail(_GMAIL_USER, [str(body.email)], welcome_msg.as_string())
 
     logger.info(
-        "Welcome email sent: engagement_id=%s to=%s",
-        engagement_id, body.email,
+        "Emails sent: engagement_id=%s notification→%s welcome→%s",
+        engagement_id, _NOTIFY_TO, body.email,
     )
 
 
@@ -501,14 +502,9 @@ async def register_engagement(body: EngagementRegisterRequest) -> EngagementRegi
         )
 
     try:
-        await asyncio.to_thread(_send_email_sync, body, account_id, engagement_id)
+        await asyncio.to_thread(_send_emails_sync, body, account_id, engagement_id)
     except Exception as exc:
-        logger.warning("Engagement email notification failed (records saved): %s", exc)
-
-    try:
-        await asyncio.to_thread(_send_welcome_email_sync, body, engagement_id)
-    except Exception as exc:
-        logger.warning("Requester welcome email failed (records saved): %s", exc)
+        logger.warning("Email send failed (records saved): %s", exc)
 
     try:
         await _enqueue_engagement_job(body, account_id, engagement_id)

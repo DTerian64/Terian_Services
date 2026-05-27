@@ -6,16 +6,12 @@ and engagement_worker.py (async worker path).
 
 Exported surface
 ────────────────
-  SCHEMAS          — OpenAI tool schema for `generate_presentation` (chatbot)
-  IMPLEMENTATIONS  — callable map for the agent loop dispatcher
-  generate_presentation_core(context) → PresentationResult
-      Direct async function for the worker path — skips JSON serialization.
+  PresentationResult                   — dataclass returned by generate_presentation_core
+  generate_presentation_core(context)  → PresentationResult
+      Shared async function: LLM slide content → python-pptx → Blob upload → SAS URL.
 
-generate_presentation tool
-──────────────────────────
-  Input : org_name, industry, user_count, engagement_type, tier_interest, use_case
-  Flow  : LLM → slide JSON → python-pptx → Blob upload → SAS URL (24 h)
-  Output: {"sas_url": "...", "blob_path": "...", "expires_at": "..."}
+Note: this file intentionally does NOT export SCHEMAS or IMPLEMENTATIONS.
+PresentationAgent overrides ask() directly — no tool-calling loop is used.
 
 Environment variables (all injected by Terraform)
 ──────────────────────────────────────────────────
@@ -340,86 +336,3 @@ async def generate_presentation_core(context: dict) -> PresentationResult:
         expires_at=expiry,
     )
 
-
-# ── OpenAI tool schema + implementation (chatbot path) ────────────────────────
-
-SCHEMAS = [
-    {
-        "type": "function",
-        "function": {
-            "name": "generate_presentation",
-            "description": (
-                "Generate a personalised Terian Services onboarding presentation (.pptx) "
-                "and return a time-limited download link. Call this when the user asks for "
-                "a deck, presentation, slides, or onboarding overview. Extract as much "
-                "context as possible from the conversation before calling."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "org_name": {
-                        "type": "string",
-                        "description": "Prospect's organisation or company name.",
-                    },
-                    "industry": {
-                        "type": "string",
-                        "description": "Industry or sector (e.g. 'Fintech', 'Healthcare'). Use '' if unknown.",
-                    },
-                    "user_count": {
-                        "type": "integer",
-                        "description": "Estimated number of end users. Use 0 if unknown.",
-                    },
-                    "engagement_type": {
-                        "type": "string",
-                        "description": "Engagement type the prospect is interested in (e.g. 'Award Nomination System').",
-                    },
-                    "tier_interest": {
-                        "type": "string",
-                        "description": "Tier they expressed interest in (e.g. 'Starter', 'Professional', 'Enterprise'). Use '' if unknown.",
-                    },
-                    "use_case": {
-                        "type": "string",
-                        "description": "Brief description of their use case or goals. Use '' if unknown.",
-                    },
-                },
-                "required": ["org_name", "engagement_type"],
-            },
-        },
-    }
-]
-
-
-async def _generate_presentation_tool(
-    org_name: str,
-    engagement_type: str,
-    industry: str = "",
-    user_count: int = 0,
-    tier_interest: str = "",
-    use_case: str = "",
-) -> dict:
-    """Tool implementation — called by the agent loop dispatcher."""
-    context = {
-        "org_name": org_name,
-        "engagement_type": engagement_type,
-        "industry": industry,
-        "user_count": user_count,
-        "tier_interest": tier_interest,
-        "use_case": use_case,
-    }
-    result = await generate_presentation_core(context)
-    return {
-        "status": "success",
-        "sas_url": result.sas_url,
-        "blob_path": result.blob_path,
-        "expires_at": result.expires_at.isoformat(),
-        "message": (
-            f"Your personalised presentation is ready. "
-            f"[Download your deck]({result.sas_url}) "
-            f"(link valid for {_SAS_EXPIRY_HOURS} hours)."
-        ),
-    }
-
-
-IMPLEMENTATIONS = {
-    "generate_presentation": _generate_presentation_tool,
-}

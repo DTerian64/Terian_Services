@@ -84,8 +84,13 @@ legal         — questions about contracts, agreements, or legal templates: "do
 product       — specific questions about product features, technical architecture,
                 ML capabilities, integrations, demos, or the Award Nomination System.
 presentation  — requests to generate, create, or download a presentation, deck,
-                slides, or onboarding overview: "can you make a deck", "generate
-                a presentation", "I'd like slides about", "send me a PowerPoint".
+                slides, PowerPoint, or onboarding overview. Covers explicit
+                requests ("make a deck", "generate a presentation", "send me a
+                PowerPoint", "I'd like slides") AND natural variants such as
+                "put something together for my team", "create something I can
+                show", "make something presentable", "put together some
+                materials for a meeting", "I'd like something visual to share",
+                or "can you prepare something for us".
 live_data     — ANY question that asks to fetch, read, summarize, or browse a URL
                 or web page (regardless of whose site it is); or questions requiring
                 real-time / external information such as current events, live pricing,
