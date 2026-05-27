@@ -270,3 +270,18 @@ resource "azurerm_storage_container" "engagement_assets" {
   container_access_type = "private"
 }
 
+# Blob container for reusable PPTX presentation templates.
+# Always private — the backend UAMI reads here; templates are downloaded
+# server-side by generate_award_onboarding() (and future service methods)
+# and personalised via token substitution before being sent to clients.
+# Content is managed by the deploy-blob-templates GHA workflow, which
+# uploads ./blob_templates/** on every push to main that touches that folder.
+# Path convention: <service>_onboarding.pptx
+#   e.g. award_nomination_onboarding.pptx
+
+resource "azurerm_storage_container" "blob_templates" {
+  name                  = "blob-templates"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "private"
+}
+

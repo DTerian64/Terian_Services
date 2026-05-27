@@ -54,3 +54,8 @@ output "engagement_assets_container_name" {
   description = "Blob container name for generated PPTX presentations — injected into the backend as ENGAGEMENT_ASSETS_CONTAINER."
   value       = azurerm_storage_container.engagement_assets.name
 }
+
+output "blob_templates_container_name" {
+  description = "Blob container name for reusable PPTX presentation templates — read by generate_award_onboarding() and future service methods."
+  value       = azurerm_storage_container.blob_templates.name
+}
