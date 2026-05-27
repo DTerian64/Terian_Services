@@ -9,7 +9,7 @@ Chatbot path (via AgentRouter)
     ask(question, history) is overridden — no tool-calling loop.
     Flow:
       1. Single LLM call to extract context JSON from the conversation
-      2. generate_presentation_core() builds PPTX and uploads to Blob
+      2. generate() dispatches to the correct service-specific method
       3. Returns AskResult with a time-limited SAS download link
 
 Direct path (engagement_worker.py)
@@ -20,6 +20,18 @@ Direct path (engagement_worker.py)
     # result.blob_path  → stored in CosmosDB
     # result.sas_url    → not used by worker (email attachment used instead)
 
+Dispatch
+────────
+    generate(job) is the single entry point for both the chatbot and worker
+    paths.  It inspects job["engagement_type"] (or "service_id") and routes
+    to the appropriate concrete method:
+
+        "Award Nomination"  →  generate_award_onboarding(job)
+        <future services>   →  generate_<service>_onboarding(job)
+
+    Concrete methods are responsible for their own template / LLM strategy.
+    Adding a new service means adding one method and one branch in generate().
+
 Skills loaded: base, presentation (prompts fetched from Blob; no tools
 registered — the loop is not used for this agent).
 """
@@ -29,11 +41,17 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
+from datetime import datetime, timezone
 
 from openai import AzureOpenAI
 
 from agents.ask_agent import AskAgent, AskResult
-from agents.skills.presentation.tools import PresentationResult, generate_presentation_core
+from agents.skills.presentation.tools import (
+    PresentationResult,
+    generate_from_template,
+    generate_presentation_core,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +83,11 @@ class PresentationAgent(AskAgent):
 
     Chatbot callers use ask(question, history) — overridden here to bypass
     the tool-calling loop entirely.  The engagement worker calls
-    generate(context) directly (also bypasses the loop).
+    generate(job) directly (also bypasses the loop).
+
+    To add a new service:
+      1. Add generate_<service>_onboarding(self, job) below.
+      2. Add a branch in generate() that routes to it.
     """
 
     def __init__(self, openai_client: AzureOpenAI | None = None) -> None:
@@ -104,8 +126,8 @@ class PresentationAgent(AskAgent):
                 context.get("org_name"), context.get("engagement_type"),
             )
 
-            # 2. Generate PPTX + upload to Blob
-            result = await generate_presentation_core(context)
+            # 2. Generate PPTX + upload to Blob (routes through dispatcher)
+            result = await self.generate(context)
 
             # 3. Build a warm, concise response with the download link
             org        = context.get("org_name") or "you"
@@ -171,15 +193,67 @@ class PresentationAgent(AskAgent):
             )
             return {}
 
-    # ── Worker path ───────────────────────────────────────────────────────────
+    # ── Worker / chatbot dispatch path ────────────────────────────────────────
 
-    async def generate(self, context: dict) -> PresentationResult:
+    async def generate(self, job: dict) -> PresentationResult:
         """
-        Direct generation — bypasses the agent loop entirely.
+        Dispatcher — single entry point for both the worker and chatbot paths.
 
-        context should contain: org_name, full_name, industry, user_count,
-        engagement_type, tier_interest, use_case, engagement_id (optional).
+        Reads job["engagement_type"] (case-insensitive, hyphens normalised) and
+        routes to the appropriate concrete generation method.  Raises
+        ValueError for unknown service types so the worker can dead-letter the
+        job rather than silently producing a wrong presentation.
+
+        job keys used here: engagement_type (required for routing).
+        All other keys are forwarded to the concrete method unchanged.
+        """
+        raw_type = (job.get("engagement_type") or "").strip().lower().replace("-", " ")
+
+        if raw_type in ("award nomination", "award-nomination", ""):
+            # Empty string falls back to Award Nomination (the only service for now).
+            return await self.generate_award_onboarding(job)
+
+        raise ValueError(
+            f"PresentationAgent: unknown engagement_type {job.get('engagement_type')!r}. "
+            "Add a generate_<service>_onboarding() method and a branch in generate()."
+        )
+
+    async def generate_award_onboarding(self, job: dict) -> PresentationResult:
+        """
+        Generate an Award Nomination onboarding presentation using the
+        master template stored in blob-templates.
+
+        Template: award_nomination_onboarding.pptx
+        Tokens substituted:
+          {{CLIENT_NAME}}       — org_name from job payload
+          {{CLIENT_SUBDOMAIN}}  — URL-safe slug derived from org_name
+          {{PRESENTATION_DATE}} — current month + year (e.g. "May 2026")
+
+        job keys used: org_name, engagement_id (optional).
+        All other job keys (tier_interest, full_name, etc.) are available
+        for future token expansion without changing the dispatch logic.
 
         Returns a PresentationResult with pptx_bytes, blob_path, sas_url.
         """
-        return await generate_presentation_core(context)
+        org_name = (job.get("org_name") or "").strip()
+
+        # Derive a URL-safe subdomain slug: lowercase, spaces/special chars → hyphens
+        subdomain = re.sub(r"[^a-z0-9]+", "-", org_name.lower()).strip("-") or "your-company"
+
+        tokens = {
+            "CLIENT_NAME":       org_name or "Your Organisation",
+            "CLIENT_SUBDOMAIN":  subdomain,
+            "PRESENTATION_DATE": datetime.now(timezone.utc).strftime("%B %Y"),
+        }
+
+        logger.info(
+            "PresentationAgent: generating Award Nomination onboarding "
+            "org=%r subdomain=%r",
+            org_name, subdomain,
+        )
+
+        return await generate_from_template(
+            template_name="award_nomination_onboarding.pptx",
+            tokens=tokens,
+            engagement_id=job.get("engagement_id"),
+        )

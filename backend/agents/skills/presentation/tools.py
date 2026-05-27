@@ -6,9 +6,14 @@ and engagement_worker.py (async worker path).
 
 Exported surface
 ────────────────
-  PresentationResult                   — dataclass returned by generate_presentation_core
-  generate_presentation_core(context)  → PresentationResult
-      Shared async function: LLM slide content → python-pptx → Blob upload → SAS URL.
+  PresentationResult                        — dataclass returned by all generators
+  generate_from_template(name, tokens, id)  → PresentationResult
+      Template path: downloads PPTX from blob-templates, substitutes {{tokens}},
+      uploads personalised result to engagement-assets.  Used by the worker for
+      all service onboarding decks.
+  generate_presentation_core(context)       → PresentationResult
+      LLM path: used by the chatbot (Ask AI) when a visitor requests a deck
+      mid-conversation without having registered.
 
 Note: this file intentionally does NOT export SCHEMAS or IMPLEMENTATIONS.
 PresentationAgent overrides ask() directly — no tool-calling loop is used.
@@ -16,7 +21,8 @@ PresentationAgent overrides ask() directly — no tool-calling loop is used.
 Environment variables (all injected by Terraform)
 ──────────────────────────────────────────────────
   AZURE_STORAGE_BLOB_ENDPOINT   — blob service endpoint
-  ENGAGEMENT_ASSETS_CONTAINER   — container name (default: engagement-assets)
+  ENGAGEMENT_ASSETS_CONTAINER   — output container (default: engagement-assets)
+  BLOB_TEMPLATES_CONTAINER      — template source container (default: blob-templates)
   AZURE_OPENAI_KEY / ENDPOINT / MODEL / API_VERSION
 """
 
@@ -26,7 +32,9 @@ import io
 import json
 import logging
 import os
+import re
 import uuid
+import zipfile
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
@@ -44,9 +52,10 @@ logger = logging.getLogger(__name__)
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 
-_BLOB_ENDPOINT    = os.getenv("AZURE_STORAGE_BLOB_ENDPOINT", "")
-_ASSETS_CONTAINER = os.getenv("ENGAGEMENT_ASSETS_CONTAINER", "engagement-assets")
-_SAS_EXPIRY_HOURS = 24
+_BLOB_ENDPOINT        = os.getenv("AZURE_STORAGE_BLOB_ENDPOINT", "")
+_ASSETS_CONTAINER     = os.getenv("ENGAGEMENT_ASSETS_CONTAINER", "engagement-assets")
+_TEMPLATES_CONTAINER  = os.getenv("BLOB_TEMPLATES_CONTAINER", "blob-templates")
+_SAS_EXPIRY_HOURS     = 24
 
 # ── Brand palette ──────────────────────────────────────────────────────────────
 
@@ -294,10 +303,95 @@ async def _upload_and_sign(blob_path: str, pptx_bytes: bytes) -> tuple[str, date
     return sas_url, expiry
 
 
-# ── Core generation function (shared entry point) ──────────────────────────────
+# ── Template-based generation (worker path) ────────────────────────────────────
 
 import asyncio  # noqa: E402 (placed here to keep top-of-file imports clean)
 
+
+async def _download_template(template_name: str) -> bytes:
+    """
+    Download a PPTX template from the blob-templates container.
+    Raises if the blob does not exist or the endpoint is not configured.
+    """
+    if not _BLOB_ENDPOINT:
+        raise EnvironmentError("AZURE_STORAGE_BLOB_ENDPOINT is not set")
+    async with _credential() as cred:
+        async with BlobServiceClient(account_url=_BLOB_ENDPOINT, credential=cred) as svc:
+            blob = svc.get_blob_client(container=_TEMPLATES_CONTAINER, blob=template_name)
+            stream = await blob.download_blob()
+            return await stream.readall()
+
+
+def _substitute_tokens(pptx_bytes: bytes, tokens: dict[str, str]) -> bytes:
+    """
+    Replace {{TOKEN}} placeholders inside every slide XML in the PPTX zip.
+
+    Operates at the zip entry level — reads each ppt/slides/slide*.xml,
+    does a plain string replacement for every token, and writes the result
+    back.  All other zip entries (images, layouts, theme, etc.) are copied
+    unchanged so the visual design is fully preserved.
+
+    This approach is safe for the award_nomination_onboarding template because
+    all tokens were verified to appear as whole strings inside single <a:t>
+    elements (no split-run issues).
+    """
+    src = io.BytesIO(pptx_bytes)
+    dst = io.BytesIO()
+    with zipfile.ZipFile(src, "r") as zin, \
+         zipfile.ZipFile(dst, "w", compression=zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if item.filename.startswith("ppt/slides/") and item.filename.endswith(".xml"):
+                text = data.decode("utf-8")
+                for key, value in tokens.items():
+                    text = text.replace(f"{{{{{key}}}}}", value)
+                data = text.encode("utf-8")
+            zout.writestr(item, data)
+    return dst.getvalue()
+
+
+async def generate_from_template(
+    template_name: str,
+    tokens: dict[str, str],
+    engagement_id: str | None = None,
+) -> PresentationResult:
+    """
+    Template-based PPTX generation.
+
+    1. Download the named template from blob-templates container.
+    2. Substitute {{tokens}} across all slide XML (zip-level replace).
+    3. Upload the personalised PPTX to engagement-assets.
+    4. Return PresentationResult (pptx_bytes, blob_path, sas_url, expires_at).
+
+    template_name  — blob name in blob-templates (e.g. "award_nomination_onboarding.pptx")
+    tokens         — dict of TOKEN_KEY → replacement value (no braces in keys)
+    engagement_id  — used as the blob path prefix; falls back to a random UUID prefix
+    """
+    # 1. Download template
+    template_bytes = await _download_template(template_name)
+    logger.info("presentation: downloaded template %s (%d bytes)", template_name, len(template_bytes))
+
+    # 2. Substitute tokens in a thread (CPU-bound zip work)
+    pptx_bytes = await asyncio.to_thread(_substitute_tokens, template_bytes, tokens)
+    logger.info("presentation: token substitution complete (%d tokens)", len(tokens))
+
+    # 3. Upload personalised deck + generate SAS URL
+    blob_path = (
+        f"{engagement_id}/onboarding.pptx"
+        if engagement_id
+        else f"chatbot/{uuid.uuid4()}/onboarding.pptx"
+    )
+    sas_url, expiry = await _upload_and_sign(blob_path, pptx_bytes)
+
+    return PresentationResult(
+        pptx_bytes=pptx_bytes,
+        blob_path=blob_path,
+        sas_url=sas_url,
+        expires_at=expiry,
+    )
+
+
+# ── LLM generation (chatbot / Ask AI path) ────────────────────────────────────
 
 async def generate_presentation_core(context: dict) -> PresentationResult:
     """
