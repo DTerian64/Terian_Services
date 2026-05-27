@@ -117,7 +117,7 @@ Context:
   Use case       : {use_case}
 """
 
-_FALLBACK_SLIDES = [
+_FALLBACK_SLIDES = [ 
     {"title": "Who We Are",        "bullets": ["AI-native technology consultancy", "Deep expertise in data & cloud", "Proven delivery across industries"]},
     {"title": "Our Approach",      "bullets": ["Discovery → Design → Deliver", "Iterative, outcome-focused methodology", "Transparent progress at every stage"]},
     {"title": "Your Engagement",   "bullets": ["Engagement scoped to your needs", "Dedicated team from day one", "Clear milestones and deliverables"]},
