@@ -23,9 +23,10 @@ cause the endpoint to return an error — both records are already in CosmosDB.
 Environment variables
   AZURE_COSMOS_ENDPOINT    — Cosmos DB account endpoint (required)
   AZURE_COSMOS_DATABASE    — database name (default: terian-services)
-  GMAIL_USER               — Gmail address used for SMTP auth + From header
-  GMAIL_APP_PASSWORD       — Gmail App Password (injected from Key Vault)
-  CONTACT_NOTIFY_EMAIL     — destination inbox (defaults to GMAIL_USER)
+  SMTP_USER                — SMTP sender address (sales@terian-services.com)
+  SMTP_PASSWORD            — Zoho App Password (injected from Key Vault)
+  SMTP_HOST                — SMTP server (default: smtppro.zoho.com)
+  CONTACT_NOTIFY_EMAIL     — destination inbox (defaults to SMTP_USER)
 """
 
 from __future__ import annotations
@@ -63,11 +64,11 @@ _ENGAGEMENTS_CTR   = "client_engagements"
 _QUEUE_ENDPOINT = os.getenv("AZURE_STORAGE_QUEUE_ENDPOINT", "")
 _QUEUE_NAME     = os.getenv("ENGAGEMENT_INTAKE_QUEUE_NAME", "engagement-intake")
 
-_GMAIL_USER    = os.getenv("GMAIL_USER", "david.terian@gmail.com")
-_GMAIL_APP_PWD = os.getenv("GMAIL_APP_PASSWORD")
+_SMTP_USER     = os.getenv("SMTP_USER", "")
+_SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 _NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", "sales@terian-services.com")
 _FROM_NAME     = "Terian Services"
-_SMTP_HOST     = "smtp.gmail.com"
+_SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 
 RequestStatus = Literal[
@@ -179,11 +180,11 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
 
     Called via asyncio.to_thread.
     """
-    if not _GMAIL_APP_PWD:
+    if not _SMTP_PASSWORD:
         logger.warning("GMAIL_APP_PASSWORD not set — skipping all outbound emails")
         return
 
-    from_header = f"{_FROM_NAME} <{_GMAIL_USER}>"
+    from_header = f"{_FROM_NAME} <{_SMTP_USER}>"
 
     # ── Message 1: internal notification ─────────────────────────────────────
 
@@ -410,9 +411,9 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
 
     with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
         server.starttls()
-        server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-        server.sendmail(_GMAIL_USER, [_NOTIFY_TO], notify_msg.as_string())
-        server.sendmail(_GMAIL_USER, [str(body.email)], welcome_msg.as_string())
+        server.login(_SMTP_USER, _SMTP_PASSWORD)
+        server.sendmail(_SMTP_USER, [_NOTIFY_TO], notify_msg.as_string())
+        server.sendmail(_SMTP_USER, [str(body.email)], welcome_msg.as_string())
 
     logger.info(
         "Emails sent: engagement_id=%s notification→%s welcome→%s",

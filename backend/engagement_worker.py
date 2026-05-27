@@ -41,8 +41,9 @@ Environment variables (all already injected by Terraform)
   AZURE_OPENAI_ENDPOINT          — Azure OpenAI endpoint
   AZURE_OPENAI_MODEL             — deployment name (default: gpt-4.1)
   AZURE_OPENAI_API_VERSION       — API version (default: 2024-12-01-preview)
-  GMAIL_USER                     — Gmail SMTP address
-  GMAIL_APP_PASSWORD             — Gmail App Password (from Key Vault)
+  SMTP_USER                      — SMTP sender address (sales@terian-services.com)
+  SMTP_PASSWORD                  — Zoho App Password (from Key Vault)
+  SMTP_HOST                      — SMTP server (default: smtppro.zoho.com)
   CONTACT_NOTIFY_EMAIL           — sales alert destination
 """
 
@@ -77,11 +78,11 @@ _COSMOS_DATABASE  = os.getenv("AZURE_COSMOS_DATABASE", "terian-services")
 _ENGAGEMENTS_CTR  = "client_engagements"
 _FAILED_JOBS_CTR  = "failed_engagement_jobs"
 
-_GMAIL_USER    = os.getenv("GMAIL_USER", "david.terian@gmail.com")
-_GMAIL_APP_PWD = os.getenv("GMAIL_APP_PASSWORD")
+_SMTP_USER     = os.getenv("SMTP_USER", "")
+_SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 _NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", "sales@terian-services.com")
 _FROM_NAME     = "Terian Services"
-_SMTP_HOST     = "smtp.gmail.com"
+_SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 
 _MAX_ATTEMPTS    = 5    # dequeue_count threshold before dead-lettering
@@ -102,7 +103,7 @@ def _credential():
 
 def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
     """Send Email #2 with the PPTX attached — runs in asyncio.to_thread."""
-    if not _GMAIL_APP_PWD:
+    if not _SMTP_PASSWORD:
         logger.warning("worker: GMAIL_APP_PASSWORD not set — skipping Email #2")
         return
 
@@ -165,7 +166,7 @@ def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
 
     msg = MIMEMultipart("mixed")
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
+    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
     msg["To"]      = to_addr
 
     msg.attach(MIMEText(html, "html"))
@@ -186,8 +187,8 @@ def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
 
     with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
         server.starttls()
-        server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-        server.sendmail(_GMAIL_USER, [to_addr], msg.as_string())
+        server.login(_SMTP_USER, _SMTP_PASSWORD)
+        server.sendmail(_SMTP_USER, [to_addr], msg.as_string())
 
     logger.info("worker: Email #2 sent → %s", to_addr)
 
@@ -252,7 +253,7 @@ async def _write_failed_job(job: dict, error: str) -> None:
 
 def _send_alert_sync(job: dict, error: str) -> None:
     """Notify sales@ when a job is dead-lettered — runs in asyncio.to_thread."""
-    if not _GMAIL_APP_PWD:
+    if not _SMTP_PASSWORD:
         return
     subject = f"[ACTION REQUIRED] Engagement worker failed — {job.get('org_name', 'unknown')}"
     body = (
@@ -266,14 +267,14 @@ def _send_alert_sync(job: dict, error: str) -> None:
     )
     msg = MIMEMultipart()
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
+    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
     msg["To"]      = _NOTIFY_TO
     msg.attach(MIMEText(body, "plain"))
     try:
         with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
             server.starttls()
-            server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-            server.sendmail(_GMAIL_USER, [_NOTIFY_TO], msg.as_string())
+            server.login(_SMTP_USER, _SMTP_PASSWORD)
+            server.sendmail(_SMTP_USER, [_NOTIFY_TO], msg.as_string())
     except Exception as exc:
         logger.error("worker: failed to send alert email: %s", exc)
 

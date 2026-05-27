@@ -205,14 +205,14 @@ resource "azurerm_key_vault_secret" "serper_api_key" {
   ]
 }
 
-# ── Gmail App Password → Key Vault secret ────────────────────────────────────
-# Only created when gmail_app_password is supplied (count = 0 disables it).
-# Pass the value as TF_VAR_gmail_app_password or a GitHub Actions secret —
+# ── SMTP App Password → Key Vault secret ─────────────────────────────────────
+# Only created when smtp_password is supplied (count = 0 disables it).
+# Pass the value as TF_VAR_smtp_password or a GitHub Actions secret —
 # never commit it to terraform.tfvars.
-resource "azurerm_key_vault_secret" "gmail_app_password" {
-  count        = var.gmail_app_password != "" ? 1 : 0
-  name         = "gmail-app-password"
-  value        = var.gmail_app_password
+resource "azurerm_key_vault_secret" "smtp_password" {
+  count        = var.smtp_password != "" ? 1 : 0
+  name         = "smtp-password"
+  value        = var.smtp_password
   key_vault_id = azurerm_key_vault.kv.id
 
   depends_on = [
@@ -329,12 +329,12 @@ resource "azurerm_container_app" "backend" {
     }
   }
 
-  # GMAIL_APP_PASSWORD — only wired when the KV secret was created.
+  # SMTP_PASSWORD — only wired when the KV secret was created.
   dynamic "secret" {
-    for_each = var.gmail_app_password != "" ? [1] : []
+    for_each = var.smtp_password != "" ? [1] : []
     content {
-      name                = "gmail-app-password"
-      key_vault_secret_id = azurerm_key_vault_secret.gmail_app_password[0].versionless_id
+      name                = "smtp-password"
+      key_vault_secret_id = azurerm_key_vault_secret.smtp_password[0].versionless_id
       identity            = azurerm_user_assigned_identity.backend.id
     }
   }
@@ -433,20 +433,24 @@ resource "azurerm_container_app" "backend" {
         name  = "AWARD_APPI_FRONTEND_RESOURCE_ID"
         value = var.award_appi_frontend_resource_id
       }
-      # Gmail SMTP — for contact form notification emails.
+      # Zoho SMTP — for contact form + engagement notification emails.
       env {
-        name  = "GMAIL_USER"
-        value = var.gmail_user
+        name  = "SMTP_USER"
+        value = var.smtp_user
+      }
+      env {
+        name  = "SMTP_HOST"
+        value = var.smtp_host
       }
       env {
         name  = "CONTACT_NOTIFY_EMAIL"
-        value = var.contact_notify_email != "" ? var.contact_notify_email : var.gmail_user
+        value = var.contact_notify_email != "" ? var.contact_notify_email : var.smtp_user
       }
       dynamic "env" {
-        for_each = var.gmail_app_password != "" ? [1] : []
+        for_each = var.smtp_password != "" ? [1] : []
         content {
-          name        = "GMAIL_APP_PASSWORD"
-          secret_name = "gmail-app-password"
+          name        = "SMTP_PASSWORD"
+          secret_name = "smtp-password"
         }
       }
     }
@@ -476,7 +480,7 @@ resource "azurerm_container_app" "backend" {
     azurerm_role_assignment.uami_app_insights_reader,
     azurerm_key_vault_secret.openai_key,
     azurerm_key_vault_secret.serper_api_key,
-    azurerm_key_vault_secret.gmail_app_password,
+    azurerm_key_vault_secret.smtp_password,
     azurerm_cognitive_deployment.gpt,
     azurerm_cognitive_deployment.gpt_classify,
   ]

@@ -4,7 +4,7 @@ agents/skills/contact/tools.py
 Tool for sending a notification email to a Terian Services inbox on behalf
 of a website visitor.
 
-Reuses the same Gmail SMTP + Cosmos DB pattern as contact_router.py:
+Reuses the same Zoho SMTP + Cosmos DB pattern as contact_router.py:
   - SMTP send runs in a thread (blocking smtplib, non-blocking for FastAPI)
   - Message is persisted to the client_communications Cosmos container
   - Email is best-effort: a transient SMTP failure returns an error result
@@ -18,8 +18,9 @@ Security
 
 Environment variables
 ─────────────────────
-  GMAIL_USER              — Gmail address for SMTP auth + From header
-  GMAIL_APP_PASSWORD      — Gmail App Password (injected from Key Vault)
+  SMTP_USER               — SMTP sender address (sales@terian-services.com)
+  SMTP_PASSWORD           — Zoho App Password (injected from Key Vault)
+  SMTP_HOST               — SMTP server (default: smtppro.zoho.com)
   AZURE_COSMOS_ENDPOINT   — Cosmos DB account endpoint URL
   AZURE_COSMOS_DATABASE   — database name (default: terian-services)
 """
@@ -42,9 +43,9 @@ logger = logging.getLogger(__name__)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-_GMAIL_USER    = os.getenv("GMAIL_USER", "")
-_GMAIL_APP_PWD = os.getenv("GMAIL_APP_PASSWORD", "")
-_SMTP_HOST     = "smtp.gmail.com"
+_SMTP_USER     = os.getenv("SMTP_USER", "")
+_SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+_SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 _FROM_NAME     = "Terian Services — Ask AI"
 
@@ -178,15 +179,15 @@ def _send_email_sync(
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
+    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
     msg["To"]      = to_address
     msg["Reply-To"] = from_email
     msg.attach(MIMEText(html, "html"))
 
     with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
         server.starttls()
-        server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-        server.sendmail(_GMAIL_USER, [to_address], msg.as_string())
+        server.login(_SMTP_USER, _SMTP_PASSWORD)
+        server.sendmail(_SMTP_USER, [to_address], msg.as_string())
 
     logger.info(
         "contact tool: email sent to %s from %s (id=%s)",
@@ -226,7 +227,7 @@ async def send_notification(
             ),
         }
 
-    if not _GMAIL_APP_PWD:
+    if not _SMTP_PASSWORD:
         logger.error("contact tool: GMAIL_APP_PASSWORD not set")
         return {
             "status": "error",

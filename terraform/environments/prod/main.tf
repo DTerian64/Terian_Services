@@ -305,9 +305,10 @@ module "container_app" {
   app_insights_log_analytics_resource_id = var.app_insights_log_analytics_resource_id
   app_insights_workspace_id              = var.app_insights_workspace_id
 
-  # Gmail SMTP (contact form notifications)
-  gmail_user           = var.gmail_user
-  gmail_app_password   = var.gmail_app_password
+  # SMTP — Zoho (contact form + engagement notifications)
+  smtp_user            = var.smtp_user
+  smtp_host            = var.smtp_host
+  smtp_password        = var.smtp_password
   contact_notify_email = var.contact_notify_email
 
   # Award Nomination compute + database (Azure Monitor metrics)

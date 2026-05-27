@@ -222,22 +222,28 @@ variable "app_insights_workspace_id" {
   default     = ""
 }
 
-# ── Gmail SMTP (contact form notifications) ──────────────────────────────────
+# ── SMTP (Zoho — contact form + engagement notifications) ────────────────────
 
-variable "gmail_user" {
-  description = "Gmail address used as the SMTP sender for contact form notification emails."
-  type        = string
-  default     = "david.terian@gmail.com"
-}
-
-variable "contact_notify_email" {
-  description = "Destination inbox for contact form notifications. Defaults to gmail_user if empty."
+variable "smtp_user" {
+  description = "SMTP sender address (e.g. sales@terian-services.com). Used for SMTP auth and the From header."
   type        = string
   default     = ""
 }
 
-variable "gmail_app_password" {
-  description = "Gmail App Password for SMTP auth. Sensitive — pass via TF_VAR_gmail_app_password or a GitHub Actions secret; never commit to disk. Leave empty to disable email notifications."
+variable "smtp_host" {
+  description = "Outgoing SMTP server hostname. Zoho Workplace: smtppro.zoho.com. Port is always 587/STARTTLS."
+  type        = string
+  default     = "smtppro.zoho.com"
+}
+
+variable "contact_notify_email" {
+  description = "Destination inbox for contact form and engagement notifications. Defaults to smtp_user if empty."
+  type        = string
+  default     = ""
+}
+
+variable "smtp_password" {
+  description = "SMTP App Password. Sensitive — pass via TF_VAR_smtp_password or a GitHub Actions secret; never commit to disk. Leave empty to disable email notifications."
   type        = string
   sensitive   = true
   default     = ""

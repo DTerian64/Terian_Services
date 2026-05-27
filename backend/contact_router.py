@@ -5,7 +5,7 @@ POST /api/contact
 
   1. Validates the inbound contact form (name, email, company, inquiry, message).
   2. Persists a document to Cosmos DB → terian-services / client_communications.
-  3. Sends an HTML notification email to the configured inbox via Gmail SMTP.
+  3. Sends an HTML notification email to the configured inbox via Zoho SMTP.
   4. Returns {"ok": true, "id": "<uuid>"}.
 
 Email is fire-and-forget: a transient SMTP failure logs a warning but does not
@@ -14,9 +14,10 @@ cause the endpoint to return an error — the message is already in Cosmos DB.
 Environment variables
   AZURE_COSMOS_ENDPOINT   — Cosmos DB account endpoint (required)
   AZURE_COSMOS_DATABASE   — database name (default: terian-services)
-  GMAIL_USER              — Gmail address used for SMTP auth + From header
-  GMAIL_APP_PASSWORD      — Gmail App Password (injected from Key Vault)
-  CONTACT_NOTIFY_EMAIL    — destination inbox (defaults to GMAIL_USER)
+  SMTP_USER               — SMTP sender address (sales@terian-services.com)
+  SMTP_PASSWORD           — Zoho App Password (injected from Key Vault)
+  SMTP_HOST               — SMTP server (default: smtppro.zoho.com)
+  CONTACT_NOTIFY_EMAIL    — destination inbox (defaults to SMTP_USER)
 """
 
 from __future__ import annotations
@@ -45,11 +46,11 @@ _COSMOS_ENDPOINT = os.getenv("AZURE_COSMOS_ENDPOINT", "")
 _COSMOS_DATABASE = os.getenv("AZURE_COSMOS_DATABASE", "terian-services")
 _CONTAINER_NAME  = "client_communications"
 
-_GMAIL_USER    = os.getenv("GMAIL_USER", "david.terian@gmail.com")
-_GMAIL_APP_PWD = os.getenv("GMAIL_APP_PASSWORD")
-_NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", _GMAIL_USER)
+_SMTP_USER     = os.getenv("SMTP_USER", "")
+_SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+_NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", _SMTP_USER)
 _FROM_NAME     = "Terian Services"
-_SMTP_HOST     = "smtp.gmail.com"
+_SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 
 
@@ -90,7 +91,7 @@ async def _save_to_cosmos(doc: dict) -> None:
 
 def _send_email_sync(contact: ContactRequest, doc_id: str) -> None:
     """Blocking SMTP send — called via asyncio.to_thread."""
-    if not _GMAIL_APP_PWD:
+    if not _SMTP_PASSWORD:
         logger.warning("GMAIL_APP_PASSWORD not set — skipping email notification")
         return
 
@@ -197,14 +198,14 @@ def _send_email_sync(contact: ContactRequest, doc_id: str) -> None:
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_GMAIL_USER}>"
+    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
     msg["To"]      = _NOTIFY_TO
     msg.attach(MIMEText(html, "html"))
 
     with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
         server.starttls()
-        server.login(_GMAIL_USER, _GMAIL_APP_PWD)
-        server.sendmail(_GMAIL_USER, [_NOTIFY_TO], msg.as_string())
+        server.login(_SMTP_USER, _SMTP_PASSWORD)
+        server.sendmail(_SMTP_USER, [_NOTIFY_TO], msg.as_string())
 
     logger.info("Contact notification sent: id=%s from=%s", doc_id, contact.email)
 

@@ -40,13 +40,15 @@ award_sql_db_resource_id        = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d
 award_appi_frontend_resource_id               = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/components/appi-award-frontend-sandbox"
 award_appi_frontend_log_analytics_resource_id = "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-secondary-sandbox"
 
-# ── Contact form notifications ───────────────────────────────────────────────
+# ── Contact form + engagement notifications ───────────────────────────────────
 
 contact_notify_email = "support@terian-services.com"
 
-# Gmail App Password — generated at https://myaccount.google.com/apppasswords
-# (16-character password, no spaces). Never commit the real value.
-gmail_app_password = "<place your own value>"
+# Zoho SMTP — App Password generated in Zoho Mail → Settings → Security → App Passwords.
+# smtp_user is the From address and SMTP login; smtp_password is the App Password.
+# Never commit the real value.
+smtp_user     = "sales@terian-services.com"
+smtp_password = "<place your own value>"
 
 # ── Serper (web search for LiveDataAgent) ────────────────────────────────────
 # Sign up at https://serper.dev to get an API key (free tier: 2,500 searches/month).
@@ -56,7 +58,3 @@ serper_api_key = "<place your own value>"
 # Admin user — david64.terian@terian-services.com
 # Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
 admin_principal_id = "<place your own value>"
-
-# Serper API key — sign up at https://serper.dev to obtain.
-# Stored in Key Vault and injected as SERPER_API_KEY. Never commit the real value.
-serper_api_key = "<place your own value>" #https://serper.dev/api-keys
