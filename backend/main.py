@@ -37,10 +37,37 @@ from metrics_router import router as metrics_router                      # noqa:
 from team_router import router as team_router                    # noqa: E402
 
 # ── Logging ──────────────────────────────────────────────────────────────────
+
+# Any log record whose source file lives inside our backend directory is
+# application code — prefix it with "App_Log:" so it can be isolated in
+# Azure Monitor / Log Analytics with a simple filter:
+#
+#   | where Message startswith "App_Log:"
+#
+# This is path-based, not name-based, so every new module or router added
+# to the backend directory is covered automatically — no list to maintain.
+
+_APP_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+class _AppLogFilter(logging.Filter):
+    """Prepend 'App_Log: ' to messages emitted by our own application code."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if os.path.abspath(record.pathname).startswith(_APP_DIR):
+            record.msg = f"App_Log: {record.msg}"
+        return True
+
+
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s %(levelname)s %(name)s — %(message)s",
 )
+
+# Attach the filter to every handler that basicConfig just created.
+for _handler in logging.root.handlers:
+    _handler.addFilter(_AppLogFilter())
+
 logger = logging.getLogger(__name__)
 
 
