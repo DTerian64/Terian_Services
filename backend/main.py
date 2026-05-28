@@ -73,9 +73,25 @@ logger = logging.getLogger(__name__)
 
 # ── Lifespan ─────────────────────────────────────────────────────────────────
 
+_REQUIRED_ENV_VARS = [
+    "AZURE_COSMOS_ENDPOINT",
+    "AZURE_STORAGE_BLOB_ENDPOINT",
+    "AZURE_OPENAI_ENDPOINT",
+]
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Start background workers on startup; stop them cleanly on shutdown."""
+    # ── Startup env-var check ─────────────────────────────────────────────────
+    missing = [v for v in _REQUIRED_ENV_VARS if not os.getenv(v)]
+    if missing:
+        logger.warning(
+            "main: the following required environment variables are not set — "
+            "some features will silently degrade: %s",
+            ", ".join(missing),
+        )
+
     stop_event = asyncio.Event()
     worker_task = asyncio.create_task(run_worker(stop_event))
     logger.info("main: engagement worker task started")
