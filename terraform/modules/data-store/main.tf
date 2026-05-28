@@ -285,3 +285,17 @@ resource "azurerm_storage_container" "blob_templates" {
   container_access_type = "private"
 }
 
+# Blob container for contact form attachment files.
+# Always private — written by the backend UAMI at request time; never served
+# directly to the browser. The corresponding Cosmos DB document in
+# client_communications stores metadata (name, type, size, blob_path) for
+# each file; the actual bytes live here.
+# Path convention: {contact_doc_id}/{filename}
+# This lets you list all attachments for a submission with a single prefix query.
+
+resource "azurerm_storage_container" "client_com_attachments" {
+  name                  = "client-com-attachments"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "private"
+}
+

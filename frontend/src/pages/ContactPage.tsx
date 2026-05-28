@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 
@@ -13,7 +13,15 @@ const INQUIRY_TYPES = [
 type InquiryType = (typeof INQUIRY_TYPES)[number];
 type Status = "idle" | "submitting" | "success" | "error";
 
-const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+const API_BASE    = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+const MAX_FILES   = 3;
+const MAX_BYTES   = 10 * 1024 * 1024; // 10 MB per file
+
+function formatBytes(n: number): string {
+  if (n < 1024)        return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
+  return `${(n / 1024 / 1024).toFixed(1)} MB`;
+}
 
 export default function ContactPage() {
   const [name, setName]       = useState("");
@@ -22,20 +30,58 @@ export default function ContactPage() {
   const [inquiry, setInquiry] = useState<InquiryType>("Services consultation");
   const [message, setMessage] = useState("");
   const [status, setStatus]   = useState<Status>("idle");
+  const [files, setFiles]     = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string>("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const addFiles = useCallback((incoming: FileList | null) => {
+    if (!incoming) return;
+    setFileError("");
+    const next = [...files];
+    for (const f of Array.from(incoming)) {
+      if (next.length >= MAX_FILES) {
+        setFileError(`Maximum ${MAX_FILES} attachments allowed.`);
+        break;
+      }
+      if (f.size > MAX_BYTES) {
+        setFileError(`"${f.name}" is over the 10 MB limit.`);
+        continue;
+      }
+      if (next.some((x) => x.name === f.name && x.size === f.size)) continue; // dedupe
+      next.push(f);
+    }
+    setFiles(next);
+  }, [files]);
+
+  const removeFile = (idx: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+    setFileError("");
+  };
+
+  const disabled = status === "submitting" || status === "success";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("submitting");
 
+    const fd = new FormData();
+    fd.append("name",    name);
+    fd.append("email",   email);
+    fd.append("company", company);
+    fd.append("inquiry", inquiry);
+    fd.append("message", message);
+    for (const f of files) fd.append("files", f, f.name);
+
     try {
       const res = await fetch(`${API_BASE}/api/contact`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ name, email, company, inquiry, message }),
+        method: "POST",
+        body:   fd,
+        // No Content-Type header — browser sets it with the boundary automatically
       });
-
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus("success");
+      setFiles([]);
     } catch {
       setStatus("error");
     }
@@ -111,7 +157,7 @@ export default function ContactPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  disabled={status === "submitting" || status === "success"}
+                  disabled={disabled}
                   className={inputClass}
                 />
               </Field>
@@ -121,7 +167,7 @@ export default function ContactPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={status === "submitting" || status === "success"}
+                  disabled={disabled}
                   className={inputClass}
                 />
               </Field>
@@ -130,7 +176,7 @@ export default function ContactPage() {
                   type="text"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
-                  disabled={status === "submitting" || status === "success"}
+                  disabled={disabled}
                   className={inputClass}
                 />
               </Field>
@@ -138,7 +184,7 @@ export default function ContactPage() {
                 <select
                   value={inquiry}
                   onChange={(e) => setInquiry(e.target.value as InquiryType)}
-                  disabled={status === "submitting" || status === "success"}
+                  disabled={disabled}
                   className={inputClass}
                 >
                   {INQUIRY_TYPES.map((type) => (
@@ -157,16 +203,88 @@ export default function ContactPage() {
                   rows={6}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  disabled={status === "submitting" || status === "success"}
+                  disabled={disabled}
                   className={inputClass}
                 />
               </Field>
             </div>
 
+            {/* ── Attachments ── */}
+            <div className="mt-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                Attachments
+                <span className="ml-2 font-normal normal-case text-slate-500">
+                  (optional · up to {MAX_FILES} files · 10 MB each)
+                </span>
+              </span>
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }}
+              />
+
+              {/* Drag-drop zone (shown when room for more files) */}
+              {files.length < MAX_FILES && !disabled && (
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    addFiles(e.dataTransfer.files);
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`mt-2 flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed px-4 py-5 text-center transition
+                    ${isDragOver
+                      ? "border-teal-400 bg-teal-500/10"
+                      : "border-white/20 hover:border-teal-400/60 hover:bg-white/5"
+                    }`}
+                >
+                  <PaperclipIcon className="h-5 w-5 text-slate-400" />
+                  <p className="text-xs text-slate-400">
+                    <span className="font-semibold text-teal-400">Browse</span>
+                    {" "}or drag files here
+                  </p>
+                </div>
+              )}
+
+              {/* Validation error */}
+              {fileError && (
+                <p className="mt-1.5 text-xs text-rose-400">{fileError}</p>
+              )}
+
+              {/* Attached file badges */}
+              {files.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {files.map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 rounded-md border border-white/10 bg-[#0a0916] px-3 py-2">
+                      <FileIcon className="h-4 w-4 shrink-0 text-teal-400" />
+                      <span className="flex-1 truncate text-xs text-slate-200">{f.name}</span>
+                      <span className="shrink-0 text-xs text-slate-500">{formatBytes(f.size)}</span>
+                      {!disabled && (
+                        <button
+                          type="button"
+                          onClick={() => removeFile(i)}
+                          className="ml-1 shrink-0 text-slate-500 hover:text-rose-400 transition"
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          <XIcon className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 type="submit"
-                disabled={status === "submitting" || status === "success"}
+                disabled={disabled}
                 className="inline-flex items-center justify-center rounded-md bg-teal-500 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-teal-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === "submitting" ? "Sending…" : "Send message →"}
@@ -205,6 +323,37 @@ function Field({
       </span>
       <div className="mt-1.5">{children}</div>
     </label>
+  );
+}
+
+// ── Inline icons ─────────────────────────────────────────────────────────────
+
+function PaperclipIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66L9.41 17.41a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+    </svg>
+  );
+}
+
+function FileIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </svg>
+  );
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
   );
 }
 
