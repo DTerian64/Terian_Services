@@ -133,10 +133,11 @@ def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
           <td style="padding:32px 40px;">
             <p style="margin:0 0 20px;font-size:15px;color:#111827;line-height:1.6;">Hi {first_name},</p>
             <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              As promised, please find attached your personalised onboarding overview for
-              <strong style="color:#111827;">{org_name}</strong>. The deck covers who we are,
-              how we work, and the specific engagement you selected — along with what to expect
-              over the next few days.
+              Please find attached your personalised onboarding overview of the Terian Services
+              <strong style="color:#111827;">Award Nomination</strong> SaaS platform for
+              <strong style="color:#111827;">{org_name}</strong>.
+              The deck covers the system capabilities and engagement tiers, and will serve as
+              the foundation for our first meeting, expected in the coming days.
             </p>
             <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
               Our team will be in touch within <strong>two business days</strong> to schedule
