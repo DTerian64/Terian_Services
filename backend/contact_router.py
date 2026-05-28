@@ -90,13 +90,22 @@ def _credential():
 
 async def _save_to_cosmos(doc: dict) -> None:
     if not _COSMOS_ENDPOINT:
-        logger.warning("AZURE_COSMOS_ENDPOINT not set — skipping Cosmos write")
+        logger.warning("contact_router: AZURE_COSMOS_ENDPOINT not set — skipping Cosmos write")
         return
+
+    logger.info(
+        "contact_router: writing to Cosmos — endpoint=%s database=%s container=%s id=%s",
+        _COSMOS_ENDPOINT, _COSMOS_DATABASE, _CONTAINER_NAME, doc.get("id"),
+    )
     async with _credential() as credential:
         async with CosmosClient(_COSMOS_ENDPOINT, credential=credential) as client:
             db = client.get_database_client(_COSMOS_DATABASE)
             container = db.get_container_client(_CONTAINER_NAME)
-            await container.create_item(doc)
+            result = await container.create_item(doc)
+            logger.info(
+                "contact_router: Cosmos write succeeded — id=%s etag=%s",
+                result.get("id"), result.get("_etag"),
+            )
 
 
 async def _upload_attachments_to_blob(
@@ -359,7 +368,10 @@ async def contact(
     try:
         await _save_to_cosmos(doc)
     except Exception as exc:
-        logger.exception("Failed to persist contact form: %s", exc)
+        logger.exception(
+            "contact_router: Cosmos write FAILED for id=%s — %s: %s",
+            doc_id, type(exc).__name__, exc,
+        )
         raise HTTPException(
             status_code=502,
             detail="Could not save your message. Please try again or email us directly.",
