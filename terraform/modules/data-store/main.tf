@@ -135,7 +135,7 @@ resource "azurerm_cosmosdb_sql_container" "client_communications" {
   resource_group_name = var.resource_group_name
   account_name        = azurerm_cosmosdb_account.main.name
   database_name       = azurerm_cosmosdb_sql_database.main.name
-  partition_key_paths = ["/id"]
+  partition_key_paths = ["/email"]
 
   # Keep contact submissions indefinitely (no TTL).
   default_ttl = -1

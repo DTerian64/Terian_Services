@@ -399,7 +399,7 @@ async def contact(
                     async with CosmosClient(_COSMOS_ENDPOINT, credential=credential) as client:
                         db = client.get_database_client(_COSMOS_DATABASE)
                         container = db.get_container_client(_CONTAINER_NAME)
-                        await container.replace_item(item=doc_id, body=doc)
+                        await container.replace_item(item=doc_id, body=doc, partition_key=email)
             except Exception as exc:
                 logger.warning(
                     "contact_router: could not patch blob_paths into Cosmos doc %s: %s",

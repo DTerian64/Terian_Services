@@ -110,7 +110,7 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="border-t border-white/10 bg-[#0f0d18] px-6 pb-6 pt-2 lg:hidden" aria-label="Mobile navigation">
+        <nav className="border-t border-white/10 bg-[#0f0d18] px-6 pb-6 pt-2 lg:hidden overflow-y-auto max-h-[calc(100vh-5.4rem)]" aria-label="Mobile navigation">
           <div className="mx-auto max-w-7xl space-y-1">
             <MobileGroup label="Products" items={PRODUCT_ITEMS} onNavigate={() => setMenuOpen(false)} />
             <MobileGroup label="Services" items={SERVICE_ITEMS} onNavigate={() => setMenuOpen(false)} />
