@@ -51,6 +51,8 @@ from agents.skills.presentation.tools import (
     PresentationResult,
     generate_from_template,
     generate_presentation_core,
+    generate_summary_presentation,
+    generate_services_overview_pptx,
 )
 
 logger = logging.getLogger(__name__)
@@ -60,21 +62,65 @@ logger = logging.getLogger(__name__)
 # prospect context we need before calling generate_presentation_core().
 
 _EXTRACT_SYSTEM = """\
-You are a context extractor. Read the conversation and output ONLY a JSON object \
-with exactly these keys — no markdown fences, no explanation, just the JSON:
+You are a context extractor for the Terian Services presentation agent.
+Read the conversation and output ONLY a JSON object with exactly these keys —
+no markdown fences, no explanation, just the JSON.
+
+Presentation types — pick the single best match, or "unknown" if the request is
+ambiguous or does not clearly refer to any of these:
+
+  "award_onboarding"                  — Award Nomination System onboarding / intro deck
+  "award_screen_flows"                — Award Nomination System screen flows / UI walkthrough
+  "award_infrastructure"              — Award Nomination System infrastructure / architecture
+  "integrity_sentinel_onboarding"     — Integrity Sentinel onboarding / intro deck
+  "integrity_sentinel_screen_flows"   — Integrity Sentinel screen flows / UI walkthrough
+  "integrity_sentinel_infrastructure" — Integrity Sentinel infrastructure / architecture
+  "services_overview"                 — Terian Services overall service catalogue
+  "unknown"                           — intent is ambiguous or not one of the above
 
 {
-  "org_name":        "<company or organisation name, empty string if not mentioned>",
-  "full_name":       "<visitor's first and last name if known, empty string otherwise>",
-  "industry":        "<industry or sector (e.g. Fintech, Healthcare), empty string if unknown>",
-  "user_count":      <integer estimated number of end users, 0 if unknown>,
-  "engagement_type": "<service or product they expressed interest in, empty string if unknown>",
-  "tier_interest":   "<Starter|Professional|Enterprise — empty string if not specified>",
-  "use_case":        "<one-sentence description of their goal or pain point, empty string if unknown>"
+  "presentation_type": "<one of the values above>",
+  "org_name":          "<company or organisation name, empty string if not mentioned>",
+  "full_name":         "<visitor's first and last name if known, empty string otherwise>",
+  "industry":          "<industry or sector (e.g. Fintech, Healthcare), empty string if unknown>",
+  "user_count":        <integer estimated number of end users, 0 if unknown>,
+  "engagement_type":   "<service or product they expressed interest in, empty string if unknown>",
+  "tier_interest":     "<Starter|Professional|Enterprise — empty string if not specified>",
+  "use_case":          "<one-sentence description of their goal or pain point, empty string if unknown>"
 }
 """
 
+_DISAMBIGUATION_MESSAGE = """\
+I can generate any of the following presentations — just let me know which one you'd like:
+
+**Award Nomination System**
+- Onboarding deck — product overview, key features, getting started
+- Screen flows — full UI walkthrough from submission through approval to announcement
+- Infrastructure overview — architecture, Azure components, security posture
+
+**Integrity Sentinel**
+- Onboarding deck — product overview, detection capabilities, pilot engagement
+- Screen flows — alert feed, case investigation, graph explorer, reporting
+- Infrastructure overview — ingest pipeline, detection engine, tenant isolation
+
+**Terian Services**
+- Services overview — all engineering and analytics capabilities in one deck
+
+Which would you like?
+"""
+
 _SAS_EXPIRY_HOURS = 24
+
+# Human-readable labels for each presentation type — used in the reply message.
+_PRES_LABELS: dict[str, str] = {
+    "award_onboarding":                  "Award Nomination System — Onboarding Deck",
+    "award_screen_flows":                "Award Nomination System — Screen Flows",
+    "award_infrastructure":              "Award Nomination System — Infrastructure Overview",
+    "integrity_sentinel_onboarding":     "Integrity Sentinel — Onboarding Deck",
+    "integrity_sentinel_screen_flows":   "Integrity Sentinel — Screen Flows",
+    "integrity_sentinel_infrastructure": "Integrity Sentinel — Infrastructure Overview",
+    "services_overview":                 "Terian Services — Services Overview",
+}
 
 
 class PresentationAgent(AskAgent):
@@ -117,28 +163,32 @@ class PresentationAgent(AskAgent):
             len(history) if history else 0,
         )
         try:
-            # 1. Extract prospect context from the conversation
+            # 1. Extract presentation type + prospect context from the conversation
             context = await asyncio.to_thread(
                 self._extract_context, question, history or []
             )
+            pres_type = context.get("presentation_type", "unknown")
             logger.info(
-                "PresentationAgent: extracted context org=%r engagement=%r",
-                context.get("org_name"), context.get("engagement_type"),
+                "PresentationAgent: extracted presentation_type=%r org=%r",
+                pres_type, context.get("org_name"),
             )
 
-            # 2. Generate PPTX + upload to Blob (routes through dispatcher)
+            # 2. Disambiguate if the intent is not clear
+            if pres_type == "unknown":
+                return AskResult(question=question, answer=_DISAMBIGUATION_MESSAGE)
+
+            # 3. Generate PPTX + upload to Blob (routes through dispatcher)
             result = await self.generate(context)
 
-            # 3. Build a warm, concise response with the download link
-            org        = context.get("org_name") or "you"
-            engagement = context.get("engagement_type") or "your selected service"
+            # 4. Build a warm, concise response with the download link
+            label = _PRES_LABELS.get(pres_type, "presentation")
+            org   = context.get("org_name") or ""
+            org_clause = f" for **{org}**" if org else ""
             answer = (
-                f"Your personalised onboarding deck for **{org}** is ready.\n\n"
+                f"Your **{label}**{org_clause} is ready.\n\n"
                 f"[Download your presentation]({result.sas_url})"
                 f" *(link valid for {_SAS_EXPIRY_HOURS} hours)*\n\n"
-                f"The deck covers who we are, how Terian Services delivers "
-                f"**{engagement}**, and what to expect over the next few days. "
-                f"Feel free to ask if you have any questions or need a new link."
+                f"Feel free to ask if you'd like a different deck or have any questions."
             )
             return AskResult(question=question, answer=answer)
 
@@ -199,23 +249,36 @@ class PresentationAgent(AskAgent):
         """
         Dispatcher — single entry point for both the worker and chatbot paths.
 
-        Reads job["engagement_type"] (case-insensitive, hyphens normalised) and
-        routes to the appropriate concrete generation method.  Raises
-        ValueError for unknown service types so the worker can dead-letter the
-        job rather than silently producing a wrong presentation.
+        Chatbot path: job contains "presentation_type" (set by _extract_context).
+        Worker path:  job contains "engagement_type" (legacy key from registration).
 
-        job keys used here: engagement_type (required for routing).
-        All other keys are forwarded to the concrete method unchanged.
+        Raises ValueError for unknown types so the worker can dead-letter the job.
         """
-        raw_type = (job.get("engagement_type") or "").strip().lower().replace("-", " ")
+        # Chatbot path — explicit presentation_type from context extraction
+        pres_type = job.get("presentation_type", "")
+        if pres_type:
+            dispatch = {
+                "award_onboarding":                  self.generate_award_onboarding,
+                "award_screen_flows":                self.generate_award_screen_flows,
+                "award_infrastructure":              self.generate_award_infrastructure,
+                "integrity_sentinel_onboarding":     self.generate_integrity_sentinel_onboarding,
+                "integrity_sentinel_screen_flows":   self.generate_integrity_sentinel_screen_flows,
+                "integrity_sentinel_infrastructure": self.generate_integrity_sentinel_infrastructure,
+                "services_overview":                 self.generate_services_overview,
+            }
+            handler = dispatch.get(pres_type)
+            if handler:
+                return await handler(job)
+            raise ValueError(f"PresentationAgent: unknown presentation_type {pres_type!r}")
 
+        # Worker / legacy path — route by engagement_type
+        raw_type = (job.get("engagement_type") or "").strip().lower().replace("-", " ")
         if raw_type in ("award nomination", "award-nomination", ""):
-            # Empty string falls back to Award Nomination (the only service for now).
             return await self.generate_award_onboarding(job)
 
         raise ValueError(
             f"PresentationAgent: unknown engagement_type {job.get('engagement_type')!r}. "
-            "Add a generate_<service>_onboarding() method and a branch in generate()."
+            "Add a branch in generate() and a concrete method."
         )
 
     async def generate_award_onboarding(self, job: dict) -> PresentationResult:
@@ -257,3 +320,48 @@ class PresentationAgent(AskAgent):
             tokens=tokens,
             engagement_id=job.get("engagement_id"),
         )
+
+    async def generate_award_screen_flows(self, job: dict) -> PresentationResult:
+        """Award Nomination System — screen flows / UI walkthrough presentation."""
+        logger.info("PresentationAgent: generating Award Nomination screen flows")
+        return await generate_summary_presentation(
+            product_id="award-nomination",
+            presentation_type="screen_flows",
+        )
+
+    async def generate_award_infrastructure(self, job: dict) -> PresentationResult:
+        """Award Nomination System — infrastructure / architecture presentation."""
+        logger.info("PresentationAgent: generating Award Nomination infrastructure")
+        return await generate_summary_presentation(
+            product_id="award-nomination",
+            presentation_type="infrastructure",
+        )
+
+    async def generate_integrity_sentinel_onboarding(self, job: dict) -> PresentationResult:
+        """Integrity Sentinel — onboarding / intro deck."""
+        logger.info("PresentationAgent: generating Integrity Sentinel onboarding")
+        return await generate_summary_presentation(
+            product_id="integrity-sentinel",
+            presentation_type="onboarding",
+        )
+
+    async def generate_integrity_sentinel_screen_flows(self, job: dict) -> PresentationResult:
+        """Integrity Sentinel — screen flows / UI walkthrough presentation."""
+        logger.info("PresentationAgent: generating Integrity Sentinel screen flows")
+        return await generate_summary_presentation(
+            product_id="integrity-sentinel",
+            presentation_type="screen_flows",
+        )
+
+    async def generate_integrity_sentinel_infrastructure(self, job: dict) -> PresentationResult:
+        """Integrity Sentinel — infrastructure / architecture presentation."""
+        logger.info("PresentationAgent: generating Integrity Sentinel infrastructure")
+        return await generate_summary_presentation(
+            product_id="integrity-sentinel",
+            presentation_type="infrastructure",
+        )
+
+    async def generate_services_overview(self, job: dict) -> PresentationResult:
+        """Terian Services — full services catalogue overview presentation."""
+        logger.info("PresentationAgent: generating services overview")
+        return await generate_services_overview_pptx()

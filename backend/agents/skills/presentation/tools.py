@@ -391,6 +391,380 @@ async def generate_from_template(
     )
 
 
+# ── Product / services summary generation ──────────────────────────────────────
+
+_PRODUCT_CONTENT_PROMPT = """\
+You are a product content writer for Terian Services.
+
+Generate concise, professional slide content for a {slide_count}-slide \
+"{presentation_label}" presentation about {product_name}.
+
+Respond ONLY with a valid JSON object (no markdown fences):
+{{
+  "slides": [
+    {{
+      "title": "string — slide heading (max 8 words)",
+      "bullets": ["string", "string", "string"]
+    }}
+  ]
+}}
+
+Produce exactly {slide_count} slide objects matching these themes:
+{slide_themes}
+
+Product context:
+  Product : {product_name}
+  Tagline : {product_tagline}
+  Overview: {product_overview}
+"""
+
+# Static product knowledge — source of truth until a dedicated product API exists.
+_PRODUCTS: dict[str, dict] = {
+    "award-nomination": {
+        "name": "Award Nomination System",
+        "tagline": "End-to-end digital nomination management for enterprise HR teams",
+        "overview": (
+            "A cloud-native SaaS platform that digitises and audits the full award "
+            "nomination lifecycle — from employee submission through HRBP review, "
+            "AI-assisted scoring, multi-tier approvals, and winner announcement. "
+            "Built on Azure, deployed as a Container App, backed by Cosmos DB. "
+            "Key capabilities: configurable nomination forms, graph-based fraud "
+            "detection (ring/super-nominator/copy-paste/transactional patterns), "
+            "real-time dashboards, SCIM provisioning, and audit trail export."
+        ),
+        "screen_flows_themes": (
+            "0 — Employee Portal: submission flow (form → draft → submit)\n"
+            "1 — HRBP Review Queue: scoring, filtering, bulk actions\n"
+            "2 — Approval Chain: multi-tier approve / reject / escalate\n"
+            "3 — Admin Dashboard: cycle management, analytics, exports\n"
+            "4 — Notifications & Comms: email triggers at each stage\n"
+            "5 — Winner Announcement: certificate generation and delivery"
+        ),
+        "infrastructure_themes": (
+            "0 — High-Level Architecture: Azure Container Apps, Cosmos DB, Blob Storage\n"
+            "1 — Authentication & Identity: Azure AD, SCIM, RBAC\n"
+            "2 — Data Layer: Cosmos DB partitioning strategy, Blob containers\n"
+            "3 — AI & Fraud Detection: OpenAI integration, graph analysis pipeline\n"
+            "4 — DevOps & CI/CD: GitHub Actions, Terraform IaC, environments\n"
+            "5 — Security & Compliance: Key Vault, TLS, audit logging, GDPR posture"
+        ),
+        "onboarding_themes": (
+            "0 — What Is Award Nomination System: product overview and value proposition\n"
+            "1 — Key Features: top 3-4 differentiating capabilities\n"
+            "2 — How It Works: end-to-end nomination lifecycle in 4-5 steps\n"
+            "3 — AI & Integrity Features: fraud detection, scoring, audit trail\n"
+            "4 — Getting Started: onboarding steps, timelines, what to expect\n"
+            "5 — Contact & Next Steps: how to reach sales, response time, resources"
+        ),
+    },
+    "integrity-sentinel": {
+        "name": "Integrity Sentinel",
+        "tagline": "Real-time fraud and anomaly detection for enterprise business processes",
+        "overview": (
+            "An AI-powered integrity monitoring platform that runs continuously over "
+            "HR, finance, and operational data to surface fraud, collusion, and policy "
+            "violations before they become material losses. Uses a layered detection "
+            "engine: rule-based thresholds, statistical anomaly detection, graph "
+            "analysis (ring networks, super-nominators), and ML classification. "
+            "Delivers findings via real-time dashboards, scored alerts, and "
+            "investigator workflows — all deployable inside the client's Azure tenant."
+        ),
+        "screen_flows_themes": (
+            "0 — Alert Feed: real-time scored alert list with severity filters\n"
+            "1 — Case Investigation: drill-down view — evidence, graph, audit trail\n"
+            "2 — Graph Explorer: interactive network visualisation of entity relationships\n"
+            "3 — Rules & Thresholds: configuration UI for rule engine parameters\n"
+            "4 — Analytics Dashboard: trend charts, detection rates, false-positive tuning\n"
+            "5 — Reporting: scheduled reports, export to PDF/Excel, regulator packs"
+        ),
+        "infrastructure_themes": (
+            "0 — High-Level Architecture: ingest pipeline, detection engine, alert store\n"
+            "1 — Data Ingestion: connectors (HR, ERP, finance), batch + streaming\n"
+            "2 — Detection Engine: rule layer → statistical layer → graph layer → ML layer\n"
+            "3 — Azure Deployment: Container Apps, Cosmos DB, Event Hub, Key Vault\n"
+            "4 — Tenant Isolation: deployed inside client Azure tenant, no data egress\n"
+            "5 — Security & Compliance: encryption at rest/transit, RBAC, audit logging"
+        ),
+        "onboarding_themes": (
+            "0 — What Is Integrity Sentinel: product overview and the problem it solves\n"
+            "1 — Detection Capabilities: rule engine, statistical, graph, ML layers\n"
+            "2 — How It Works: ingest → detect → alert → investigate → resolve\n"
+            "3 — Key Differentiators: tenant isolation, explainability, low false-positive rate\n"
+            "4 — Getting Started: data connectors, configuration, onboarding timeline\n"
+            "5 — Contact & Next Steps: reach sales, pilot engagement offer, resources"
+        ),
+    },
+}
+
+_SERVICES_SLIDES: list[dict] = [
+    {
+        "title": "AI Analytics",
+        "bullets": [
+            "Custom ML models: forecasting, classification, anomaly detection, NLP",
+            "Embedding-based search and GenAI pipelines with retrieval + evals/guardrails",
+            "End-to-end delivery from problem framing through production deployment",
+        ],
+    },
+    {
+        "title": "Integrity & Fraud Detection",
+        "bullets": [
+            "Business-process-aware fraud detection across HR, finance, and operations",
+            "Layered engine: rule thresholds → statistical anomaly → graph analysis → ML",
+            "Patterns detected: collusion rings, duplicate payments, ghost vendors, copy-paste fraud",
+        ],
+    },
+    {
+        "title": "Data Mining",
+        "bullets": [
+            "Pattern discovery and driver analysis on operational, financial, and HR data",
+            "Written findings reports paired with interactive dashboards (Power BI / Fabric / Looker)",
+            "Delivered as a fixed-scope engagement with clear outputs and timelines",
+        ],
+    },
+    {
+        "title": "Datacenter → Cloud Migration",
+        "bullets": [
+            "Azure-first migration programs covering the 6 R's (rehost / replatform / refactor…)",
+            "Structured approach: Assess → Design → Migrate → Optimize → Operate",
+            "Delivered inside your Azure tenant under MSA & DPA — no data leaves your boundary",
+        ],
+    },
+    {
+        "title": "MLOps & Model Governance",
+        "bullets": [
+            "Model registry, drift monitoring, and automated evaluation harnesses",
+            "Responsible-AI reviews, audits, and model cards for regulatory compliance",
+            "Operates inside your Azure tenant for sensitive or regulated environments",
+        ],
+    },
+    {
+        "title": "Get In Touch",
+        "bullets": [
+            "sales@terian-services.com — we respond within one business day",
+            "terian-services.com — full service descriptions and case studies",
+            "All engagements scoped under MSA & DPA before any data is shared",
+        ],
+    },
+]
+
+
+def _call_llm_for_product_content(
+    product_id: str,
+    presentation_type: str,  # "onboarding" | "screen_flows" | "infrastructure"
+) -> list[dict]:
+    """Return 6 slides of structured content for the given product + deck type."""
+    product = _PRODUCTS.get(product_id)
+    if not product:
+        raise ValueError(f"Unknown product_id: {product_id!r}")
+
+    themes_key = f"{presentation_type}_themes"
+    themes = product.get(themes_key, product["onboarding_themes"])
+
+    label_map = {
+        "onboarding":      "Product Onboarding",
+        "screen_flows":    "Screen Flows",
+        "infrastructure":  "Infrastructure Overview",
+    }
+    label = label_map.get(presentation_type, "Overview")
+
+    prompt = _PRODUCT_CONTENT_PROMPT.format(
+        slide_count=6,
+        presentation_label=label,
+        product_name=product["name"],
+        product_tagline=product["tagline"],
+        product_overview=product["overview"],
+        slide_themes=themes,
+    )
+
+    client = AzureOpenAI(
+        api_key=os.getenv("AZURE_OPENAI_KEY", ""),
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT", ""),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview"),
+    )
+    response = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_MODEL", "gpt-4.1"),
+        messages=[{"role": "user", "content": prompt}],
+        max_completion_tokens=1400,
+        temperature=0.3,
+    )
+    raw = (response.choices[0].message.content or "").strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    data = json.loads(raw)
+    slides = data.get("slides", [])
+    if len(slides) != 6:
+        raise ValueError(f"Expected 6 slides, got {len(slides)}")
+    return slides
+
+
+def _build_summary_pptx_bytes(
+    title: str,
+    subtitle: str,
+    slides_content: list[dict],
+) -> bytes:
+    """
+    Build a clean Terian-branded PPTX from a title + list of {title, bullets} slides.
+    The cover slide uses the dark brand background; content slides are white.
+    """
+    prs = Presentation()
+    prs.slide_width  = Inches(10)
+    prs.slide_height = Inches(5.625)
+
+    W        = prs.slide_width
+    H        = prs.slide_height
+    HEADER_H = Inches(1.1)
+    FOOTER_H = Inches(0.45)
+    MARGIN_L = Inches(0.55)
+    blank    = prs.slide_layouts[6]
+
+    # ── Cover slide ────────────────────────────────────────────────────────────
+    cover = prs.slides.add_slide(blank)
+    cover.background.fill.solid()
+    cover.background.fill.fore_color.rgb = _DARK_BG
+
+    accent = cover.shapes.add_shape(1, 0, 0, Inches(0.35), H)
+    accent.fill.solid()
+    accent.fill.fore_color.rgb = _TEAL
+    accent.line.fill.background()
+
+    _add_text_box(cover, MARGIN_L, Inches(0.3), W - Inches(0.7), Inches(0.45),
+                  "TERIAN SERVICES", 11, _TEAL, bold=True)
+    _add_text_box(cover, MARGIN_L, Inches(1.2), W - Inches(0.7), Inches(1.1),
+                  title, 34, _WHITE, bold=True)
+    _add_text_box(cover, MARGIN_L, Inches(2.45), W - Inches(0.7), Inches(0.5),
+                  subtitle, 16, _TEAL)
+
+    ftr = cover.shapes.add_shape(1, 0, H - FOOTER_H, W, FOOTER_H)
+    ftr.fill.solid()
+    ftr.fill.fore_color.rgb = RGBColor(0x1A, 0x17, 0x2B)
+    ftr.line.fill.background()
+    _add_text_box(cover, MARGIN_L, H - FOOTER_H + Pt(4), W - 2 * MARGIN_L, FOOTER_H,
+                  "terian-services.com", 10, _GRAY_TEXT)
+
+    # ── Content slides ─────────────────────────────────────────────────────────
+    for slide_data in slides_content:
+        slide = prs.slides.add_slide(blank)
+        slide.background.fill.solid()
+        slide.background.fill.fore_color.rgb = _WHITE
+
+        hdr = slide.shapes.add_shape(1, 0, 0, W, HEADER_H)
+        hdr.fill.solid()
+        hdr.fill.fore_color.rgb = _TEAL
+        hdr.line.fill.background()
+
+        _add_text_box(slide, MARGIN_L, Inches(0.25), W - 2 * MARGIN_L, Inches(0.7),
+                      slide_data.get("title", ""), 24, _WHITE, bold=True)
+
+        bullet_top = HEADER_H + Inches(0.35)
+        for bullet in slide_data.get("bullets", [])[:4]:
+            _add_text_box(slide, MARGIN_L, bullet_top,
+                          Inches(0.25), Inches(0.4), "▸", 13, _TEAL, bold=True)
+            _add_text_box(slide, MARGIN_L + Inches(0.3), bullet_top,
+                          W - MARGIN_L - Inches(0.6), Inches(0.4),
+                          bullet, 15, _BODY_TEXT)
+            bullet_top += Inches(0.72)
+
+        ftr2 = slide.shapes.add_shape(1, 0, H - FOOTER_H, W, FOOTER_H)
+        ftr2.fill.solid()
+        ftr2.fill.fore_color.rgb = _DARK_BG
+        ftr2.line.fill.background()
+        _add_text_box(slide, MARGIN_L, H - FOOTER_H + Pt(4),
+                      W - 2 * MARGIN_L, FOOTER_H,
+                      "Terian Services  ·  terian-services.com", 10, _GRAY_TEXT)
+
+    buf = io.BytesIO()
+    prs.save(buf)
+    return buf.getvalue()
+
+
+async def generate_summary_presentation(
+    product_id: str,
+    presentation_type: str,
+    blob_prefix: str = "chatbot",
+) -> PresentationResult:
+    """
+    LLM → PPTX → Blob pipeline for product summary presentations.
+
+    product_id        — "award-nomination" | "integrity-sentinel"
+    presentation_type — "onboarding" | "screen_flows" | "infrastructure"
+    blob_prefix       — path prefix in engagement-assets container
+    """
+    if not _BLOB_ENDPOINT:
+        raise EnvironmentError("AZURE_STORAGE_BLOB_ENDPOINT is not set")
+
+    product = _PRODUCTS.get(product_id)
+    if not product:
+        raise ValueError(f"Unknown product_id: {product_id!r}")
+
+    label_map = {
+        "onboarding":     "Product Onboarding",
+        "screen_flows":   "Screen Flows",
+        "infrastructure": "Infrastructure Overview",
+    }
+    subtitle = label_map.get(presentation_type, "Overview")
+
+    try:
+        slides_content = await asyncio.to_thread(
+            _call_llm_for_product_content, product_id, presentation_type
+        )
+    except Exception as exc:
+        logger.warning(
+            "presentation: LLM product content failed (%s) — using fallback", exc
+        )
+        slides_content = _FALLBACK_SLIDES
+
+    pptx_bytes = await asyncio.to_thread(
+        _build_summary_pptx_bytes,
+        product["name"],
+        subtitle,
+        slides_content,
+    )
+
+    blob_path = f"{blob_prefix}/{uuid.uuid4()}/{product_id}-{presentation_type}.pptx"
+    sas_url, expiry = await _upload_and_sign(blob_path, pptx_bytes)
+
+    logger.info(
+        "presentation: generated %s/%s → %s", product_id, presentation_type, blob_path
+    )
+    return PresentationResult(
+        pptx_bytes=pptx_bytes,
+        blob_path=blob_path,
+        sas_url=sas_url,
+        expires_at=expiry,
+    )
+
+
+async def generate_services_overview_pptx(
+    blob_prefix: str = "chatbot",
+) -> PresentationResult:
+    """
+    Build a Terian Services overview presentation from the static services content.
+    No LLM call — content is authoritative and hardcoded.
+    """
+    if not _BLOB_ENDPOINT:
+        raise EnvironmentError("AZURE_STORAGE_BLOB_ENDPOINT is not set")
+
+    pptx_bytes = await asyncio.to_thread(
+        _build_summary_pptx_bytes,
+        "Terian Services",
+        "Our Engineering & Analytics Capabilities",
+        _SERVICES_SLIDES,
+    )
+
+    blob_path = f"{blob_prefix}/{uuid.uuid4()}/services-overview.pptx"
+    sas_url, expiry = await _upload_and_sign(blob_path, pptx_bytes)
+
+    logger.info("presentation: generated services overview → %s", blob_path)
+    return PresentationResult(
+        pptx_bytes=pptx_bytes,
+        blob_path=blob_path,
+        sas_url=sas_url,
+        expires_at=expiry,
+    )
+
+
 # ── LLM generation (chatbot / Ask AI path) ────────────────────────────────────
 
 async def generate_presentation_core(context: dict) -> PresentationResult:
