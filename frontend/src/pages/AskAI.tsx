@@ -298,6 +298,13 @@ export default function AskAIPage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [chatMessages, aiLoading]);
 
+  // Restore focus to the input whenever the AI finishes responding
+  useEffect(() => {
+    if (!aiLoading) {
+      questionInputRef.current?.focus();
+    }
+  }, [aiLoading]);
+
   // ── File attachment handler ──────────────────────────────────────────────
 
   const handleFileAttach = useCallback((file: File) => {
