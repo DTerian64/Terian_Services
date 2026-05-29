@@ -66,9 +66,28 @@ You are a context extractor for the Terian Services presentation agent.
 Read the conversation and output ONLY a JSON object with exactly these keys —
 no markdown fences, no explanation, just the JSON.
 
-Presentation types — pick the single best match, or "unknown" if the request is
-ambiguous or does not clearly refer to any of these:
+## Classifying presentation_type
 
+Set presentation_type to one of the specific values below ONLY when the user's
+request unambiguously names BOTH a product/area AND a deck type.
+
+Examples that ARE specific enough:
+  "show me the Award Nomination screen flows"     → "award_screen_flows"
+  "integrity sentinel infrastructure deck"        → "integrity_sentinel_infrastructure"
+  "services overview presentation"                → "services_overview"
+  "give me an IS onboarding presentation"         → "integrity_sentinel_onboarding"
+
+Examples that are NOT specific enough → MUST return "unknown":
+  "I'd like to see some presentations"
+  "can you show me a presentation?"
+  "what presentations do you have?"
+  "show me a deck"
+  "give me a presentation about Terian"
+  Any request that does not name a specific product AND deck type.
+
+When in doubt, use "unknown". It is always better to ask than to generate the wrong deck.
+
+Allowed values:
   "award_onboarding"                  — Award Nomination System onboarding / intro deck
   "award_screen_flows"                — Award Nomination System screen flows / UI walkthrough
   "award_infrastructure"              — Award Nomination System infrastructure / architecture
@@ -76,7 +95,7 @@ ambiguous or does not clearly refer to any of these:
   "integrity_sentinel_screen_flows"   — Integrity Sentinel screen flows / UI walkthrough
   "integrity_sentinel_infrastructure" — Integrity Sentinel infrastructure / architecture
   "services_overview"                 — Terian Services overall service catalogue
-  "unknown"                           — intent is ambiguous or not one of the above
+  "unknown"                           — anything vague, general, or ambiguous
 
 {
   "presentation_type": "<one of the values above>",
@@ -91,22 +110,23 @@ ambiguous or does not clearly refer to any of these:
 """
 
 _DISAMBIGUATION_MESSAGE = """\
-I can generate any of the following presentations — just let me know which one you'd like:
+Great — I can generate any of the following presentations for you right now. \
+Just tell me which one you'd like and I'll have it ready in seconds.
 
 **Award Nomination System**
-- Onboarding deck — product overview, key features, getting started
-- Screen flows — full UI walkthrough from submission through approval to announcement
-- Infrastructure overview — architecture, Azure components, security posture
+- **Onboarding deck** — product overview, key features, how it works, and how to get started
+- **Screen flows** — full UI walkthrough from employee submission through approvals to winner announcement
+- **Infrastructure overview** — Azure architecture, Cosmos DB, authentication, CI/CD, and security posture
 
 **Integrity Sentinel**
-- Onboarding deck — product overview, detection capabilities, pilot engagement
-- Screen flows — alert feed, case investigation, graph explorer, reporting
-- Infrastructure overview — ingest pipeline, detection engine, tenant isolation
+- **Onboarding deck** — product overview, detection capabilities, key differentiators, and pilot offer
+- **Screen flows** — alert feed, case investigation, graph explorer, rules configuration, and reporting
+- **Infrastructure overview** — ingest pipeline, detection engine layers, Azure deployment, and tenant isolation
 
 **Terian Services**
-- Services overview — all engineering and analytics capabilities in one deck
+- **Services overview** — all engineering and analytics capabilities in one concise deck
 
-Which would you like?
+Which one would you like?
 """
 
 _SAS_EXPIRY_HOURS = 24
