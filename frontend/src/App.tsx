@@ -19,46 +19,45 @@ import PricingPage from "./pages/PricingPage";
 import AwardNominationPricingPage from "./pages/AwardNominationPricingPage";
 import NewEngagementPage from "./pages/NewEngagementPage";
 
+const SITE = "Terian Services";
+
 type RouteEntry = {
   match: (path: string) => boolean;
   component: () => React.ReactElement;
+  title: string;
 };
 
 const routes: RouteEntry[] = [
   // Static pages
-  { match: (p) => p === "/about", component: AboutPage },
-  { match: (p) => p === "/contact", component: ContactPage },
-  { match: (p) => p === "/ask-ai", component: AskAIPage },
-  { match: (p) => p === "/trust", component: TrustPage },
-  { match: (p) => p === "/pricing" || p === "/pricing/", component: PricingPage },
-  { match: (p) => p === "/pricing/award-nomination", component: AwardNominationPricingPage },
-  { match: (p) => p === "/engagement/new" || p === "/engagement/new/", component: NewEngagementPage },
-  { match: (p) => p === "/privacy" || p === "/privacy.html", component: PrivacyPage },
+  { match: (p) => p === "/about",                                          component: AboutPage,                 title: "About Us" },
+  { match: (p) => p === "/contact",                                        component: ContactPage,               title: "Contact" },
+  { match: (p) => p === "/ask-ai",                                         component: AskAIPage,                 title: "Ask AI" },
+  { match: (p) => p === "/trust",                                          component: TrustPage,                 title: "Trust & Security" },
+  { match: (p) => p === "/pricing" || p === "/pricing/",                   component: PricingPage,               title: "Pricing" },
+  { match: (p) => p === "/pricing/award-nomination",                       component: AwardNominationPricingPage,title: "Award Nomination Pricing" },
+  { match: (p) => p === "/engagement/new" || p === "/engagement/new/",     component: NewEngagementPage,         title: "Start an Engagement" },
+  { match: (p) => p === "/privacy" || p === "/privacy.html",               component: PrivacyPage,               title: "Privacy Policy" },
 
   // Products
-  { match: (p) => p === "/products" || p === "/products/", component: ProductsPage },
+  { match: (p) => p === "/products" || p === "/products/",                 component: ProductsPage,              title: "Products" },
   {
-    match: (p) =>
-      p === "/products/award-nomination" ||
-      // legacy
-      p === "/award_nomination",
+    match: (p) => p === "/products/award-nomination" || p === "/award_nomination",
     component: AwardNominationPage,
+    title: "Award Nomination System",
   },
-  { match: (p) => p === "/products/integrity-sentinel", component: IntegritySentinelPage },
+  { match: (p) => p === "/products/integrity-sentinel",                    component: IntegritySentinelPage,     title: "Integrity Sentinel" },
 
   // Services
-  { match: (p) => p === "/services" || p === "/services/", component: ServicesPage },
-  { match: (p) => p === "/services/ai-analytics", component: AIAnalyticsPage }, 
+  { match: (p) => p === "/services" || p === "/services/",                 component: ServicesPage,              title: "Services" },
+  { match: (p) => p === "/services/ai-analytics",                          component: AIAnalyticsPage,           title: "AI Analytics" },
   {
-    match: (p) =>
-      p === "/services/integrity-fraud" ||
-      // legacy
-      p === "/systemic_fraud_detection",
+    match: (p) => p === "/services/integrity-fraud" || p === "/systemic_fraud_detection",
     component: IntegrityFraudPage,
+    title: "Integrity & Fraud Detection",
   },
-  { match: (p) => p === "/services/data-mining", component: DataMiningPage },
-  { match: (p) => p === "/services/cloud-migration", component: CloudMigrationPage },
-  { match: (p) => p === "/services/mlops", component: MLOpsPage },
+  { match: (p) => p === "/services/data-mining",                           component: DataMiningPage,            title: "Data Mining" },
+  { match: (p) => p === "/services/cloud-migration",                       component: CloudMigrationPage,        title: "Cloud Migration" },
+  { match: (p) => p === "/services/mlops",                                 component: MLOpsPage,                 title: "MLOps & Model Governance" },
 ];
 
 export default function App() {
@@ -66,10 +65,13 @@ export default function App() {
 
   for (const route of routes) {
     if (route.match(pathname)) {
+      document.title = `${route.title} | ${SITE}`;
       const Component = route.component;
       return <Component />;
     }
   }
 
+  // Home page — just the site name
+  document.title = `${SITE} — AI-Powered Engineering & Analytics`;
   return <HomePage />;
 }
