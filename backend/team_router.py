@@ -86,22 +86,34 @@ async def _fetch_from_cosmos() -> list[TeamMember]:
             detail="AZURE_COSMOS_ENDPOINT is not configured.",
         )
 
+    t_start = time.monotonic()
+
     async with DefaultAzureCredential() as credential:
+        t_cred = time.monotonic()
+        logger.info("team: credential acquired in %.0f ms", (t_cred - t_start) * 1000)
+
         async with CosmosClient(endpoint, credential=credential) as client:
+            t_client = time.monotonic()
+            logger.info("team: CosmosClient opened in %.0f ms", (t_client - t_cred) * 1000)
+
             database = client.get_database_client(database_name)
             container = database.get_container_client("employees")
 
-            # Sort by sort_order ascending. All documents must have this field;
-            # the default Cosmos DB index policy (/*) covers it automatically.
             query = "SELECT * FROM c ORDER BY c.sort_order ASC"
             items: list[TeamMember] = []
             async for doc in container.query_items(query=query):
                 try:
                     items.append(_doc_to_member(doc))
                 except Exception as exc:
-                    logger.warning("Skipping malformed employee document %s: %s", doc.get("id"), exc)
+                    logger.warning("team: skipping malformed document %s: %s", doc.get("id"), exc)
 
-    logger.info("Fetched %d team member(s) from Cosmos DB", len(items))
+            t_query = time.monotonic()
+            logger.info(
+                "team: query returned %d document(s) in %.0f ms",
+                len(items), (t_query - t_client) * 1000,
+            )
+
+    logger.info("team: total _fetch_from_cosmos %.0f ms", (time.monotonic() - t_start) * 1000)
     return items
 
 
