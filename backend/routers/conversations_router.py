@@ -30,7 +30,7 @@ import re
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
 
-import conversation_service as svc
+import services.conversation_service as svc
 
 logger = logging.getLogger(__name__)
 

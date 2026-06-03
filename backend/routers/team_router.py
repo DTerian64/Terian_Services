@@ -31,7 +31,7 @@ import time
 from typing import Any, Optional
 
 from azure.cosmos.aio import CosmosClient
-from azure.identity.aio import DefaultAzureCredential
+from azure.identity.aio import DefaultAzureCredential, ManagedIdentityCredential
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -88,7 +88,10 @@ async def _fetch_from_cosmos() -> list[TeamMember]:
 
     t_start = time.monotonic()
 
-    async with DefaultAzureCredential() as credential:
+    client_id = os.environ.get("AZURE_CLIENT_ID")
+    credential = ManagedIdentityCredential(client_id=client_id) if client_id else DefaultAzureCredential()
+
+    async with credential:
         t_cred = time.monotonic()
         logger.info("team: credential acquired in %.0f ms", (t_cred - t_start) * 1000)
 

@@ -27,14 +27,14 @@ from fastapi.middleware.cors import CORSMiddleware
 # In production, env vars are injected by the platform and load_dotenv is a no-op.
 load_dotenv()
 
-from ask_ai_router import router as ask_ai_router                # noqa: E402
-from contact_router import router as contact_router              # noqa: E402
-from conversations_router import router as conversations_router  # noqa: E402
-from engagement_router import router as engagement_router                # noqa: E402
-from engagement_intake_router import router as engagement_intake_router  # noqa: E402
-from engagement_worker import run_worker                                  # noqa: E402
-from metrics_router import router as metrics_router                      # noqa: E402
-from team_router import router as team_router                    # noqa: E402
+from routers.ask_ai_router import router as ask_ai_router                # noqa: E402
+from routers.contact_router import router as contact_router              # noqa: E402
+from routers.conversations_router import router as conversations_router  # noqa: E402
+from routers.engagement_router import router as engagement_router                # noqa: E402
+from routers.engagement_intake_router import router as engagement_intake_router  # noqa: E402
+from engagement_worker import run_worker                                          # noqa: E402
+from routers.metrics_router import router as metrics_router                      # noqa: E402
+from routers.team_router import router as team_router                    # noqa: E402
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 

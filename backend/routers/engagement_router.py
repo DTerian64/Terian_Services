@@ -24,7 +24,7 @@ import logging
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from engagement_service import get_engagement
+from services.engagement_service import get_engagement
 
 logger = logging.getLogger(__name__)
 

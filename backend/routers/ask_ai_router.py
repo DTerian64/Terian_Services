@@ -37,8 +37,8 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 
 from agents import AgentOrchestrator, AskResult  # noqa: F401 (AskResult used for type clarity)
-import conversation_service as conv_svc
-import attachment_service as attach_svc
+import services.conversation_service as conv_svc
+import services.attachment_service as attach_svc
 
 logger = logging.getLogger(__name__)
 

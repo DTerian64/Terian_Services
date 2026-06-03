@@ -24,14 +24,21 @@ Authentication
 
 Caching
   All data is cached in-process for CACHE_TTL_SECONDS (default 5 min).
+
+Performance
+  All 6 independent network calls (3 KQL + 3 Azure Monitor metrics) are
+  executed concurrently via asyncio.gather + asyncio.to_thread, reducing
+  cold-path latency from the sum of all calls to the slowest single call.
+  The two single-row requests-table KQL queries are merged into one.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
@@ -70,19 +77,22 @@ requests
 | order by timestamp asc
 """
 
-# Single-row 24h summary: totals + response-time percentiles
-_SUMMARY_KQL = """
+# Merged single-row query: summary percentiles + nomination/session counts.
+# Both previously queried the `requests` table — combined into one round trip.
+_SUMMARY_AND_ACTIVITY_KQL = """
 requests
 | where name !startswith "HEAD /health"
 | where name !startswith "OPTIONS "
 | summarize
-    total    = count(),
-    failures = countif(success == false),
-    p50_ms   = round(percentile(duration, 50)),
-    p95_ms   = round(percentile(duration, 95))
+    total       = count(),
+    failures    = countif(success == false),
+    p50_ms      = round(percentile(duration, 50)),
+    p95_ms      = round(percentile(duration, 95)),
+    nominations = countif(name == "POST /api/nominations" and success == true),
+    sessions    = dcount(session_Id)
 """
 
-# Page view counts and unique session count
+# Page view counts and unique session count — lives in the frontend App Insights
 _PAGEVIEWS_KQL = """
 pageViews
 | summarize
@@ -90,16 +100,8 @@ pageViews
     unique_users = dcount(session_Id)
 """
 
-# Successful nominations submitted + distinct user sessions across all requests
-_ACTIVITY_KQL = """
-requests
-| summarize
-    nominations = countif(name == "POST /api/nominations" and success == true),
-    sessions    = dcount(session_Id)
-"""
 
-
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# ── Credential + sync query helpers ──────────────────────────────────────────
 
 def _credential():
     client_id = os.getenv("AZURE_CLIENT_ID")
@@ -108,27 +110,22 @@ def _credential():
     return DefaultAzureCredential()
 
 
-def _query(client: LogsQueryClient, kql: str, resource_id: str | None = None) -> list[dict]:
-    """Run a KQL query against an App Insights resource and return rows as dicts.
-
-    ``resource_id`` defaults to the backend API App Insights (RESOURCE_ID).
-    Pass an explicit value to target a different App Insights component
-    (e.g. the frontend one for pageViews data).
+def _run_kql(kql: str, resource_id: str) -> list[dict]:
     """
+    Execute one KQL query synchronously — intended for asyncio.to_thread.
+    Creates its own LogsQueryClient so concurrent calls don't share state.
+    """
+    client = LogsQueryClient(_credential())
     response = client.query_resource(
-        resource_id=resource_id or RESOURCE_ID,
+        resource_id=resource_id,
         query=kql,
         timespan=timedelta(hours=24),
     )
-    # FAILURE means all sub-queries failed — surface as exception.
-    # PARTIAL means some data is available despite partial errors — use it.
     if response.status == LogsQueryStatus.FAILURE:
-        raise RuntimeError(f"App Insights query failed: {response.partial_error}")
+        raise RuntimeError(f"App Insights KQL failed: {response.partial_error}")
     if not response.tables:
         return []
     table = response.tables[0]
-    # query_resource() returns columns as plain strings;
-    # query_workspace() returns LogsTableColumn objects with a .name attribute.
     cols = [col if isinstance(col, str) else col.name for col in table.columns]
     rows = []
     for row in table.rows:
@@ -140,22 +137,18 @@ def _query(client: LogsQueryClient, kql: str, resource_id: str | None = None) ->
     return rows
 
 
-def _metric(resource_id: str, metric_name: str, aggregation: str = "Average") -> float:
+def _run_metric(resource_id: str, metric_name: str, aggregation: str = "Average") -> float:
     """
-    Query a single Azure Monitor metric for the last day via azure-mgmt-monitor.
+    Query a single Azure Monitor metric synchronously — intended for asyncio.to_thread.
     Returns 0.0 if the resource ID is not configured or the query fails.
-    aggregation: 'Average' | 'Maximum' | 'Minimum' | 'Total' | 'Count'
     """
     if not resource_id:
         return 0.0
     try:
-        # Extract subscription ID from the ARM resource ID.
-        parts = resource_id.split("/")
+        parts  = resource_id.split("/")
         sub_id = parts[parts.index("subscriptions") + 1]
-
-        from datetime import datetime, timezone as tz
-        end   = datetime.now(tz.utc)
-        start = end - timedelta(days=1)
+        end    = datetime.now(timezone.utc)
+        start  = end - timedelta(days=1)
         timespan = f"{start.isoformat()}/{end.isoformat()}"
 
         client = MonitorManagementClient(_credential(), sub_id)
@@ -164,7 +157,7 @@ def _metric(resource_id: str, metric_name: str, aggregation: str = "Average") ->
             metricnames=metric_name,
             aggregation=aggregation,
             timespan=timespan,
-            interval="PT1H",   # 24 hourly buckets — P1D yields 1 bucket that's often null
+            interval="PT1H",
         )
         attr = aggregation.lower()
         resource_short = resource_id.split("/")[-1]
@@ -175,8 +168,6 @@ def _metric(resource_id: str, metric_name: str, aggregation: str = "Average") ->
                     if val is not None:
                         logger.debug("metric %s/%s = %s", resource_short, metric_name, val)
                         return float(val)
-        # Call succeeded but every data point was null — metric may not have been
-        # emitted yet (e.g. ACA scaled to zero with no recent traffic).
         logger.info("metric %s/%s: no non-null data points in last 24h", resource_short, metric_name)
         return 0.0
     except Exception as exc:
@@ -192,6 +183,9 @@ async def awards_metrics() -> dict:
     """
     Last-24h metrics for the Award Nomination System.
     Served from an in-process cache; refreshes at most every 5 minutes.
+
+    All 6 network calls are fired concurrently — total latency equals the
+    slowest individual call rather than the sum of all calls.
     """
     if not RESOURCE_ID:
         raise HTTPException(
@@ -203,6 +197,8 @@ async def awards_metrics() -> dict:
     cached = _cache.get("awards")
     if cached and now - cached["ts"] < CACHE_TTL_SECONDS:
         return cached["data"]
+
+    t_start = time.monotonic()
 
     # ── Zero-value defaults ───────────────────────────────────────────────────
     _empty_summary: dict[str, Any] = {
@@ -216,47 +212,72 @@ async def awards_metrics() -> dict:
         "aca_primary": 0, "aca_secondary": 0, "sql_mb": 0.0,
     }
 
-    # ── App Insights KQL queries ──────────────────────────────────────────────
-    try:
-        logs_client = LogsQueryClient(_credential())
-        hourly        = _query(logs_client, _HOURLY_KQL)
-        summary_rows  = _query(logs_client, _SUMMARY_KQL)
-        # pageViews is emitted by the browser JS SDK — lives in the *frontend*
-        # App Insights resource, not the backend API one.
-        pv_resource   = FRONTEND_RESOURCE_ID if FRONTEND_RESOURCE_ID else RESOURCE_ID
-        pv_rows       = _query(logs_client, _PAGEVIEWS_KQL, resource_id=pv_resource)
-        activity_rows = _query(logs_client, _ACTIVITY_KQL)
+    pv_resource = FRONTEND_RESOURCE_ID if FRONTEND_RESOURCE_ID else RESOURCE_ID
 
-        summary = summary_rows[0]  if summary_rows  else _empty_summary
-        pv      = pv_rows[0]       if pv_rows        else {}
-        act     = activity_rows[0] if activity_rows  else {}
+    # ── Fire all 6 calls concurrently ────────────────────────────────────────
+    # Each runs in its own thread so the sync SDK doesn't block the event loop.
+    (
+        hourly_result,
+        summary_result,
+        pv_result,
+        aca_primary_result,
+        aca_secondary_result,
+        sql_result,
+    ) = await asyncio.gather(
+        asyncio.to_thread(_run_kql, _HOURLY_KQL,                  RESOURCE_ID),
+        asyncio.to_thread(_run_kql, _SUMMARY_AND_ACTIVITY_KQL,    RESOURCE_ID),
+        asyncio.to_thread(_run_kql, _PAGEVIEWS_KQL,               pv_resource),
+        asyncio.to_thread(_run_metric, _ACA_PRIMARY_ID,   "Replicas", "Average"),
+        asyncio.to_thread(_run_metric, _ACA_SECONDARY_ID, "Replicas", "Average"),
+        asyncio.to_thread(_run_metric, _SQL_DB_ID,        "storage",  "Maximum"),
+        return_exceptions=True,   # don't let one failure cancel the others
+    )
 
-        health: dict[str, Any] = {
-            "total":        summary.get("total",    0),
-            "failures":     summary.get("failures", 0),
-            "p95_ms":       summary.get("p95_ms",   0),
-            "unique_users": pv.get("unique_users",  0),
-            "pages_viewed": pv.get("pages_viewed",  0),
-            "nominations":  act.get("nominations",  0),
-            "sessions":     act.get("sessions",     0),
-        }
-    except Exception as exc:
-        logger.warning("App Insights query unavailable, returning zeros: %s", exc)
-        hourly  = []
-        summary = _empty_summary
-        health  = _empty_health
+    logger.info("metrics: all calls completed in %.0f ms", (time.monotonic() - t_start) * 1000)
 
-    # ── Azure Monitor Metrics (ACA replicas + SQL storage) ───────────────────
-    try:
-        sql_bytes = _metric(_SQL_DB_ID, "storage", "Maximum")
-        compute: dict[str, Any] = {
-            "aca_primary":   int(round(_metric(_ACA_PRIMARY_ID,   "Replicas", "Average"))),
-            "aca_secondary": int(round(_metric(_ACA_SECONDARY_ID, "Replicas", "Average"))),
-            "sql_mb":        round(sql_bytes / (1024 * 1024), 2) if sql_bytes else 0.0,
-        }
-    except Exception as exc:
-        logger.warning("Azure Monitor metrics unavailable: %s", exc)
-        compute = _empty_compute
+    # ── Unpack KQL results (replace exceptions with empty lists) ──────────────
+    def _rows(result: Any, label: str) -> list[dict]:
+        if isinstance(result, Exception):
+            logger.warning("metrics: %s query failed — %s", label, result)
+            return []
+        return result  # type: ignore[return-value]
+
+    hourly        = _rows(hourly_result,  "hourly")
+    summary_rows  = _rows(summary_result, "summary+activity")
+    pv_rows       = _rows(pv_result,      "pageviews")
+
+    combined = summary_rows[0] if summary_rows else {}
+    pv       = pv_rows[0]      if pv_rows      else {}
+
+    summary: dict[str, Any] = {
+        "total":    combined.get("total",    0),
+        "failures": combined.get("failures", 0),
+        "p50_ms":   combined.get("p50_ms",   0),
+        "p95_ms":   combined.get("p95_ms",   0),
+    }
+    health: dict[str, Any] = {
+        "total":        combined.get("total",       0),
+        "failures":     combined.get("failures",    0),
+        "p95_ms":       combined.get("p95_ms",      0),
+        "unique_users": pv.get("unique_users",      0),
+        "pages_viewed": pv.get("pages_viewed",      0),
+        "nominations":  combined.get("nominations", 0),
+        "sessions":     combined.get("sessions",    0),
+    }
+
+    # ── Unpack Azure Monitor results (replace exceptions with 0.0) ────────────
+    def _num(result: Any, label: str) -> float:
+        if isinstance(result, Exception):
+            logger.warning("metrics: %s metric failed — %s", label, result)
+            return 0.0
+        return float(result)  # type: ignore[arg-type]
+
+    sql_bytes = _num(sql_result,         "sql_storage")
+    compute: dict[str, Any] = {
+        "aca_primary":   int(round(_num(aca_primary_result,   "aca_primary"))),
+        "aca_secondary": int(round(_num(aca_secondary_result, "aca_secondary"))),
+        "sql_mb":        round(sql_bytes / (1024 * 1024), 2) if sql_bytes else 0.0,
+    }
 
     data: dict[str, Any] = {
         "summary": summary,
