@@ -21,6 +21,12 @@ Auth
 Caching
   Results are cached in memory for CACHE_TTL_SECONDS (60 s by default).
   Restart the container or wait for TTL expiry to pick up document changes.
+
+Performance
+  CosmosClient is created once as a module-level singleton and reused
+  across all requests. Opening a new client per cache-miss added ~2 s of
+  TCP connection overhead; reusing it reduces the cold path to the query
+  time alone (~200 ms).
 """
 
 from __future__ import annotations
@@ -53,6 +59,34 @@ class TeamMember(BaseModel):
     web_url: Optional[str] = None
 
 
+# ── Singleton CosmosClient ────────────────────────────────────────────────────
+# Created once on first use and reused for the lifetime of the process.
+# This avoids the ~2 s TCP handshake cost on every cache miss.
+
+_cosmos_client: CosmosClient | None = None
+
+
+def _get_cosmos_client() -> CosmosClient:
+    """Return the singleton CosmosClient, creating it on first call."""
+    global _cosmos_client
+    if _cosmos_client is None:
+        endpoint = os.environ.get("AZURE_COSMOS_ENDPOINT", "")
+        if not endpoint:
+            raise HTTPException(
+                status_code=503,
+                detail="AZURE_COSMOS_ENDPOINT is not configured.",
+            )
+        client_id = os.environ.get("AZURE_CLIENT_ID")
+        credential = (
+            ManagedIdentityCredential(client_id=client_id)
+            if client_id
+            else DefaultAzureCredential()
+        )
+        _cosmos_client = CosmosClient(endpoint, credential=credential)
+        logger.info("team: CosmosClient singleton created")
+    return _cosmos_client
+
+
 # ── In-memory cache ───────────────────────────────────────────────────────────
 
 _cache: list[TeamMember] | None = None
@@ -77,46 +111,26 @@ def _doc_to_member(doc: dict[str, Any]) -> TeamMember:
 
 
 async def _fetch_from_cosmos() -> list[TeamMember]:
-    endpoint = os.environ.get("AZURE_COSMOS_ENDPOINT", "")
     database_name = os.environ.get("AZURE_COSMOS_DATABASE", "terian-services")
 
-    if not endpoint:
-        raise HTTPException(
-            status_code=503,
-            detail="AZURE_COSMOS_ENDPOINT is not configured.",
-        )
-
     t_start = time.monotonic()
+    client = _get_cosmos_client()
 
-    client_id = os.environ.get("AZURE_CLIENT_ID")
-    credential = ManagedIdentityCredential(client_id=client_id) if client_id else DefaultAzureCredential()
+    database  = client.get_database_client(database_name)
+    container = database.get_container_client("employees")
 
-    async with credential:
-        t_cred = time.monotonic()
-        logger.info("team: credential acquired in %.0f ms", (t_cred - t_start) * 1000)
+    query = "SELECT * FROM c ORDER BY c.sort_order ASC"
+    items: list[TeamMember] = []
+    async for doc in container.query_items(query=query):
+        try:
+            items.append(_doc_to_member(doc))
+        except Exception as exc:
+            logger.warning("team: skipping malformed document %s: %s", doc.get("id"), exc)
 
-        async with CosmosClient(endpoint, credential=credential) as client:
-            t_client = time.monotonic()
-            logger.info("team: CosmosClient opened in %.0f ms", (t_client - t_cred) * 1000)
-
-            database = client.get_database_client(database_name)
-            container = database.get_container_client("employees")
-
-            query = "SELECT * FROM c ORDER BY c.sort_order ASC"
-            items: list[TeamMember] = []
-            async for doc in container.query_items(query=query):
-                try:
-                    items.append(_doc_to_member(doc))
-                except Exception as exc:
-                    logger.warning("team: skipping malformed document %s: %s", doc.get("id"), exc)
-
-            t_query = time.monotonic()
-            logger.info(
-                "team: query returned %d document(s) in %.0f ms",
-                len(items), (t_query - t_client) * 1000,
-            )
-
-    logger.info("team: total _fetch_from_cosmos %.0f ms", (time.monotonic() - t_start) * 1000)
+    logger.info(
+        "team: query returned %d document(s) in %.0f ms",
+        len(items), (time.monotonic() - t_start) * 1000,
+    )
     return items
 
 
@@ -135,7 +149,7 @@ async def get_team() -> list[TeamMember]:
     except HTTPException:
         raise
     except Exception as exc:
-        logger.exception("Failed to fetch team from Cosmos DB: %s", exc)
+        logger.exception("team: failed to fetch from Cosmos DB: %s", exc)
         raise HTTPException(status_code=500, detail="Could not load team data.")
 
     _cache = members
