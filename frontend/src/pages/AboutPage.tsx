@@ -28,6 +28,8 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <TeamSection />
+
       <section>
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">How we work</p>
@@ -55,8 +57,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      <TeamSection />
 
       <section className="bg-[#0f0d18] text-white">
         <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-6 py-14 lg:flex-row lg:items-center lg:px-10">
