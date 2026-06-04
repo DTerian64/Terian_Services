@@ -142,7 +142,10 @@ def _run_metric(resource_id: str, metric_name: str, aggregation: str = "Average"
     Query a single Azure Monitor metric synchronously — intended for asyncio.to_thread.
     Returns 0.0 if the resource ID is not configured or the query fails.
     """
+    resource_short = resource_id.split("/")[-1] if resource_id else "<not set>"
+
     if not resource_id:
+        logger.warning("metrics: resource_id not set for metric %s — returning 0", metric_name)
         return 0.0
     try:
         parts  = resource_id.split("/")
@@ -151,6 +154,7 @@ def _run_metric(resource_id: str, metric_name: str, aggregation: str = "Average"
         start  = end - timedelta(days=1)
         timespan = f"{start.isoformat()}/{end.isoformat()}"
 
+        logger.info("metrics: querying %s / %s / %s", resource_short, metric_name, aggregation)
         client = MonitorManagementClient(_credential(), sub_id)
         result = client.metrics.list(
             resource_uri=resource_id,
@@ -160,19 +164,17 @@ def _run_metric(resource_id: str, metric_name: str, aggregation: str = "Average"
             interval="PT1H",
         )
         attr = aggregation.lower()
-        resource_short = resource_id.split("/")[-1]
         for metric in result.value:
             for ts in metric.timeseries:
                 for dp in reversed(ts.data):
                     val = getattr(dp, attr, None)
                     if val is not None:
-                        logger.debug("metric %s/%s = %s", resource_short, metric_name, val)
+                        logger.info("metrics: %s / %s = %s", resource_short, metric_name, val)
                         return float(val)
-        logger.info("metric %s/%s: no non-null data points in last 24h", resource_short, metric_name)
+        logger.warning("metrics: %s / %s — no non-null data points in last 24h", resource_short, metric_name)
         return 0.0
     except Exception as exc:
-        logger.warning("Azure Monitor metric unavailable (%s / %s): %s",
-                       resource_id.split("/")[-1], metric_name, exc)
+        logger.warning("metrics: %s / %s — exception: %s", resource_short, metric_name, exc)
         return 0.0
 
 
