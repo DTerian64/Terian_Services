@@ -152,7 +152,10 @@ def _run_metric(resource_id: str, metric_name: str, aggregation: str = "Average"
         sub_id = parts[parts.index("subscriptions") + 1]
         end    = datetime.now(timezone.utc)
         start  = end - timedelta(days=1)
-        timespan = f"{start.isoformat()}/{end.isoformat()}"
+        # Use explicit Z-suffix format — .isoformat() can render UTC offset as
+        # " 00:00" (space) instead of "+00:00" on some runtimes, which Azure
+        # Monitor's ISO 8601 parser rejects with a BadRequest.
+        timespan = f"{start.strftime('%Y-%m-%dT%H:%M:%SZ')}/{end.strftime('%Y-%m-%dT%H:%M:%SZ')}"
 
         logger.info("metrics: querying %s / %s / %s", resource_short, metric_name, aggregation)
         client = MonitorManagementClient(_credential(), sub_id)
