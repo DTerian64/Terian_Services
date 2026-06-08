@@ -13,6 +13,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
+    environment: prod
 
     steps:
       - uses: actions/checkout@v4
