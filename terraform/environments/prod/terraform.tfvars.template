@@ -58,3 +58,19 @@ serper_api_key = "<place your own value>"
 # Admin user — david64.terian@terian-services.com
 # Storage Blob Data Contributor + Cosmos DB Built-in Data Contributor
 admin_principal_id = "<place your own value>"
+
+# ── Cloudflare (terianix.ai) ──────────────────────────────────────────────────
+# API token: Cloudflare dashboard → My Profile → API Tokens → Create Token
+#   Permissions needed: Zone → DNS → Edit, scoped to terianix.ai zone only.
+# Zone ID: Cloudflare dashboard → terianix.ai → Overview → right-hand sidebar.
+
+cloudflare_api_token = "<place your own value>"
+cloudflare_zone_id   = "<place your own value>"
+
+# ── Terianix SWA apex verification ────────────────────────────────────────────
+# Leave empty on Phase 1 apply.  After the SWA is created, get the token from:
+#   Azure Portal → Static Web Apps → terianix-frontend →
+#   Custom domains → Add → terianix.ai → copy the verification token shown.
+# Then set this value and re-apply (Phase 2).
+
+terianix_swa_verification_token = ""

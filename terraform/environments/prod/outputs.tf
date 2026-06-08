@@ -71,3 +71,27 @@ output "frontend_appinsights_connection_string" {
   value       = azurerm_application_insights.frontend.connection_string
   sensitive   = true
 }
+
+# ── Terianix frontend (SWA) ──────────────────────────────────────────────────
+output "terianix_swa_default_hostname" {
+  description = "terianix.ai SWA default hostname (azurestaticapps.net) — use this as the CNAME value and to retrieve the apex verification token from the Azure portal."
+  value       = module.terianix_static_web_app.default_hostname
+}
+
+output "terianix_swa_api_key" {
+  description = "terianix.ai SWA deployment token — store as GitHub Actions secret TERIANIX_SWA_DEPLOYMENT_TOKEN in the terianix_frontend repo."
+  value       = module.terianix_static_web_app.api_key
+  sensitive   = true
+}
+
+output "terianix_swa_custom_domain" {
+  description = "Custom domain binding for terianix.ai (only set after Phase 2 apply)."
+  value       = length(azurerm_static_web_app_custom_domain.terianix_apex) > 0 ? azurerm_static_web_app_custom_domain.terianix_apex[0].domain_name : "not yet bound — set terianix_swa_verification_token and re-apply"
+}
+
+# ── Terianix frontend telemetry ──────────────────────────────────────────────
+output "terianix_frontend_appinsights_connection_string" {
+  description = "App Insights connection string for terianix.ai — add as GitHub Actions variable VITE_APPINSIGHTS_CONNECTION_STRING in the terianix_frontend repo."
+  value       = azurerm_application_insights.terianix_frontend.connection_string
+  sensitive   = true
+}

@@ -59,6 +59,12 @@ locals {
     project     = "terian-services"
     managed_by  = "terraform"
   }
+
+  terianix_tags = {
+    environment = "prod"
+    project     = "terianix"
+    managed_by  = "terraform"
+  }
 }
 
 # ── 0. Resource groups ───────────────────────────────────────────────────────
@@ -344,6 +350,120 @@ resource "azurerm_application_insights" "frontend" {
   workspace_id        = data.azurerm_log_analytics_workspace.corporate.id
   application_type    = "web"
   tags                = local.tags
+}
+
+# ── 9. Terianix.ai frontend ─────────────────────────────────────────────────
+# terianix.ai is a Cloudflare-managed domain (registered in Cloudflare).
+# DNS records are managed here via the Cloudflare provider — no Azure DNS zone
+# is needed for this domain.
+#
+# Two-phase apply (same pattern as terian-services.com apex binding):
+#   Phase 1 — first apply (terianix_swa_verification_token = ""):
+#     • Creates the SWA and Cloudflare CNAME/www records
+#     • Skips the asuid TXT record and apex custom-domain binding
+#     • Run: terraform output terianix_swa_default_hostname
+#       then open Azure portal → SWA → Custom Domains → Add → terianix.ai
+#       to retrieve the verification token shown there
+#   Phase 2 — set terianix_swa_verification_token = "<token>" and re-apply:
+#     • Creates the asuid TXT record in Cloudflare
+#     • Creates the apex + www custom-domain bindings in Azure
+#     • Azure issues the managed TLS cert (~10 min)
+#
+# ⚠  Cloudflare proxy must stay OFF (proxied = false) on all terianix.ai
+#    records.  With Cloudflare proxying enabled, Azure cannot reach the domain
+#    during managed-cert issuance or renewal and the binding will stay stuck
+#    in "Validating".
+# ─────────────────────────────────────────────────────────────────────────────
+
+module "terianix_static_web_app" {
+  source = "../../modules/static-web-app"
+
+  resource_group_name = azurerm_resource_group.corporate.name
+  location            = var.location
+  app_name            = var.terianix_swa_name
+  tags                = local.terianix_tags
+
+  # Same backend as terian-services.com.  terianix.ai origins are added to
+  # backend_allowed_origins (see the CORS note below).
+  app_settings = {
+    VITE_API_URL = "https://${module.container_app.container_app_fqdn}"
+  }
+
+  depends_on = [module.container_app]
+}
+
+# ── Cloudflare DNS records for terianix.ai ───────────────────────────────────
+
+# Apex — Cloudflare flattens this CNAME to A records automatically ("CNAME at root").
+resource "cloudflare_record" "terianix_apex" {
+  zone_id = var.cloudflare_zone_id
+  name    = "@"
+  type    = "CNAME"
+  content = module.terianix_static_web_app.default_hostname
+  proxied = false
+  ttl     = 300
+}
+
+# www subdomain
+resource "cloudflare_record" "terianix_www" {
+  zone_id = var.cloudflare_zone_id
+  name    = "www"
+  type    = "CNAME"
+  content = module.terianix_static_web_app.default_hostname
+  proxied = false
+  ttl     = 300
+}
+
+# SWA domain-ownership verification TXT record (asuid.terianix.ai).
+# Only created once terianix_swa_verification_token is set (Phase 2 apply).
+resource "cloudflare_record" "terianix_swa_verify" {
+  count   = var.terianix_swa_verification_token != "" ? 1 : 0
+  zone_id = var.cloudflare_zone_id
+  name    = var.terianix_swa_verification_dns_name
+  type    = "TXT"
+  content = var.terianix_swa_verification_token
+  proxied = false
+  ttl     = 300
+}
+
+# ── Azure SWA custom-domain bindings for terianix.ai ────────────────────────
+
+resource "azurerm_static_web_app_custom_domain" "terianix_apex" {
+  count             = var.terianix_swa_verification_token != "" ? 1 : 0
+  static_web_app_id = module.terianix_static_web_app.static_web_app_id
+  domain_name       = "terianix.ai"
+  validation_type   = "dns-txt-token"
+
+  depends_on = [
+    cloudflare_record.terianix_swa_verify,
+    cloudflare_record.terianix_apex,
+  ]
+}
+
+resource "azurerm_static_web_app_custom_domain" "terianix_www" {
+  count             = var.terianix_swa_verification_token != "" ? 1 : 0
+  static_web_app_id = module.terianix_static_web_app.static_web_app_id
+  domain_name       = "www.terianix.ai"
+  validation_type   = "cname-delegation"
+
+  depends_on = [
+    cloudflare_record.terianix_www,
+    azurerm_static_web_app_custom_domain.terianix_apex,
+  ]
+}
+
+# ── Application Insights (terianix frontend telemetry) ───────────────────────
+# Dedicated instance so terianix metrics stay separate from terian-services.com.
+# Both instances share the same Log Analytics workspace, so cross-brand KQL
+# queries work by joining on the workspace — no data is siloed.
+
+resource "azurerm_application_insights" "terianix_frontend" {
+  name                = "appi-terianix-frontend"
+  resource_group_name = azurerm_resource_group.corporate.name
+  location            = var.location
+  workspace_id        = data.azurerm_log_analytics_workspace.corporate.id
+  application_type    = "web"
+  tags                = local.terianix_tags
 }
 
 # ── 7. Post-apply notes ─────────────────────────────────────────────────────

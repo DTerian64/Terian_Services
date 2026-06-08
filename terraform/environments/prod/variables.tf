@@ -318,3 +318,36 @@ variable "admin_principal_id" {
   type        = string
   default     = ""
 }
+
+# ── Cloudflare (terianix.ai DNS) ─────────────────────────────────────────────
+
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token with Zone:DNS:Edit permission for the terianix.ai zone. Sensitive — inject via TF_VAR_cloudflare_api_token or a GitHub Actions secret; never commit."
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare Zone ID for terianix.ai — find it on the zone's Overview page in the Cloudflare dashboard."
+  type        = string
+}
+
+# ── Terianix Static Web App (terianix.ai frontend) ───────────────────────────
+
+variable "terianix_swa_name" {
+  description = "Static Web App resource name for the terianix.ai frontend."
+  type        = string
+  default     = "terianix-frontend"
+}
+
+variable "terianix_swa_verification_dns_name" {
+  description = "DNS name for the SWA apex-domain ownership TXT record. Azure SWA (unlike App Service) places this at the root '@' for external DNS providers like Cloudflare."
+  type        = string
+  default     = "@"
+}
+
+variable "terianix_swa_verification_token" {
+  description = "SWA custom-domain verification token for terianix.ai — populate after first apply (get it from the Azure portal or the terianix_swa_default_hostname output, then re-apply to create the TXT record and apex binding)."
+  type        = string
+  default     = ""
+}
