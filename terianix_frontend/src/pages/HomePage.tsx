@@ -1,6 +1,19 @@
+import { useEffect } from "react";
 import PageLayout from "../components/PageLayout";
 
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+
+/** Fire-and-forget: wake CosmosDB before the user navigates to a page that needs it. */
+function useApiWarmup() {
+  useEffect(() => {
+    if (!API_BASE) return;
+    fetch(`${API_BASE}/api/team`, { method: "GET", signal: AbortSignal.timeout(15_000) })
+      .catch(() => { /* warmup — errors are intentionally silent */ });
+  }, []);
+}
+
 export default function HomePage() {
+  useApiWarmup();
   return (
     <PageLayout>
       {/* Hero */}

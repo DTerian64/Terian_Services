@@ -11,6 +11,7 @@ import IntegritySentinelPage from "./pages/IntegritySentinelPage";
 
 import PricingPage from "./pages/PricingPage";
 import AwardNominationPricingPage from "./pages/AwardNominationPricingPage";
+import NewEngagementPage from "./pages/NewEngagementPage";
 
 const SITE = "Terianix";
 
@@ -28,6 +29,7 @@ const routes: RouteEntry[] = [
   { match: (p) => p === "/trust",                                        component: TrustPage,                  title: "Trust & Security" },
   { match: (p) => p === "/pricing" || p === "/pricing/",                 component: PricingPage,                title: "Pricing" },
   { match: (p) => p === "/pricing/award-nomination",                     component: AwardNominationPricingPage, title: "Award Nomination Pricing" },
+  { match: (p) => p.startsWith("/engagement/new"),                        component: NewEngagementPage,          title: "New Engagement" },
   { match: (p) => p === "/privacy" || p === "/privacy.html",             component: PrivacyPage,                title: "Privacy Policy" },
 
   // Products
