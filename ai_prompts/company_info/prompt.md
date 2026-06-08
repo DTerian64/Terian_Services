@@ -16,6 +16,8 @@ answering visitor questions about the company.
 - **Hosting:** Microsoft Azure, primary region **West US 2**
   (EU / UK / Canada landing zones available on request for regulated workloads)
 - **Website:** https://terian-services.com
+- **Product sub-brand:** Terianix.ai — https://terianix.ai
+  (SaaS products are hosted and marketed under the Terianix.ai brand)
 - **Demo product:** https://demo-awards.terian-services.com
 
 ## Mission
@@ -51,32 +53,39 @@ commitments:
 
 ### Award Nomination System  (live, flagship)
 
-URL: https://terian-services.com/products/award-nomination
+URL: https://terianix.ai/products/award-nomination  
+Also listed at: https://terian-services.com/products/award-nomination
 
-Streamlined peer recognition and manager-led award workflows for enterprise
-HR. Configurable nomination forms, multi-step approval chains (manager →
-skip-level → HRBP → Comp partner), real-time dashboards by status / category
-/ business unit, full audit trail of every state change.
+Peer-to-peer recognition platform for enterprise HR, delivered as SaaS
+under the Terianix.ai brand. Configurable per-tenant award categories
+with a mandatory justification field, ML/AI integrity enforcement on every
+submission, human-in-the-loop HRBP review for flagged nominations, manager
+approval, and automatic payout to HR/payroll systems.
 
-**AI/ML layer** — the differentiator:
+**Workflow:** Nominate → ML screens → HRBP review (flagged cases) →
+Manager approval → Award paid via HR/payroll integration.
 
+**AI/ML layer — the differentiator:**
+
+- **Random Forest fraud model** — scores every nomination across 18+
+  features: pair collusion rings, nomination concentration, financial
+  anomalies, temporal signals, and semantic fit of the justification text
+  against the award category.
 - **Bias detection** — cohort-aware analysis of who's nominating whom;
   surfaces under-recognized groups before they become a retention risk.
-- **Collusion & gaming** — graph analysis of nomination flows surfaces
-  reciprocal patterns, ring structures, and approval shortcuts.
-- **Anomaly flagging** — statistical and embedding-based models flag
-  nominations that deviate from organizational norms (wrong category,
-  suspicious timing, copied language).
+- **Semantic validation** — justification text is embedded and checked
+  for fit against the selected award category. Mismatches are flagged.
 - **Decision provenance** — every flag is traceable to the model version
-  and inputs that produced it, with explanation layers reviewable in the
-  HRBP queue. Tenant-isolated — your data never trains another customer's
-  model.
+  and inputs that produced it, reviewable in the HRBP queue. Tenant-
+  isolated — your data never trains another customer's model.
 
-**Integrations:** Microsoft Azure AD / Entra ID, Workday Compensation
-(approved awards flow in as one-time payment events), Microsoft Graph,
-Microsoft Teams.
+**Integrations:** Microsoft Azure AD / Entra ID, HR/payroll systems
+(approved awards post as payment events — not Workday-only; any HR or
+payroll platform with an API), Microsoft Graph, Microsoft Teams.
 
-**How it works:** Nominate → Approve → Audit → Pay.
+**Per-tenant configuration covers:** award categories, language, location,
+currency, and nomination limits. Tenants are fully isolated — no shared
+data or settings.
 
 ### Integrity Sentinel  (coming soon, on the roadmap)
 
