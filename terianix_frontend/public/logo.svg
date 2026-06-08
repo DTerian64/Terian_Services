@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" fill="none">
+  <!-- Shield outline -->
+  <path d="M50 4 L92 20 L92 58 C92 80 72 98 50 106 C28 98 8 80 8 58 L8 20 Z"
+        stroke="#2ab8a8" stroke-width="4" fill="#0a0a0a"/>
+  <!-- T bar (horizontal) -->
+  <rect x="28" y="32" width="44" height="8" rx="2" fill="#2ab8a8"/>
+  <!-- T stem (vertical) -->
+  <rect x="46" y="40" width="8" height="22" rx="2" fill="#2ab8a8"/>
+  <!-- Checkmark -->
+  <polyline points="32,72 43,83 68,58"
+            stroke="#2ab8a8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

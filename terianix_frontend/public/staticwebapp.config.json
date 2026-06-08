@@ -1,0 +1,52 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/assets/*",
+      "/*.{js,css,png,jpg,jpeg,gif,svg,ico,json,woff,woff2,ttf,eot}"
+    ]
+  },
+  "mimeTypes": {
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
+    ".json": "application/json",
+    ".css": "text/css",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".ico": "image/x-icon",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+    ".ttf": "font/ttf",
+    ".eot": "application/vnd.ms-fontobject"
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+    "Cross-Origin-Opener-Policy": "same-origin",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload"
+  },
+  "routes": [
+    {
+      "route": "/assets/*",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "route": "/mockups/*",
+      "headers": {
+        "X-Frame-Options": "SAMEORIGIN"
+      }
+    },
+    {
+      "route": "/award_nomination",
+      "redirect": "/products/award-nomination",
+      "statusCode": 301
+    }
+  ]
+}

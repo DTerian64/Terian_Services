@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Integrity Sentinel Connector Catalog Prototype</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Admin navigation">
+        <div class="brand">
+          <div class="brand-mark">IS</div>
+          <div>
+            <div class="brand-name">Integrity Sentinel</div>
+            <div class="brand-subtitle">Tenant Admin</div>
+          </div>
+        </div>
+        <nav class="side-nav">
+          <button class="nav-item active" type="button">Data Sources</button>
+          <button class="nav-item" type="button">Ingestion Policies</button>
+          <button class="nav-item" type="button">Ontology Mapping</button>
+          <button class="nav-item" type="button">Audit Log</button>
+          <button class="nav-item" type="button">Settings</button>
+        </nav>
+        <div class="tenant-box">
+          <span class="eyebrow">Tenant</span>
+          <strong>Contoso</strong>
+          <span>Production</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <div class="crumbs">Admin / Data Sources / Connector Catalog</div>
+            <h1 id="screen-title">Connector Catalog</h1>
+          </div>
+          <div class="topbar-actions">
+            <span class="status-pill">Draft safe</span>
+            <button id="save-draft" class="button secondary" type="button">Save draft</button>
+          </div>
+        </header>
+
+        <section class="stepper" aria-label="Connector setup steps">
+          <button class="step is-active" type="button" data-screen="catalog">1 Catalog</button>
+          <button class="step" type="button" data-screen="detail">2 Details</button>
+          <button class="step" type="button" data-screen="connection">3 Connection</button>
+          <button class="step" type="button" data-screen="discovery">4 Discovery</button>
+          <button class="step" type="button" data-screen="scope">5 Scope</button>
+          <button class="step" type="button" data-screen="preview">6 Preview</button>
+          <button class="step" type="button" data-screen="mapping">7 Mapping</button>
+          <button class="step" type="button" data-screen="schedule">8 Schedule</button>
+          <button class="step" type="button" data-screen="activate">9 Activate</button>
+          <button class="step" type="button" data-screen="instance">10 Instance</button>
+        </section>
+
+        <div id="screen-root" class="screen-root" aria-live="polite"></div>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

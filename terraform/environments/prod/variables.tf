@@ -203,7 +203,7 @@ variable "serper_api_key" {
 variable "backend_allowed_origins" {
   description = "Comma-separated list of origins allowed to call /api/*."
   type        = string
-  default     = "https://terian-services.com,https://www.terian-services.com"
+  default     = "https://terian-services.com,https://www.terian-services.com,https://terianix.ai,https://www.terianix.ai"
 }
 
 # ── DevOps principal (for federated GitHub Actions login) ──────────────────
