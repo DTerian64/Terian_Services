@@ -7,23 +7,19 @@ export default function AboutPage() {
     <PageLayout>
       <PageHero
         eyebrow="About"
-        title="Engineering for the parts of the enterprise that matter."
-        description="Terian Services builds AI/ML-empowered SaaS and delivering high-trust enterprise services. We work where the data is sensitive, the workflows are real, and the outcomes are measurable."
+        title="Enterprise SaaS built to last."
+        description="Terianix ships AI-assisted SaaS for enterprises. We work where the data is sensitive, the workflows are real, and the outcomes are measurable."
       />
 
       <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-        <div className="grid gap-10 lg:grid-cols-3">
+        <div className="grid gap-10 lg:grid-cols-2">
           <Pillar
-            title="Products"
-            description="AI/ML-empowered SaaS we build, host, and operate. Currently led by the Award Nomination System, with Integrity Sentinel on the roadmap."
+            title="Award Nomination System"
+            description="Peer recognition and manager-led award workflows with full audit trail, approval chains, and an ML layer that flags bias and anomalous patterns."
           />
           <Pillar
-            title="Services"
-            description="Hands-on AI analytics, integrity & fraud detection, and data mining. Senior engineers, embedded with your team, shipping in production."
-          />
-          <Pillar
-            title="Migrations"
-            description="Datacenter-to-cloud transformation programs. Azure-first, Terraform-driven, with rollback plans written before we touch anything."
+            title="Integrity Sentinel"
+            description="Fraud-detection SaaS — multi-tenant rule engine plus ML models for transactions, vendor master, and expense data. Currently in early access."
           />
         </div>
       </section>
@@ -66,7 +62,7 @@ export default function AboutPage() {
           </div>
           <a
             href="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-violet-400"
+            className="inline-flex items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400"
           >
             Get in touch →
           </a>

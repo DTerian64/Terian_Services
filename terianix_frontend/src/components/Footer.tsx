@@ -23,7 +23,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <a href="/" className="flex items-center gap-3 text-white no-underline">
               <img src="/logo.svg" alt="" className="h-10 w-auto object-contain" />
-              <span className="text-lg font-bold">Terianix</span>
+              <span className="text-lg font-bold">Terianix.ai</span>
             </a>
             <p className="mt-4 text-sm leading-6 text-white/60">
               Enterprise SaaS by Terian Services. Secure. Isolated. Provable.

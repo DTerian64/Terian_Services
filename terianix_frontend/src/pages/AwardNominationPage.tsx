@@ -112,9 +112,9 @@ export default function AwardNominationPage() {
       {archOpen && <ArchitectureModal onClose={() => setArchOpen(false)} />}
       {workflowOpen && <WorkflowModal onClose={() => setWorkflowOpen(false)} />}
       <PageHero
-        eyebrow="Product · AI/ML-assisted"
+        eyebrow="Product · ML/AI Integrity-enforced"
         title="Award Nomination System"
-        description="Recognize the right people, faster — with an AI-assisted nomination workflow that catches bias, surfaces collusion, and drops approved awards directly into Workday."
+        description="Peer-to-peer and manager-led recognition with ML/AI integrity enforcement baked in — bias detection and collusion surfacing run on every nomination, flagged cases are routed through human-in-the-loop HRBP review, then manager approval, before awards drop directly into your HR or payroll system."
         primaryCta={{ label: "Request a demo", href: DEMO_REQUEST_URL, target: "_blank", rel: "noreferrer" }}
         secondaryCta={{ label: "Talk to engineering", href: "mailto:sales@terian-services.com" }}
       />
@@ -139,31 +139,31 @@ export default function AwardNominationPage() {
       <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">What it does</p>
         <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          A complete recognition workflow, built for the enterprise.
+          Award Nomination: Peer-to-Peer Recognition
         </h2>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <Feature
-            title="Peer & manager nominations"
-            description="Configurable nomination forms with category templates, eligibility rules, and rich text + attachments."
+            title="Configurable SaaS per tenant"
+            description="Award categories, language, location, currency, and nomination limits are all configured per tenant. Every deployment is isolated — no shared data, no cross-tenant leakage."
           />
           <Feature
-            title="Multi-step approval chains"
-            description="Manager → skip-level → HRBP → Comp partner. Routing, SLAs, and reminders built in."
+            title="Peer-to-peer nominations"
+            description="Every submission feeds a Random Forest fraud model evaluating collusion patterns, financial anomalies, temporal signals, and semantic fit — before it reaches a human reviewer."
+          />
+          <Feature
+            title="ML-scored, human-reviewed approval"
+            description="ML fraud score computed across 18+ features — pair collusion rings, nomination concentration, amount anomalies, and semantic content. Flagged cases route to human-in-the-loop HRBP review → manager approval."
             onDetail={() => setWorkflowOpen(true)}
-          />
-          <Feature
-            title="Real-time dashboards"
-            description="Pipeline view by status, category, business unit. Org-level recognition equity and trend reporting."
-            href="#live-metrics"
           />
           <Feature
             title="Full audit trail"
             description="Every state change, comment, and approver decision is captured. Exportable for audit and compliance."
           />
           <Feature
-            title="Workday compensation events"
-            description="Approved awards flow into Workday automatically as one-time payment events. No manual data entry."
+            title="Real-time dashboards"
+            description="Pipeline view by status, category, business unit. Org-level recognition equity and trend reporting."
+            href="#live-metrics"
           />
           <Feature
             title="Azure AD SSO + B2B"
@@ -223,7 +223,7 @@ export default function AwardNominationPage() {
           <Step number="1" title="Nominate" description="Employee or manager submits with category, justification, and optional attachments." />
           <Step number="2" title="Approve" description="Routed through configured approval chain with SLAs, reminders, and audit logging." />
           <Step number="3" title="Audit" description="ML layer flags anomalies and bias risk. HRBP review queue handles exceptions." />
-          <Step number="4" title="Pay" description="Approved awards post to Workday as compensation events. Recognition is delivered, payroll handles the rest." />
+          <Step number="4" title="Pay" description="Approved awards post to your HR or payroll system as compensation events. Recognition is delivered, payroll handles the rest." />
         </div>
       </section>
 
@@ -235,7 +235,7 @@ export default function AwardNominationPage() {
           </h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <IntegrationPill label="Microsoft Azure AD / Entra ID" />
-            <IntegrationPill label="Workday Compensation" />
+            <IntegrationPill label="HR / Payroll" />
             <IntegrationPill label="Microsoft Graph" />
             <IntegrationPill label="Microsoft Teams" />
           </div>

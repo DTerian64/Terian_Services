@@ -1,6 +1,6 @@
 <svg width="100%" viewBox="0 0 680 265" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Award Nomination System platform overview</title>
-  <desc>Five-step nomination workflow: Nominate, ML review, Manager, HR review, Award — with ML intelligence layer, audit trail, Azure AD and Workday integrations, and multi-tenant SaaS architecture.</desc>
+  <desc>Five-step nomination workflow: Nominate, ML review, HR review, Manager approval, Award — with ML intelligence layer, audit trail, Azure AD and HR/payroll integrations, and multi-tenant SaaS architecture.</desc>
 
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
@@ -8,113 +8,96 @@
     </marker>
   </defs>
 
-  <!-- Background -->
   <rect width="680" height="265" fill="#0a0914"/>
-  <!-- Top teal accent bar -->
-  <rect width="680" height="3" fill="#2dd4bf"/>
+  <rect width="680" height="3" fill="#8b5cf6"/>
 
-  <!-- LEFT: Product name -->
-  <rect x="30" y="26" width="2.5" height="88" rx="1" fill="#2dd4bf"/>
-  <text x="42" y="51" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="17" font-weight="700" fill="#f1f5f9">Award</text>
-  <text x="42" y="71" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="17" font-weight="700" fill="#f1f5f9">nomination</text>
-  <text x="42" y="91" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="17" font-weight="700" fill="#2dd4bf">system</text>
-  <text x="42" y="113" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9.5" fill="#64748b" letter-spacing="0.05em">Recognition</text>
-  <text x="42" y="127" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9.5" fill="#64748b" letter-spacing="0.05em">intelligence</text>
-
-  <!-- Vertical divider -->
-  <line x1="163" y1="20" x2="163" y2="140" stroke="#ffffff" stroke-opacity="0.1" stroke-width="0.5"/>
-
-  <!-- CENTER: Workflow pipeline -->
-  <text x="175" y="33" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#475569" letter-spacing="0.12em">NOMINATION WORKFLOW</text>
+  <!-- Workflow label -->
+  <text x="340" y="33" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#475569" letter-spacing="0.12em" text-anchor="middle">NOMINATION WORKFLOW</text>
 
   <!-- Box 1: Nominate -->
-  <rect x="175" y="44" width="66" height="34" rx="4" fill="#0d0c1a" stroke="#ffffff" stroke-opacity="0.18" stroke-width="0.5"/>
-  <text x="208" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Nominate</text>
+  <rect x="55" y="44" width="90" height="34" rx="4" fill="#0d0c1a" stroke="#ffffff" stroke-opacity="0.18" stroke-width="0.5"/>
+  <text x="100" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Nominate</text>
 
   <!-- Arrow 1 -->
-  <line x1="242" y1="61" x2="254" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
+  <line x1="146" y1="61" x2="158" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
 
-  <!-- Box 2: ML review (teal accent) -->
-  <rect x="255" y="44" width="66" height="34" rx="4" fill="#041510" stroke="#2dd4bf" stroke-opacity="0.5" stroke-width="0.8"/>
-  <text x="288" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#5eead4" text-anchor="middle">ML review</text>
+  <!-- Box 2: ML review (violet accent) -->
+  <rect x="159" y="44" width="90" height="34" rx="4" fill="#0d0b1e" stroke="#8b5cf6" stroke-opacity="0.55" stroke-width="0.8"/>
+  <text x="204" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#a78bfa" text-anchor="middle">ML review</text>
 
   <!-- Arrow 2 -->
-  <line x1="322" y1="61" x2="334" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
+  <line x1="250" y1="61" x2="262" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
 
-  <!-- Box 3: Manager -->
-  <rect x="335" y="44" width="66" height="34" rx="4" fill="#0d0c1a" stroke="#ffffff" stroke-opacity="0.18" stroke-width="0.5"/>
-  <text x="368" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Manager</text>
+  <!-- Box 3: HR review (violet-tinted) -->
+  <rect x="263" y="44" width="90" height="34" rx="4" fill="#0d0b1e" stroke="#8b5cf6" stroke-opacity="0.3" stroke-width="0.5"/>
+  <text x="308" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#c4b5fd" text-anchor="middle">HR review</text>
 
   <!-- Arrow 3 -->
-  <line x1="402" y1="61" x2="414" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
+  <line x1="354" y1="61" x2="366" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
 
-  <!-- Box 4: HR review -->
-  <rect x="415" y="44" width="66" height="34" rx="4" fill="#0d0c1a" stroke="#ffffff" stroke-opacity="0.18" stroke-width="0.5"/>
-  <text x="448" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">HR review</text>
+  <!-- Box 4: Manager -->
+  <rect x="367" y="44" width="90" height="34" rx="4" fill="#0d0c1a" stroke="#ffffff" stroke-opacity="0.18" stroke-width="0.5"/>
+  <text x="412" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#94a3b8" text-anchor="middle">Manager</text>
 
   <!-- Arrow 4 -->
-  <line x1="482" y1="61" x2="494" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
+  <line x1="458" y1="61" x2="470" y2="61" stroke="#334155" stroke-width="0.8" marker-end="url(#a)"/>
 
   <!-- Box 5: Award (green accent) -->
-  <rect x="495" y="44" width="66" height="34" rx="4" fill="#041308" stroke="#10b981" stroke-opacity="0.45" stroke-width="0.8"/>
-  <text x="528" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#34d399" text-anchor="middle">Award</text>
+  <rect x="471" y="44" width="90" height="34" rx="4" fill="#041308" stroke="#10b981" stroke-opacity="0.45" stroke-width="0.8"/>
+  <text x="516" y="65" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#34d399" text-anchor="middle">Award</text>
 
   <!-- ML annotation under box 2 -->
-  <line x1="288" y1="78" x2="288" y2="92" stroke="#2dd4bf" stroke-opacity="0.35" stroke-width="0.5" stroke-dasharray="2,2"/>
-  <rect x="258" y="92" width="60" height="17" rx="8" fill="#041510" stroke="#2dd4bf" stroke-opacity="0.35" stroke-width="0.5"/>
-  <text x="288" y="104.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="8.5" fill="#5eead4" text-anchor="middle">ML scoring</text>
+  <line x1="204" y1="78" x2="204" y2="92" stroke="#8b5cf6" stroke-opacity="0.35" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <rect x="174" y="92" width="60" height="17" rx="8" fill="#0d0b1e" stroke="#8b5cf6" stroke-opacity="0.35" stroke-width="0.5"/>
+  <text x="204" y="104.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="8.5" fill="#a78bfa" text-anchor="middle">ML scoring</text>
 
-  <!-- RIGHT: Integration badges -->
-  <text x="601" y="33" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#475569" letter-spacing="0.08em" text-anchor="middle">INTEGRATIONS</text>
+  <!-- HRBP annotation under box 3 -->
+  <line x1="308" y1="78" x2="308" y2="92" stroke="#8b5cf6" stroke-opacity="0.25" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <rect x="272" y="92" width="72" height="17" rx="8" fill="#0d0b1e" stroke="#8b5cf6" stroke-opacity="0.25" stroke-width="0.5"/>
+  <text x="308" y="104.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="8.5" fill="#c4b5fd" text-anchor="middle">Human in loop</text>
 
-  <!-- Vertical divider before badges -->
-  <line x1="567" y1="20" x2="567" y2="140" stroke="#ffffff" stroke-opacity="0.08" stroke-width="0.5"/>
+  <!-- Integration badges -->
+  <text x="617" y="33" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#475569" letter-spacing="0.08em" text-anchor="middle">INTEGRATIONS</text>
+  <line x1="583" y1="20" x2="583" y2="140" stroke="#ffffff" stroke-opacity="0.08" stroke-width="0.5"/>
 
-  <!-- Badge: Azure AD -->
-  <rect x="568" y="44" width="72" height="22" rx="11" fill="#0d0c1a" stroke="#3b82f6" stroke-opacity="0.4" stroke-width="0.5"/>
-  <text x="604" y="58.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#93c5fd" text-anchor="middle">Azure AD</text>
+  <rect x="584" y="44" width="72" height="22" rx="11" fill="#0d0c1a" stroke="#3b82f6" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="620" y="58.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#93c5fd" text-anchor="middle">Azure AD</text>
 
-  <!-- Badge: Workday -->
-  <rect x="568" y="70" width="72" height="22" rx="11" fill="#0d0c1a" stroke="#f59e0b" stroke-opacity="0.4" stroke-width="0.5"/>
-  <text x="604" y="84.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#fcd34d" text-anchor="middle">Workday</text>
+  <rect x="584" y="70" width="72" height="22" rx="11" fill="#0d0c1a" stroke="#8b5cf6" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="620" y="84.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#c4b5fd" text-anchor="middle">HR / Payroll</text>
 
-  <!-- Badge: MS Graph -->
-  <rect x="568" y="96" width="72" height="22" rx="11" fill="#0d0c1a" stroke="#a78bfa" stroke-opacity="0.4" stroke-width="0.5"/>
-  <text x="604" y="110.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#c4b5fd" text-anchor="middle">MS Graph</text>
+  <rect x="584" y="96" width="72" height="22" rx="11" fill="#0d0c1a" stroke="#a78bfa" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="620" y="110.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#c4b5fd" text-anchor="middle">MS Graph</text>
 
   <!-- Horizontal divider -->
   <rect x="30" y="136" width="620" height="0.5" fill="#ffffff" fill-opacity="0.08"/>
 
-  <!-- BOTTOM PILLARS -->
+  <!-- Bottom pillars -->
   <line x1="185" y1="144" x2="185" y2="238" stroke="#ffffff" stroke-opacity="0.07" stroke-width="0.5"/>
   <line x1="340" y1="144" x2="340" y2="238" stroke="#ffffff" stroke-opacity="0.07" stroke-width="0.5"/>
   <line x1="495" y1="144" x2="495" y2="238" stroke="#ffffff" stroke-opacity="0.07" stroke-width="0.5"/>
 
-  <!-- Pillar 1: Audit trail -->
-  <text x="40" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#2dd4bf" letter-spacing="0.1em">AUDIT TRAIL</text>
+  <text x="40" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#8b5cf6" letter-spacing="0.1em">AUDIT TRAIL</text>
   <text x="40" y="177" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">Every action logged</text>
   <text x="40" y="193" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Immutable records</text>
   <text x="40" y="208" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Full timestamp chain</text>
 
-  <!-- Pillar 2: Bias detection -->
-  <text x="198" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#2dd4bf" letter-spacing="0.1em">BIAS DETECTION</text>
+  <text x="198" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#8b5cf6" letter-spacing="0.1em">BIAS DETECTION</text>
   <text x="198" y="177" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">ML anomaly scoring</text>
   <text x="198" y="193" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Per-tenant RF models</text>
   <text x="198" y="208" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Graph collusion rings</text>
 
-  <!-- Pillar 3: Integrations -->
-  <text x="353" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#2dd4bf" letter-spacing="0.1em">INTEGRATIONS</text>
-  <text x="353" y="177" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">Azure AD · Workday</text>
+  <text x="353" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#8b5cf6" letter-spacing="0.1em">INTEGRATIONS</text>
+  <text x="353" y="177" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">Azure AD · HR/Payroll</text>
   <text x="353" y="193" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Microsoft Graph API</text>
   <text x="353" y="208" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Durable Functions</text>
 
-  <!-- Pillar 4: Architecture -->
-  <text x="508" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#2dd4bf" letter-spacing="0.1em">ARCHITECTURE</text>
+  <text x="508" y="159" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" fill="#8b5cf6" letter-spacing="0.1em">ARCHITECTURE</text>
   <text x="508" y="177" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="12" font-weight="600" fill="#e2e8f0">Multi-tenant SaaS</text>
   <text x="508" y="193" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Isolated tenants</text>
   <text x="508" y="208" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="10.5" fill="#64748b">Audit-ready, Azure</text>
 
   <!-- Bottom branding strip -->
   <rect x="0" y="244" width="680" height="21" fill="#07060d"/>
-  <text x="340" y="257" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="8.5" fill="#2d3748" text-anchor="middle" letter-spacing="0.15em">TERIAN SERVICES · TERIAN-SERVICES.COM</text>
+  <text x="340" y="257" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="8.5" fill="#2d3748" text-anchor="middle" letter-spacing="0.15em">TERIANIX.AI · ENTERPRISE SAAS</text>
 </svg>
