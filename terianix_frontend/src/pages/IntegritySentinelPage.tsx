@@ -168,7 +168,7 @@ export default function IntegritySentinelPage() {
         </div>
         <div className="overflow-hidden">
           <img
-            src="/terianix-is-banner.svg"
+            src="/terianix-is-banner.png"
             alt="Integrity Sentinel — AI-Powered Graph Intelligence for Risk, Trust & Integrity Analysis"
             className="w-full object-cover"
             style={{ maxHeight: "420px", objectPosition: "center 30%" }}
