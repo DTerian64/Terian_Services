@@ -1,0 +1,253 @@
+<svg width="100%" viewBox="0 0 900 360" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Integrity Sentinel — Terianix.ai platform overview</title>
+  <desc>Graph intelligence platform: entity nodes connected through a central integrity shield, with ML anomaly detection, risk scoring, and investigator workflow.</desc>
+
+  <!-- Background -->
+  <rect width="900" height="360" fill="#060510"/>
+  <!-- Top violet bar -->
+  <rect width="900" height="3" fill="#8b5cf6"/>
+
+  <!-- ── LEFT PANEL (0–192) ───────────────────────────────────────────────── -->
+  <rect x="0" y="3" width="192" height="342" fill="#0d0b1e"/>
+  <rect x="192" y="3" width="0.5" height="342" fill="#ffffff" fill-opacity="0.08"/>
+
+  <!-- Shield logo -->
+  <path d="M96,22 L114,29 L114,50 Q114,66 96,75 Q78,66 78,50 L78,29 Z"
+        fill="#8b5cf6" fill-opacity="0.12" stroke="#8b5cf6" stroke-width="1.5"/>
+  <!-- T -->
+  <rect x="88" y="36" width="16" height="2.5" rx="1" fill="#8b5cf6"/>
+  <rect x="93.5" y="38.5" width="5" height="13" rx="1" fill="#8b5cf6"/>
+  <!-- Checkmark -->
+  <polyline points="85,57 90,63 107,50" fill="none" stroke="#8b5cf6" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Sparkle -->
+  <path d="M118,18 L119.1,23.4 L124.5,24.5 L119.1,25.6 L118,31 L116.9,25.6 L111.5,24.5 L116.9,23.4 Z"
+        fill="#c4b5fd"/>
+
+  <!-- Brand name -->
+  <text x="96" y="93" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="15" font-weight="700" fill="#e2e8f0" text-anchor="middle">Terianix.ai</text>
+  <text x="96" y="107" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#475569" text-anchor="middle" letter-spacing="0.06em">by Terian Services</text>
+
+  <rect x="20" y="116" width="152" height="0.5" fill="#ffffff" fill-opacity="0.07"/>
+
+  <!-- Tagline -->
+  <text x="20" y="134" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="11" font-weight="600" fill="#c4b5fd">Turning Connected Data</text>
+  <text x="20" y="150" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="11" font-weight="600" fill="#c4b5fd">into Trust Intelligence.</text>
+
+  <text x="20" y="171" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#64748b">We help organisations discover hidden</text>
+  <text x="20" y="184" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#64748b">relationships, detect integrity risks,</text>
+  <text x="20" y="197" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#64748b">and protect what matters most.</text>
+
+  <!-- Bottom pillars -->
+  <rect x="20" y="260" width="152" height="0.5" fill="#ffffff" fill-opacity="0.07"/>
+
+  <text x="20" y="278" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#8b5cf6" letter-spacing="0.1em" font-weight="700">AZURE NATIVE</text>
+  <text x="20" y="290" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#64748b">Scalable. Secure. Reliable.</text>
+
+  <text x="20" y="308" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#8b5cf6" letter-spacing="0.1em" font-weight="700">AI / ML SOLUTIONS</text>
+  <text x="20" y="320" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#64748b">Intelligent. Responsible.</text>
+
+  <text x="108" y="278" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#8b5cf6" letter-spacing="0.1em" font-weight="700">SAAS PLATFORM</text>
+  <text x="108" y="290" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#64748b">Modern. Flexible.</text>
+
+  <text x="108" y="308" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#8b5cf6" letter-spacing="0.1em" font-weight="700">ENTERPRISE SECURITY</text>
+  <text x="108" y="320" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#64748b">Built for Trust.</text>
+
+  <!-- ── CENTRE GRAPH (193–658) ──────────────────────────────────────────── -->
+
+  <!-- Subtle centre glow -->
+  <ellipse cx="426" cy="172" rx="115" ry="95" fill="#8b5cf6" fill-opacity="0.04"/>
+
+  <!-- EDGES (drawn first, behind nodes) -->
+  <!-- Violet = trusted -->
+  <line x1="275" y1="117" x2="398" y2="158" stroke="#8b5cf6" stroke-opacity="0.55" stroke-width="0.9"/>
+  <line x1="582" y1="117" x2="455" y2="158" stroke="#8b5cf6" stroke-opacity="0.55" stroke-width="0.9"/>
+  <line x1="548" y1="257" x2="458" y2="200" stroke="#8b5cf6" stroke-opacity="0.5" stroke-width="0.9"/>
+  <!-- Gray = normal -->
+  <line x1="337" y1="82" x2="402" y2="150" stroke="#475569" stroke-opacity="0.6" stroke-width="0.9"/>
+  <line x1="514" y1="90" x2="453" y2="152" stroke="#475569" stroke-opacity="0.6" stroke-width="0.9"/>
+  <line x1="260" y1="217" x2="387" y2="185" stroke="#475569" stroke-opacity="0.5" stroke-width="0.9"/>
+  <!-- Red dashed = anomaly -->
+  <line x1="338" y1="262" x2="397" y2="200" stroke="#ef4444" stroke-opacity="0.65" stroke-width="0.9" stroke-dasharray="3,2"/>
+  <!-- Secondary cross-edges (faint) -->
+  <line x1="295" y1="112" x2="325" y2="84" stroke="#334155" stroke-width="0.6"/>
+  <line x1="522" y1="99" x2="570" y2="113" stroke="#334155" stroke-width="0.6"/>
+  <line x1="268" y1="221" x2="278" y2="117" stroke="#334155" stroke-width="0.6" stroke-dasharray="2,3"/>
+  <line x1="338" y1="262" x2="260" y2="219" stroke="#ef4444" stroke-opacity="0.3" stroke-width="0.6" stroke-dasharray="2,3"/>
+  <line x1="548" y1="258" x2="514" y2="97" stroke="#334155" stroke-width="0.6"/>
+
+  <!-- CENTRE NODE: integrity shield -->
+  <circle cx="426" cy="175" r="36" fill="#8b5cf6" fill-opacity="0.06"/>
+  <circle cx="426" cy="175" r="28" fill="#0e0c1c" stroke="#8b5cf6" stroke-opacity="0.65" stroke-width="1.2"/>
+  <!-- Mini shield -->
+  <path d="M426,156 L438,161 L438,172 Q438,183 426,189 Q414,183 414,172 L414,161 Z"
+        fill="#8b5cf6" fill-opacity="0.22" stroke="#a78bfa" stroke-width="1"/>
+  <!-- Graph dots inside shield -->
+  <circle cx="422" cy="168" r="2.2" fill="#c4b5fd"/>
+  <circle cx="431" cy="172" r="2.2" fill="#c4b5fd"/>
+  <circle cx="425" cy="180" r="2.2" fill="#c4b5fd"/>
+  <line x1="422" y1="168" x2="431" y2="172" stroke="#a78bfa" stroke-width="0.9"/>
+  <line x1="431" y1="172" x2="425" y2="180" stroke="#a78bfa" stroke-width="0.9"/>
+  <line x1="422" y1="168" x2="425" y2="180" stroke="#a78bfa" stroke-width="0.9"/>
+
+  <!-- PERIPHERAL NODES -->
+
+  <!-- Entities (top-left, violet) -->
+  <circle cx="265" cy="111" r="15" fill="#0e0c1c" stroke="#8b5cf6" stroke-opacity="0.5" stroke-width="0.9"/>
+  <circle cx="265" cy="107" r="3.5" fill="#a78bfa"/>
+  <path d="M257,119 Q265,115 273,119" fill="none" stroke="#a78bfa" stroke-width="1.2"/>
+  <text x="265" y="133" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">ENTITIES</text>
+
+  <!-- Data Sources (top-centre-left, gray) -->
+  <circle cx="333" cy="76" r="15" fill="#0e0c1c" stroke="#475569" stroke-opacity="0.55" stroke-width="0.9"/>
+  <ellipse cx="333" cy="72" rx="6" ry="2.5" fill="none" stroke="#94a3b8" stroke-width="0.9"/>
+  <rect x="327" y="72" width="12" height="7" fill="none" stroke="#94a3b8" stroke-width="0.9"/>
+  <ellipse cx="333" cy="79" rx="6" ry="2.5" fill="none" stroke="#94a3b8" stroke-width="0.9"/>
+  <text x="333" y="100" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">DATA SOURCES</text>
+
+  <!-- Systems (top-centre-right, gray) -->
+  <circle cx="515" cy="83" r="15" fill="#0e0c1c" stroke="#475569" stroke-opacity="0.55" stroke-width="0.9"/>
+  <rect x="508" y="76" width="5" height="5" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+  <rect x="515" y="76" width="5" height="5" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+  <rect x="508" y="83" width="5" height="5" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+  <rect x="515" y="83" width="5" height="5" fill="none" stroke="#94a3b8" stroke-width="0.8"/>
+  <text x="515" y="107" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">SYSTEMS</text>
+
+  <!-- AI/ML Analytics (top-right, violet) -->
+  <circle cx="581" cy="111" r="15" fill="#0e0c1c" stroke="#8b5cf6" stroke-opacity="0.5" stroke-width="0.9"/>
+  <path d="M575,108 Q578,103 581,106 Q584,103 587,108 Q588,114 581,117 Q574,114 575,108 Z"
+        fill="none" stroke="#a78bfa" stroke-width="1"/>
+  <text x="581" y="133" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">AI / ML ANALYTICS</text>
+
+  <!-- Relationships (left, gray) -->
+  <circle cx="254" cy="217" r="15" fill="#0e0c1c" stroke="#475569" stroke-opacity="0.55" stroke-width="0.9"/>
+  <rect x="248" y="209" width="11" height="14" rx="1" fill="none" stroke="#94a3b8" stroke-width="0.9"/>
+  <line x1="250" y1="213" x2="257" y2="213" stroke="#94a3b8" stroke-width="0.7"/>
+  <line x1="250" y1="217" x2="257" y2="217" stroke="#94a3b8" stroke-width="0.7"/>
+  <line x1="250" y1="221" x2="257" y2="221" stroke="#94a3b8" stroke-width="0.7"/>
+  <text x="254" y="241" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">RELATIONSHIPS</text>
+
+  <!-- Organisations (bottom-left, red = anomaly) -->
+  <circle cx="330" cy="263" r="15" fill="#0d0c1a" stroke="#ef4444" stroke-opacity="0.6" stroke-width="0.9"/>
+  <rect x="323" y="255" width="13" height="14" fill="none" stroke="#f87171" stroke-width="0.9"/>
+  <rect x="326.5" y="261" width="3" height="8" fill="#f87171" fill-opacity="0.4"/>
+  <!-- Warning badge -->
+  <circle cx="342" cy="252" r="4.5" fill="#ef4444"/>
+  <text x="342" y="254" font-family="Arial,sans-serif" font-size="6" font-weight="bold"
+        fill="#fff" text-anchor="middle">!</text>
+  <text x="330" y="287" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">ORGANISATIONS</text>
+
+  <!-- Security Controls (bottom-right, violet) -->
+  <circle cx="547" cy="258" r="15" fill="#0e0c1c" stroke="#8b5cf6" stroke-opacity="0.5" stroke-width="0.9"/>
+  <path d="M547,248 L555,252 L555,260 Q555,268 547,271 Q539,268 539,260 L539,252 Z"
+        fill="#8b5cf6" fill-opacity="0.2" stroke="#a78bfa" stroke-width="1"/>
+  <text x="547" y="282" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#64748b" text-anchor="middle">SECURITY CONTROLS</text>
+
+  <!-- LEGEND -->
+  <line x1="210" y1="313" x2="234" y2="313" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="239" y="316.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8" fill="#64748b">Trusted Relationships</text>
+
+  <line x1="332" y1="313" x2="356" y2="313" stroke="#475569" stroke-width="1.5"/>
+  <text x="361" y="316.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8" fill="#64748b">Normal Behaviour</text>
+
+  <line x1="450" y1="313" x2="474" y2="313" stroke="#ef4444" stroke-opacity="0.75" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="479" y="316.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8" fill="#64748b">Anomalies / Risk Detected</text>
+
+  <!-- ── RIGHT PANEL (659–900) ──────────────────────────────────────────── -->
+  <rect x="658.5" y="3" width="0.5" height="342" fill="#ffffff" fill-opacity="0.08"/>
+
+  <!-- Product name -->
+  <text x="672" y="52" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="27" font-weight="800" fill="#8b5cf6" letter-spacing="-0.3px">INTEGRITY</text>
+  <text x="672" y="83" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="27" font-weight="800" fill="#8b5cf6" letter-spacing="-0.3px">SENTINEL</text>
+
+  <text x="672" y="105" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#94a3b8">AI-Powered Graph Intelligence for</text>
+  <text x="672" y="119" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#94a3b8">Risk, Trust &amp; Integrity Analysis</text>
+
+  <!-- Early access badge -->
+  <rect x="672" y="129" width="78" height="16" rx="8"
+        fill="#0d0b1e" stroke="#8b5cf6" stroke-opacity="0.45" stroke-width="0.8"/>
+  <text x="711" y="140.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#a78bfa" text-anchor="middle" letter-spacing="0.05em">EARLY ACCESS</text>
+
+  <rect x="672" y="157" width="212" height="0.5" fill="#ffffff" fill-opacity="0.07"/>
+
+  <!-- Capability bullets -->
+  <circle cx="679" cy="172" r="2.5" fill="#8b5cf6"/>
+  <text x="688" y="176" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#e2e8f0">Graph-based entity relationship mapping</text>
+
+  <circle cx="679" cy="192" r="2.5" fill="#8b5cf6"/>
+  <text x="688" y="196" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#e2e8f0">ML anomaly &amp; collusion detection</text>
+
+  <circle cx="679" cy="212" r="2.5" fill="#8b5cf6"/>
+  <text x="688" y="216" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#e2e8f0">Risk scoring with explainability</text>
+
+  <circle cx="679" cy="232" r="2.5" fill="#8b5cf6"/>
+  <text x="688" y="236" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#e2e8f0">Transactions, vendors, expenses, HR</text>
+
+  <circle cx="679" cy="252" r="2.5" fill="#8b5cf6"/>
+  <text x="688" y="256" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="9.5" fill="#e2e8f0">Full audit trail + investigator workflow</text>
+
+  <!-- Connectors -->
+  <rect x="672" y="270" width="212" height="0.5" fill="#ffffff" fill-opacity="0.07"/>
+  <text x="672" y="287" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="7.5" fill="#475569" letter-spacing="0.1em">CONNECTORS</text>
+
+  <rect x="672" y="295" width="46" height="16" rx="8"
+        fill="#0d0c1a" stroke="#3b82f6" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="695" y="306.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#93c5fd" text-anchor="middle">Workday</text>
+
+  <rect x="724" y="295" width="40" height="16" rx="8"
+        fill="#0d0c1a" stroke="#8b5cf6" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="744" y="306.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#c4b5fd" text-anchor="middle">NetSuite</text>
+
+  <rect x="770" y="295" width="30" height="16" rx="8"
+        fill="#0d0c1a" stroke="#a78bfa" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="785" y="306.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#c4b5fd" text-anchor="middle">SAP</text>
+
+  <rect x="806" y="295" width="56" height="16" rx="8"
+        fill="#0d0c1a" stroke="#8b5cf6" stroke-opacity="0.4" stroke-width="0.5"/>
+  <text x="834" y="306.5" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#c4b5fd" text-anchor="middle">CSV / API</text>
+
+  <!-- ── BOTTOM BRANDING STRIP ───────────────────────────────────────────── -->
+  <rect x="0" y="345" width="900" height="15" fill="#07060d"/>
+  <text x="450" y="356" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif"
+        font-size="8.5" fill="#2d3748" text-anchor="middle" letter-spacing="0.15em">TERIANIX.AI · ENTERPRISE SAAS</text>
+</svg>
