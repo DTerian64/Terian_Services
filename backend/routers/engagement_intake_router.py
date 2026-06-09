@@ -67,7 +67,7 @@ _QUEUE_NAME     = os.getenv("ENGAGEMENT_INTAKE_QUEUE_NAME", "engagement-intake")
 _SMTP_USER     = os.getenv("SMTP_USER", "")
 _SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 _NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", "sales@terian-services.com")
-_FROM_NAME     = "Terian Services"
+_FROM_NAME     = "Terianix.ai"
 _SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 
@@ -205,12 +205,12 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);
+          <td style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
                      padding:32px 40px;">
             <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;
                        letter-spacing:-0.3px;">New Engagement Request</h1>
-            <p style="margin:6px 0 0;color:#99f6e4;font-size:13px;">
-              terian-services.com
+            <p style="margin:6px 0 0;color:#c4b5fd;font-size:13px;">
+              terianix.ai
             </p>
           </td>
         </tr>
@@ -252,7 +252,7 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
               </tr>
               <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
                 <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Engagement</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#0d9488;">{body.engagement_type}</td>
+                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#8b5cf6;">{body.engagement_type}</td>
               </tr>
               <tr style="border-top:1px solid #e5e7eb;">
                 <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Tier Interest</td>
@@ -260,7 +260,7 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
               </tr>
             </table>
 
-            {"<p style='margin:0 0 8px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;'>Use Case</p><div style='background:#f9fafb;border:1px solid #e5e7eb;border-left:4px solid #0d9488;border-radius:6px;padding:16px;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;'>" + body.use_case + "</div>" if body.use_case else ""}
+            {"<p style='margin:0 0 8px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;'>Use Case</p><div style='background:#f9fafb;border:1px solid #e5e7eb;border-left:4px solid #8b5cf6;border-radius:6px;padding:16px;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;'>" + body.use_case + "</div>" if body.use_case else ""}
 
             <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;">
               Account ID: {account_id}<br>
@@ -274,7 +274,7 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
           <td style="padding:16px 40px;border-top:1px solid #e5e7eb;
                      background:#f9fafb;text-align:center;">
             <p style="margin:0;font-size:12px;color:#9ca3af;">
-              Terian Services · terian-services.com
+              Terianix.ai · terianix.ai
             </p>
           </td>
         </tr>
@@ -294,7 +294,7 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
     # ── Message 2: requester welcome ──────────────────────────────────────────
 
     first_name = body.full_name.split()[0]
-    welcome_subject = "Welcome to Terian Services — we've received your request"
+    welcome_subject = "Welcome to Terianix.ai — we've received your request"
     welcome_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -311,12 +311,12 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
 
         <!-- Header -->
         <tr>
-          <td style="background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);
+          <td style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
                      padding:32px 40px;">
             <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;
-                       letter-spacing:-0.3px;">Welcome to Terian Services</h1>
-            <p style="margin:6px 0 0;color:#99f6e4;font-size:13px;">
-              terian-services.com
+                       letter-spacing:-0.3px;">Welcome to Terianix.ai</h1>
+            <p style="margin:6px 0 0;color:#c4b5fd;font-size:13px;">
+              terianix.ai
             </p>
           </td>
         </tr>
@@ -346,7 +346,7 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
               </tr>
               <tr style="border-top:1px solid #e5e7eb;">
                 <td style="padding:10px 16px;color:#6b7280;font-size:13px;width:140px;">Engagement</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#0d9488;">{body.engagement_type}</td>
+                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#8b5cf6;">{body.engagement_type}</td>
               </tr>
               <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
                 <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Tier</td>
@@ -363,20 +363,20 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
             </table>
 
             <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              We're preparing a personalised overview of how Terian Services can address your
+              We're preparing a personalised overview of how Terianix.ai can address your
               needs. You'll receive it via a follow-up email shortly — keep an eye on your inbox.
             </p>
 
             <p style="margin:0 0 8px;font-size:15px;color:#374151;line-height:1.6;">
               In the meantime, feel free to reach us at
               <a href="mailto:sales@terian-services.com"
-                 style="color:#0d9488;text-decoration:none;">sales@terian-services.com</a>
+                 style="color:#8b5cf6;text-decoration:none;">sales@terian-services.com</a>
               with any questions.
             </p>
 
             <p style="margin:28px 0 0;font-size:15px;color:#374151;line-height:1.6;">
               Warm regards,<br>
-              <strong style="color:#111827;">The Terian Services Team</strong>
+              <strong style="color:#111827;">The Terianix.ai Team</strong>
             </p>
 
             <p style="margin:24px 0 0;font-size:11px;color:#d1d5db;">
@@ -390,7 +390,7 @@ def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engageme
           <td style="padding:16px 40px;border-top:1px solid #e5e7eb;
                      background:#f9fafb;text-align:center;">
             <p style="margin:0;font-size:12px;color:#9ca3af;">
-              Terian Services · terian-services.com
+              Terianix.ai · terianix.ai
             </p>
           </td>
         </tr>
