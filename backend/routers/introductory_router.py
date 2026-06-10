@@ -314,7 +314,7 @@ async def introductory_presentation_deck(service_id: str, body: PresentationDeck
     # "Acme Corp, LLC" -> "Acme" rather than "Acme-Corp-LLC" / "Acme_Corp_LLC".
     display_name = normalize_org_name(org_name)
     org_slug = re.sub(r"[^A-Za-z0-9]+", "_", display_name).strip("_") or "Organisation"
-    filename = f"Terian_{org_slug}_{label}.pptx"
+    filename = f"{org_slug}_{label}.pptx"
 
     # Mirrors the subdomain slug derived in
     # presentation_agent.generate_award_onboarding() — the stable path the
