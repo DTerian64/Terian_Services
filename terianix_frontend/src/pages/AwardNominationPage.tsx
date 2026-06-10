@@ -3,7 +3,7 @@ import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 import AwardMetrics from "../components/AwardMetrics";
 
-const DEMO_REQUEST_URL = "https://demo-awards.terian-services.com/demo/request";
+const DEMO_REQUEST_URL = "https://demo-awards.terianix.ai/demo/request";
 
 function ArchitectureModal({ onClose }: { onClose: () => void }) {
   useEffect(() => {

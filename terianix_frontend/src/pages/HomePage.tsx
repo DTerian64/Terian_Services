@@ -63,9 +63,9 @@ export default function HomePage() {
       <section id="products" className="border-b border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
-            eyebrow="Products"
-            title="Here are our SaaS products — try them"
-            description="Production software grounded in real enterprise constraints — Azure AD native, audit-ready, and AI-assisted from the inside out."
+            eyebrow="Multi-tenant · Multi-lingual · ML-native"
+            title="Enterprise SaaS with intelligence baked into every layer."
+            description="Terianix.ai builds multi-tenant, multi-lingual SaaS applications where the ML layer and AI analytics aren't add-ons — they're in the product's DNA. Every workflow we ship surfaces patterns, flags anomalies, and routes exceptions to the right human before damage is done. Built on Azure. Isolated by design. Auditable by default."
           />
 
           <div className="mt-12 grid gap-6 md:grid-cols-2">
