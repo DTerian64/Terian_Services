@@ -334,8 +334,9 @@ class PresentationAgent(AskAgent):
 
         Template: award_nomination_onboarding.pptx
         Tokens substituted:
-          {{CLIENT_NAME}}       — org_name from job payload
-          {{CLIENT_SUBDOMAIN}}  — URL-safe slug derived from org_name
+          {{CLIENT_NAME}}       — org_name from job payload, full name as typed
+          {{CLIENT_SUBDOMAIN}}  — URL-safe slug derived from the trimmed org name
+                                   (legal-entity suffixes like Inc./LLC stripped)
           {{PRESENTATION_DATE}} — current month + year (e.g. "May 2026")
 
         job keys used: org_name, engagement_id (optional).
@@ -347,15 +348,16 @@ class PresentationAgent(AskAgent):
         org_name = (job.get("org_name") or "").strip()
 
         # Strip trailing legal-entity suffixes (Inc., LLC, Ltd, Corp, ...) before
-        # deriving the slug/display name, so "Acme Corp, LLC" -> "Acme" rather
-        # than "Acme-Corp-Llc".
+        # deriving the subdomain slug, so "Acme Corp, LLC" -> "Acme" rather than
+        # "Acme-Corp-Llc". CLIENT_NAME keeps the full name as typed — only the
+        # slug/subdomain (and downstream filenames) use the trimmed name.
         display_name = normalize_org_name(org_name)
 
         # Derive a URL-safe subdomain slug: lowercase, spaces/special chars → hyphens
         subdomain = re.sub(r"[^a-z0-9]+", "-", display_name.lower()).strip("-") or "your-company"
 
         tokens = {
-            "CLIENT_NAME":       display_name or "Your Organisation",
+            "CLIENT_NAME":       org_name or "Your Organisation",
             "CLIENT_SUBDOMAIN":  subdomain,
             "PRESENTATION_DATE": datetime.now(timezone.utc).strftime("%B %Y"),
         }
