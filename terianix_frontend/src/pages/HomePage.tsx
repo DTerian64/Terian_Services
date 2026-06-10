@@ -1,7 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PageLayout from "../components/PageLayout";
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+
+const AWARD_DEMO_REQUEST_URL = "https://demo-awards.terianix.ai/demo/request";
+const AWARD_ONBOARDING_DECK_URL =
+  "https://stterianservices.blob.core.windows.net/blob-templates/award_nomination_onboarding_template.pptx";
+const INTEGRITY_DISCUSS_HREF =
+  "mailto:sales@terian-services.com?subject=Integrity%20Sentinel%20discussion";
 
 /** Fire-and-forget: wake CosmosDB before the user navigates to a page that needs it. */
 function useApiWarmup() {
@@ -14,6 +20,7 @@ function useApiWarmup() {
 
 export default function HomePage() {
   useApiWarmup();
+  const [previewOpen, setPreviewOpen] = useState(false);
   return (
     <PageLayout>
       {/* Hero */}
@@ -44,16 +51,10 @@ export default function HomePage() {
 
           <div className="mt-10 flex flex-wrap gap-3">
             <a
-              href="/products"
+              href="/contact"
               className="inline-flex items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400"
             >
-              Explore Products →
-            </a>
-            <a
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-md border border-white/20 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:border-violet-300 hover:text-violet-300"
-            >
-              Request a Demo
+              Contact us →
             </a>
           </div>
         </div>
@@ -74,7 +75,7 @@ export default function HomePage() {
               title="Award Nomination System"
               description="Streamlined peer recognition and manager-led award workflows with full audit trail, approval chains, real-time dashboards, and an ML layer that flags bias, collusion, and anomalous nomination patterns. Native integrations with Azure AD and Workday."
               href="/products/award-nomination"
-              ctaLabel="Try it now"
+              ctaLabel="Explore product"
               accent="violet"
             />
             <ProductCard
@@ -82,7 +83,7 @@ export default function HomePage() {
               title="Integrity Sentinel"
               description="Productized fraud-detection SaaS — multi-tenant, configurable rule engine plus ML models for transactions, vendor master, and expense data. Get notified when we open the pilot."
               href="/products/integrity-sentinel"
-              ctaLabel="Get notified"
+              ctaLabel="Explore product"
               accent="indigo"
             />
           </div>
@@ -93,8 +94,8 @@ export default function HomePage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
-            eyebrow="Why Terianix"
-            title="Enterprise instincts, SaaS delivery"
+            eyebrow="Why Terianix.ai"
+            title="Built like enterprise software. Delivered like SaaS."
           />
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -103,39 +104,159 @@ export default function HomePage() {
               description="Built on Azure AD, Microsoft Graph, and the Microsoft data stack — adoption is friction-free across your tenant with no identity bridge required."
             />
             <ValueCard
-              title="Audit-ready"
-              description="Every action, approval, and model decision is logged. Compliance reports run in seconds, not days. No after-the-fact reconstruction."
+              title="AI/ML-empowered"
+              description="AI analytics, integrity, and fraud detection are what we build. ML models run on every transaction and workflow, surfacing risk before it costs you."
             />
             <ValueCard
-              title="AI-assisted"
-              description="ML layers surface anomalies, flag risk, and accelerate workflows — without replacing human judgment or obscuring the reasoning."
+              title="Transparent by design"
+              description="Observability and traceability are built into every business workflow — every action, approval, and ML decision is visible in real time."
             />
           </div>
         </div>
       </section>
 
-      {/* CTA strip */}
-      <section className="bg-[#0f0d18] text-white">
-        <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-6 py-14 lg:flex-row lg:items-center lg:px-10">
-          <div>
-            <h2 className="text-2xl font-bold md:text-3xl">Ready to see it in action?</h2>
-            <p className="mt-2 text-white/70">
-              30 minutes, no slides. We'll walk you through the product live.
-            </p>
+      {/* See it in action */}
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
+            See it in action
+          </p>
+
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Award Nomination System
+          </h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <CtaRow
+              title="Demo SaaS tenant"
+              description="Request and join a Demo Inc. company to try all the product functionality."
+              label="Join Demo Inc."
+              href={AWARD_DEMO_REQUEST_URL}
+              target="_blank"
+              rel="noreferrer"
+            />
+            <CtaRow
+              title="Product Presentation"
+              description="A walkthrough of the platform, workflow, and integrations — ready to share internally."
+              label="Download presentation"
+              href={AWARD_ONBOARDING_DECK_URL}
+              download
+            />
+            <CtaRow
+              title="Contact for live demo"
+              description="30 minutes, no slides — we'll walk you through the product live."
+              label="Book a live demo"
+              href="/contact"
+            />
           </div>
-          <a
-            href="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400"
-          >
-            Book a demo →
-          </a>
+
+          <h2 className="mt-16 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Integrity Sentinel
+          </h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <CtaRow
+              title="Admin Config mockup"
+              description="Preview the Admin Configuration Workflow — see how tenants set up integrity rules and monitoring."
+              label="Preview Admin UI"
+              onClick={() => setPreviewOpen(true)}
+            />
+            <CtaRow
+              title="Ask any questions"
+              description="Talk through the platform, your use cases, and pilot timing with our team."
+              label="Discuss the platform"
+              href={INTEGRITY_DISCUSS_HREF}
+            />
+            <CtaRow
+              title="Register for updates"
+              description="Be the first to know when the pilot opens."
+              label="Get notified"
+              href="/contact"
+            />
+          </div>
         </div>
       </section>
+
+      {/* Admin UI preview modal */}
+      {previewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setPreviewOpen(false)}
+        >
+          <div
+            className="relative flex w-full max-w-6xl flex-col overflow-hidden rounded-xl shadow-2xl"
+            style={{ height: "88vh" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 bg-[#0f0d18] px-5 py-3">
+              <span className="text-sm font-semibold text-slate-300">
+                Integrity Sentinel — Admin Configuration Workflow
+              </span>
+              <button
+                type="button"
+                onClick={() => setPreviewOpen(false)}
+                aria-label="Close preview"
+                className="text-slate-400 transition hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <iframe
+              src="/mockups/integrity-sentinel/admin_configuration_workflow/index.html"
+              title="Integrity Sentinel Admin UI Preview"
+              className="w-full flex-1 bg-white"
+            />
+          </div>
+        </div>
+      )}
     </PageLayout>
   );
 }
 
 // ── Reusable building blocks ─────────────────────────────────────────────────
+
+function CtaRow({
+  title,
+  description,
+  label,
+  href,
+  target,
+  rel,
+  download,
+  onClick,
+}: {
+  title?: string;
+  description: string;
+  label: string;
+  href?: string;
+  target?: string;
+  rel?: string;
+  download?: boolean;
+  onClick?: () => void;
+}) {
+  const cardClass =
+    "group flex h-full flex-col justify-between gap-6 rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 transition hover:border-violet-400";
+  const labelClass =
+    "text-sm font-semibold text-violet-400 transition group-hover:text-violet-300";
+
+  const content = (
+    <>
+      <div>
+        {title ? <h3 className="text-lg font-bold text-slate-100">{title}</h3> : null}
+        <p className={`text-sm leading-7 text-slate-300 ${title ? "mt-2" : ""}`}>{description}</p>
+      </div>
+      <span className={labelClass}>{label} →</span>
+    </>
+  );
+
+  return href ? (
+    <a href={href} target={target} rel={rel} download={download} className={cardClass}>
+      {content}
+    </a>
+  ) : (
+    <button type="button" onClick={onClick} className={`${cardClass} text-left`}>
+      {content}
+    </button>
+  );
+}
 
 function SectionHeading({
   eyebrow,

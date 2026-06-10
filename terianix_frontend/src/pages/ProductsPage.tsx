@@ -9,7 +9,7 @@ const PRODUCTS = [
     description:
       "Streamlined peer recognition and manager-led award workflows with full audit trail, approval chains, real-time dashboards, and an ML layer that flags bias, collusion, and anomalous nomination patterns. Native integrations with Azure AD and Workday.",
     href: "/products/award-nomination",
-    cta: "See the product",
+    cta: "Explore product",
   },
   {
     tag: "Coming Soon",
@@ -18,7 +18,7 @@ const PRODUCTS = [
     description:
       "Productized fraud-detection SaaS — multi-tenant, configurable rule engine plus ML models for transactions, vendor master, and expense data. Pilot opening in 2026.",
     href: "/products/integrity-sentinel",
-    cta: "Get notified",
+    cta: "Explore product",
   },
 ];
 

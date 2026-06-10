@@ -113,8 +113,9 @@ export default function ContactPage() {
                 <span className="font-semibold">West US 2</span>.
               </p>
               <p className="mt-2">
-                For services engagements we typically work inside your Azure
-                tenant, under MSA &amp; DPA.
+                Each customer gets a fully isolated tenant — your data never
+                touches another customer's environment. Azure AD SSO and B2B
+                guest access work from day one.
               </p>
             </div>
           </div>
