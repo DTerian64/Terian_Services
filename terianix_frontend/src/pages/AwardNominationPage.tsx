@@ -103,14 +103,194 @@ function WorkflowModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function WorkflowNotificationsDrawer({ onClose }: { onClose: () => void }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onClose, 300);
+  };
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+      onClick={handleClose}
+    >
+      <div
+        className={`relative flex h-full w-full max-w-2xl flex-col bg-[#0d0b1e] shadow-2xl ring-1 ring-white/10 transition-transform duration-300 ease-in-out ${visible ? "translate-x-0" : "translate-x-full"}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
+              Workflow Notifications
+            </p>
+            <p className="mt-0.5 text-sm text-slate-400">Email samples — sandbox data</p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+            aria-label="Close workflow notifications preview"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <img
+            src="/awards-nomination-workflow-notification.png"
+            alt="Workflow notifications — email samples from live sandbox"
+            className="w-full rounded-lg"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AuditLogDrawer({ onClose }: { onClose: () => void }) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onClose, 300);
+  };
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+      onClick={handleClose}
+    >
+      <div
+        className={`relative flex h-full w-full max-w-2xl flex-col bg-[#0d0b1e] shadow-2xl ring-1 ring-white/10 transition-transform duration-300 ease-in-out ${visible ? "translate-x-0" : "translate-x-full"}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
+              Full Audit Trail
+            </p>
+            <p className="mt-0.5 text-sm text-slate-400">Nomination log — sample sandbox data</p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+            aria-label="Close audit log preview"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <img
+            src="/awards-nomination-log-analytics.png"
+            alt="Full audit trail — nomination log screenshot from live sandbox"
+            className="w-full rounded-lg"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsDrawer({ onClose }: { onClose: () => void }) {
+  const [visible, setVisible] = useState(false);
+
+  // Trigger enter animation on the frame after mount
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onClose, 300);
+  };
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+      onClick={handleClose}
+    >
+      <div
+        className={`relative flex h-full w-full max-w-2xl flex-col bg-[#0d0b1e] shadow-2xl ring-1 ring-white/10 transition-transform duration-300 ease-in-out ${visible ? "translate-x-0" : "translate-x-full"}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
+              Analytics &amp; Reporting
+            </p>
+            <p className="mt-0.5 text-sm text-slate-400">Overview — sample sandbox data</p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+            aria-label="Close analytics preview"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        {/* Scrollable image */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <img
+            src="/sandbox-awards.terianix.ai_analytics.png"
+            alt="Analytics & Reporting — Overview screenshot from live sandbox"
+            className="w-full rounded-lg"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AwardNominationPage() {
   const [archOpen, setArchOpen] = useState(false);
   const [workflowOpen, setWorkflowOpen] = useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   return (
     <PageLayout>
       {archOpen && <ArchitectureModal onClose={() => setArchOpen(false)} />}
       {workflowOpen && <WorkflowModal onClose={() => setWorkflowOpen(false)} />}
+      {analyticsOpen && <AnalyticsDrawer onClose={() => setAnalyticsOpen(false)} />}
+      {auditOpen && <AuditLogDrawer onClose={() => setAuditOpen(false)} />}
+      {notificationsOpen && <WorkflowNotificationsDrawer onClose={() => setNotificationsOpen(false)} />}
       <PageHero
         eyebrow="Product · ML/AI Integrity-enforced"
         title="Award Nomination System"
@@ -159,10 +339,21 @@ export default function AwardNominationPage() {
           <Feature
             title="Full audit trail"
             description="Every state change, comment, and approver decision is captured. Exportable for audit and compliance."
+            onSample={() => setAuditOpen(true)}
+          />
+          <Feature
+            title="Workflow Notifications"
+            description="Automated emails at every stage: nomination submitted, approval requested, fraud flag routed to HRBP, award approved, payout confirmed. Every stakeholder stays informed without manual follow-up."
+            onSample={() => setNotificationsOpen(true)}
+          />
+          <Feature
+            title="Analytics & Reporting"
+            description="Nomination pipeline by status, category, and business unit. Recognition equity trends and manager-level breakdowns — exportable data for HR leadership and audit."
+            onSample={() => setAnalyticsOpen(true)}
           />
           <Feature
             title="Real-time dashboards"
-            description="Pipeline view by status, category, business unit. Org-level recognition equity and trend reporting."
+            description="Live platform telemetry: API requests, failure rate, P95 latency, active users, and compute health — refreshed every 5 minutes from the live sandbox."
             href="#live-metrics"
           />
           <Feature
@@ -288,11 +479,13 @@ function Feature({
   title,
   description,
   href,
+  onSample,
   onDetail,
 }: {
   title: string;
   description: string;
   href?: string;
+  onSample?: () => void;
   onDetail?: () => void;
 }) {
   const inner = (
@@ -301,6 +494,15 @@ function Feature({
       <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
       {href && (
         <p className="mt-3 text-xs font-semibold text-violet-400">View live →</p>
+      )}
+      {onSample && (
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSample(); }}
+          className="mt-3 text-xs font-semibold text-violet-400 transition hover:text-violet-300"
+        >
+          View sample →
+        </button>
       )}
       {onDetail && (
         <button

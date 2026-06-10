@@ -170,8 +170,8 @@ export default function IntegritySentinelPage() {
           <img
             src="/terianix-is-banner.png"
             alt="Integrity Sentinel — AI-Powered Graph Intelligence for Risk, Trust & Integrity Analysis"
-            className="w-full object-cover"
-            style={{ maxHeight: "420px", objectPosition: "center 30%" }}
+            className="w-full"
+            style={{ display: "block", height: "auto" }}
           />
         </div>
       </section>
@@ -181,7 +181,7 @@ export default function IntegritySentinelPage() {
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Strategic positioning</p>
             <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-              Not a SIEM. Not a dashboard. An integrity intelligence system.
+              Graph intelligence that surfaces hidden risk across every system where work happens.
             </h2>
           </div>
           <div className="space-y-5 text-base leading-8 text-slate-300">
