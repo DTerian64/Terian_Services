@@ -1,9 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 import AwardMetrics from "../components/AwardMetrics";
 
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
+
 const DEMO_REQUEST_URL = "https://demo-awards.terianix.ai/demo/request";
+const PRESENTATION_DECK_URL = `${API_BASE}/api/introductory/award-nomination/presentation-deck`;
+
+// Mirrors backend/agents/presentation_agent.py's normalize_org_name(): strips a
+// trailing legal-entity suffix (Inc., LLC, Ltd, Corp, ...) so "Acme Corp, LLC"
+// produces a filename based on "Acme" rather than "Acme_Corp_LLC".
+const LEGAL_SUFFIX_RE =
+  /[\s,]+(?:incorporated|inc|llc|l\.l\.c|ltd|limited|corp|corporation|co|company|plc|llp|lp|gmbh|pte\.?\s*ltd|pty\.?\s*ltd|s\.a|ag|bv|nv)\.?\s*$/i;
+
+function normalizeOrgName(orgName: string): string {
+  let name = orgName.trim();
+  while (true) {
+    const stripped = name.replace(LEGAL_SUFFIX_RE, "").trim();
+    if (stripped === name || !stripped) break;
+    name = stripped;
+  }
+  return name || orgName.trim();
+}
 
 function ArchitectureModal({ onClose }: { onClose: () => void }) {
   useEffect(() => {
@@ -283,6 +302,51 @@ export default function AwardNominationPage() {
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [deckModalOpen, setDeckModalOpen] = useState(false);
+  const [orgName, setOrgName] = useState("");
+  const [deckLoading, setDeckLoading] = useState(false);
+  const [deckError, setDeckError] = useState<string | null>(null);
+
+  function closeDeckModal() {
+    if (deckLoading) return;
+    setDeckModalOpen(false);
+    setOrgName("");
+    setDeckError(null);
+  }
+
+  async function handleDownloadDeck(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = orgName.trim();
+    if (!trimmed) {
+      setDeckError("Please enter your organization name.");
+      return;
+    }
+    setDeckLoading(true);
+    setDeckError(null);
+    try {
+      const res = await fetch(PRESENTATION_DECK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ org_name: trimmed }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${normalizeOrgName(trimmed).replace(/[^A-Za-z0-9]+/g, "_")}_Award_Nomination_Overview.pptx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setDeckModalOpen(false);
+      setOrgName("");
+    } catch {
+      setDeckError("Could not generate the presentation. Please try again, or email sales@terian-services.com.");
+    } finally {
+      setDeckLoading(false);
+    }
+  }
 
   return (
     <PageLayout>
@@ -295,8 +359,9 @@ export default function AwardNominationPage() {
         eyebrow="Product · ML/AI Integrity-enforced"
         title="Award Nomination System"
         description="Peer-to-peer and manager-led recognition with ML/AI integrity enforcement baked in — bias detection and collusion surfacing run on every nomination, flagged cases are routed through human-in-the-loop HRBP review, then manager approval, before awards drop directly into your HR or payroll system."
-        primaryCta={{ label: "Request a demo", href: DEMO_REQUEST_URL, target: "_blank", rel: "noreferrer" }}
-        secondaryCta={{ label: "Talk to engineering", href: "mailto:sales@terian-services.com" }}
+        primaryCta={{ label: "Join Demo Inc.", href: DEMO_REQUEST_URL, target: "_blank", rel: "noreferrer" }}
+        secondaryCta={{ label: "Product presentation →", onClick: () => setDeckModalOpen(true) }}
+        tertiaryCta={{ label: "Book live demo →", href: "/contact" }}
       />
 
       {/* ── Platform banner ── */}
@@ -471,9 +536,64 @@ export default function AwardNominationPage() {
           </a>
         </div>
       </section>
+
+      {/* Download presentation modal */}
+      {deckModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={closeDeckModal}
+        >
+          <div
+            className="relative w-full max-w-md rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-100">Download presentation</h3>
+              <button
+                type="button"
+                onClick={closeDeckModal}
+                aria-label="Close"
+                className="text-slate-400 transition hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mt-2 text-sm leading-7 text-slate-300">
+              We'll personalize the Award Nomination System overview deck for your organization.
+            </p>
+            <form onSubmit={handleDownloadDeck} className="mt-5">
+              <label htmlFor="org-name" className="block text-xs font-semibold uppercase tracking-wider text-violet-400">
+                Organization name
+              </label>
+              <input
+                id="org-name"
+                type="text"
+                required
+                autoFocus
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                placeholder="e.g. Acme Corp"
+                className="mt-2 w-full rounded-md border-2 border-white/10 bg-transparent px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-violet-400"
+              />
+              {deckError ? (
+                <p className="mt-2 text-sm text-red-400">{deckError}</p>
+              ) : null}
+              <button
+                type="submit"
+                disabled={deckLoading}
+                className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deckLoading ? "Preparing your deck…" : "Download presentation →"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </PageLayout>
   );
 }
+
+// ── Reusable building blocks ─────────────────────────────────────────────────
 
 function Feature({
   title,

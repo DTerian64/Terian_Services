@@ -1,10 +1,47 @@
+type HeroCta = {
+  label: string;
+  href?: string;
+  target?: string;
+  rel?: string;
+  onClick?: () => void;
+};
+
 type PageHeroProps = {
   eyebrow: string;
   title: React.ReactNode;
   description?: React.ReactNode;
-  primaryCta?: { label: string; href: string; target?: string; rel?: string };
-  secondaryCta?: { label: string; href: string; target?: string; rel?: string };
+  primaryCta?: HeroCta;
+  secondaryCta?: HeroCta;
+  tertiaryCta?: HeroCta;
 };
+
+function PrimaryHeroCta({ cta }: { cta: HeroCta }) {
+  const className =
+    "inline-flex items-center justify-center rounded-md bg-violet-500 px-6 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-violet-400";
+  return cta.href ? (
+    <a href={cta.href} target={cta.target} rel={cta.rel} className={className}>
+      {cta.label} →
+    </a>
+  ) : (
+    <button type="button" onClick={cta.onClick} className={className}>
+      {cta.label} →
+    </button>
+  );
+}
+
+function SecondaryHeroCta({ cta }: { cta: HeroCta }) {
+  const className =
+    "inline-flex items-center justify-center rounded-md border border-white/20 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:border-violet-300 hover:text-violet-300";
+  return cta.href ? (
+    <a href={cta.href} target={cta.target} rel={cta.rel} className={className}>
+      {cta.label}
+    </a>
+  ) : (
+    <button type="button" onClick={cta.onClick} className={className}>
+      {cta.label}
+    </button>
+  );
+}
 
 export default function PageHero({
   eyebrow,
@@ -12,6 +49,7 @@ export default function PageHero({
   description,
   primaryCta,
   secondaryCta,
+  tertiaryCta,
 }: PageHeroProps) {
   return (
     <section className="bg-[#0f0d18] text-white">
@@ -21,28 +59,11 @@ export default function PageHero({
         {description ? (
           <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">{description}</p>
         ) : null}
-        {(primaryCta || secondaryCta) && (
+        {(primaryCta || secondaryCta || tertiaryCta) && (
           <div className="mt-10 flex flex-wrap gap-3">
-            {primaryCta ? (
-              <a
-                href={primaryCta.href}
-                target={primaryCta.target}
-                rel={primaryCta.rel}
-                className="inline-flex items-center justify-center rounded-md bg-violet-500 px-6 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-violet-400"
-              >
-                {primaryCta.label} →
-              </a>
-            ) : null}
-            {secondaryCta ? (
-              <a
-                href={secondaryCta.href}
-                target={secondaryCta.target}
-                rel={secondaryCta.rel}
-                className="inline-flex items-center justify-center rounded-md border border-white/20 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:border-violet-300 hover:text-violet-300"
-              >
-                {secondaryCta.label}
-              </a>
-            ) : null}
+            {primaryCta ? <PrimaryHeroCta cta={primaryCta} /> : null}
+            {secondaryCta ? <SecondaryHeroCta cta={secondaryCta} /> : null}
+            {tertiaryCta ? <SecondaryHeroCta cta={tertiaryCta} /> : null}
           </div>
         )}
       </div>
