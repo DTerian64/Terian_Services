@@ -303,6 +303,32 @@ async def _upload_and_sign(blob_path: str, pptx_bytes: bytes) -> tuple[str, date
     return sas_url, expiry
 
 
+async def _upload_company_copy(company_copy_slug: str, pptx_bytes: bytes) -> None:
+    """
+    Upload an additional archival copy of a generated deck to a stable,
+    company-named path under the "chatbot" folder of engagement-assets:
+
+        chatbot/{company_copy_slug}-award-nomination-presentation.pptx
+
+    This keeps one discoverable, overwrite-on-regenerate copy per
+    organisation across all three generation entry points (engagement
+    worker, chatbot, intro CTA). No SAS URL is generated — this copy is
+    for internal/sales browsing, not for client delivery.
+
+    Best-effort: failures are logged but never raised, so this never
+    breaks the primary generation/delivery flow.
+    """
+    blob_path = f"chatbot/{company_copy_slug}-award-nomination-presentation.pptx"
+    try:
+        async with _credential() as cred:
+            async with BlobServiceClient(account_url=_BLOB_ENDPOINT, credential=cred) as svc:
+                blob = svc.get_blob_client(container=_ASSETS_CONTAINER, blob=blob_path)
+                await blob.upload_blob(pptx_bytes, overwrite=True)
+        logger.info("presentation: company copy saved → %s/%s", _ASSETS_CONTAINER, blob_path)
+    except Exception as exc:
+        logger.warning("presentation: failed to save company copy %s: %s", blob_path, exc)
+
+
 # ── Template-based generation (worker path) ────────────────────────────────────
 
 import asyncio  # noqa: E402 (placed here to keep top-of-file imports clean)
@@ -354,6 +380,7 @@ async def generate_from_template(
     template_name: str,
     tokens: dict[str, str],
     engagement_id: str | None = None,
+    company_copy_slug: str | None = None,
 ) -> PresentationResult:
     """
     Template-based PPTX generation.
@@ -361,11 +388,15 @@ async def generate_from_template(
     1. Download the named template from blob-templates container.
     2. Substitute {{tokens}} across all slide XML (zip-level replace).
     3. Upload the personalised PPTX to engagement-assets.
-    4. Return PresentationResult (pptx_bytes, blob_path, sas_url, expires_at).
+    4. If company_copy_slug is set, also save an archival copy to
+       chatbot/{company_copy_slug}-award-nomination-presentation.pptx
+       (best-effort, does not affect the returned result).
+    5. Return PresentationResult (pptx_bytes, blob_path, sas_url, expires_at).
 
-    template_name  — blob name in blob-templates (e.g. "award_nomination_onboarding.pptx")
-    tokens         — dict of TOKEN_KEY → replacement value (no braces in keys)
-    engagement_id  — used as the blob path prefix; falls back to a random UUID prefix
+    template_name      — blob name in blob-templates (e.g. "award_nomination_onboarding.pptx")
+    tokens             — dict of TOKEN_KEY → replacement value (no braces in keys)
+    engagement_id      — used as the blob path prefix; falls back to a random UUID prefix
+    company_copy_slug  — if set, also archive a copy under chatbot/{slug}-award-nomination-presentation.pptx
     """
     # 1. Download template
     template_bytes = await _download_template(template_name)
@@ -382,6 +413,10 @@ async def generate_from_template(
         else f"chatbot/{uuid.uuid4()}/onboarding.pptx"
     )
     sas_url, expiry = await _upload_and_sign(blob_path, pptx_bytes)
+
+    # 4. Archival company copy (best-effort, additional to the path above)
+    if company_copy_slug:
+        await _upload_company_copy(company_copy_slug, pptx_bytes)
 
     return PresentationResult(
         pptx_bytes=pptx_bytes,

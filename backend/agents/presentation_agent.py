@@ -131,6 +131,32 @@ Which one would you like?
 
 _SAS_EXPIRY_HOURS = 24
 
+# ── Org name normalization ────────────────────────────────────────────────────
+# Strip a trailing legal-entity suffix so "Acme Corp, LLC" becomes "Acme"
+# rather than "Acme-Corp-Llc" in the deck, slug, and filenames. Applied
+# iteratively so multi-part suffixes ("Acme Corp, LLC") are fully removed.
+_LEGAL_SUFFIX_RE = re.compile(
+    r"[\s,]+(?:incorporated|inc|llc|l\.l\.c|ltd|limited|corp|corporation|"
+    r"co|company|plc|llp|lp|gmbh|pte\.?\s*ltd|pty\.?\s*ltd|s\.a|ag|bv|nv)\.?\s*$",
+    re.IGNORECASE,
+)
+
+
+def normalize_org_name(org_name: str) -> str:
+    """
+    Strip trailing legal-entity suffixes (Inc., LLC, Ltd, Corp, ...) from an
+    organisation name, repeatedly, so "Acme Corp, LLC" -> "Acme" rather than
+    "Acme-Corp-Llc". Falls back to the original (stripped) string if nothing
+    is left after stripping, or if no recognisable suffix is present.
+    """
+    name = (org_name or "").strip()
+    while True:
+        stripped = _LEGAL_SUFFIX_RE.sub("", name).strip()
+        if stripped == name or not stripped:
+            break
+        name = stripped
+    return name or (org_name or "").strip()
+
 # Human-readable labels for each presentation type — used in the reply message.
 _PRES_LABELS: dict[str, str] = {
     "award_onboarding":                  "Award Nomination System — Onboarding Deck",
@@ -320,25 +346,31 @@ class PresentationAgent(AskAgent):
         """
         org_name = (job.get("org_name") or "").strip()
 
+        # Strip trailing legal-entity suffixes (Inc., LLC, Ltd, Corp, ...) before
+        # deriving the slug/display name, so "Acme Corp, LLC" -> "Acme" rather
+        # than "Acme-Corp-Llc".
+        display_name = normalize_org_name(org_name)
+
         # Derive a URL-safe subdomain slug: lowercase, spaces/special chars → hyphens
-        subdomain = re.sub(r"[^a-z0-9]+", "-", org_name.lower()).strip("-") or "your-company"
+        subdomain = re.sub(r"[^a-z0-9]+", "-", display_name.lower()).strip("-") or "your-company"
 
         tokens = {
-            "CLIENT_NAME":       org_name or "Your Organisation",
+            "CLIENT_NAME":       display_name or "Your Organisation",
             "CLIENT_SUBDOMAIN":  subdomain,
             "PRESENTATION_DATE": datetime.now(timezone.utc).strftime("%B %Y"),
         }
 
         logger.info(
             "PresentationAgent: generating Award Nomination onboarding "
-            "org=%r subdomain=%r",
-            org_name, subdomain,
+            "org=%r display_name=%r subdomain=%r",
+            org_name, display_name, subdomain,
         )
 
         return await generate_from_template(
             template_name="award_nomination_onboarding_template.pptx",
             tokens=tokens,
             engagement_id=job.get("engagement_id"),
+            company_copy_slug=subdomain,
         )
 
     async def generate_award_screen_flows(self, job: dict) -> PresentationResult:

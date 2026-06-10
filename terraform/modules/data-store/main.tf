@@ -210,6 +210,25 @@ resource "azurerm_cosmosdb_sql_container" "client_engagements" {
   default_ttl = -1
 }
 
+# ── Intro / lead-capture requests ────────────────────────────────────────────
+# One document per "Download presentation" CTA hit on the marketing site
+# (introductory_router.py). Captures the org_name the visitor entered before
+# their personalised deck is generated, so sales can see who has shown
+# interest even if they never complete the full engagement intake form.
+# Partition by /service_id (e.g. "award-nomination") — low cardinality today,
+# mirrors engagement_details. A future Cosmos change-feed / notification
+# trigger can watch this container to alert sales@ on new submissions.
+
+resource "azurerm_cosmosdb_sql_container" "intro_requests" {
+  name                = "intro_requests"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/service_id"]
+
+  default_ttl = -1
+}
+
 # ── Engagement worker dead-letter store ──────────────────────────────────────
 # One document per job that exhausted all delivery attempts.
 # The worker writes here and alerts sales@ so a human can follow up.

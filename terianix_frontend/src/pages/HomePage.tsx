@@ -1,13 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import PageLayout from "../components/PageLayout";
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 const AWARD_DEMO_REQUEST_URL = "https://demo-awards.terianix.ai/demo/request";
-const AWARD_ONBOARDING_DECK_URL =
-  "https://stterianservices.blob.core.windows.net/blob-templates/award_nomination_onboarding_template.pptx";
+const AWARD_PRESENTATION_DECK_URL = `${API_BASE}/api/introductory/award-nomination/presentation-deck`;
 const INTEGRITY_DISCUSS_HREF =
   "mailto:sales@terian-services.com?subject=Integrity%20Sentinel%20discussion";
+
+// Mirrors backend/agents/presentation_agent.py's normalize_org_name(): strips a
+// trailing legal-entity suffix (Inc., LLC, Ltd, Corp, ...) so "Acme Corp, LLC"
+// produces a filename based on "Acme" rather than "Acme_Corp_LLC".
+const LEGAL_SUFFIX_RE =
+  /[\s,]+(?:incorporated|inc|llc|l\.l\.c|ltd|limited|corp|corporation|co|company|plc|llp|lp|gmbh|pte\.?\s*ltd|pty\.?\s*ltd|s\.a|ag|bv|nv)\.?\s*$/i;
+
+function normalizeOrgName(orgName: string): string {
+  let name = orgName.trim();
+  while (true) {
+    const stripped = name.replace(LEGAL_SUFFIX_RE, "").trim();
+    if (stripped === name || !stripped) break;
+    name = stripped;
+  }
+  return name || orgName.trim();
+}
 
 /** Fire-and-forget: wake CosmosDB before the user navigates to a page that needs it. */
 function useApiWarmup() {
@@ -21,6 +36,52 @@ function useApiWarmup() {
 export default function HomePage() {
   useApiWarmup();
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [deckModalOpen, setDeckModalOpen] = useState(false);
+  const [orgName, setOrgName] = useState("");
+  const [deckLoading, setDeckLoading] = useState(false);
+  const [deckError, setDeckError] = useState<string | null>(null);
+
+  function closeDeckModal() {
+    if (deckLoading) return;
+    setDeckModalOpen(false);
+    setOrgName("");
+    setDeckError(null);
+  }
+
+  async function handleDownloadDeck(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = orgName.trim();
+    if (!trimmed) {
+      setDeckError("Please enter your organization name.");
+      return;
+    }
+    setDeckLoading(true);
+    setDeckError(null);
+    try {
+      const res = await fetch(AWARD_PRESENTATION_DECK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ org_name: trimmed }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Terian_${normalizeOrgName(trimmed).replace(/[^A-Za-z0-9]+/g, "_")}_Award_Nomination_Overview.pptx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setDeckModalOpen(false);
+      setOrgName("");
+    } catch {
+      setDeckError("Could not generate the presentation. Please try again, or email sales@terian-services.com.");
+    } finally {
+      setDeckLoading(false);
+    }
+  }
+
   return (
     <PageLayout>
       {/* Hero */}
@@ -138,8 +199,7 @@ export default function HomePage() {
               title="Product Presentation"
               description="A walkthrough of the platform, workflow, and integrations — ready to share internally."
               label="Download presentation"
-              href={AWARD_ONBOARDING_DECK_URL}
-              download
+              onClick={() => setDeckModalOpen(true)}
             />
             <CtaRow
               title="Contact for live demo"
@@ -204,6 +264,59 @@ export default function HomePage() {
               title="Integrity Sentinel Admin UI Preview"
               className="w-full flex-1 bg-white"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Download presentation modal */}
+      {deckModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={closeDeckModal}
+        >
+          <div
+            className="relative w-full max-w-md rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-100">Download presentation</h3>
+              <button
+                type="button"
+                onClick={closeDeckModal}
+                aria-label="Close"
+                className="text-slate-400 transition hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mt-2 text-sm leading-7 text-slate-300">
+              We'll personalize the Award Nomination System overview deck for your organization.
+            </p>
+            <form onSubmit={handleDownloadDeck} className="mt-5">
+              <label htmlFor="org-name" className="block text-xs font-semibold uppercase tracking-wider text-violet-400">
+                Organization name
+              </label>
+              <input
+                id="org-name"
+                type="text"
+                required
+                autoFocus
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                placeholder="e.g. Acme Corp"
+                className="mt-2 w-full rounded-md border-2 border-white/10 bg-transparent px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-violet-400"
+              />
+              {deckError ? (
+                <p className="mt-2 text-sm text-red-400">{deckError}</p>
+              ) : null}
+              <button
+                type="submit"
+                disabled={deckLoading}
+                className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deckLoading ? "Preparing your deck…" : "Download presentation →"}
+              </button>
+            </form>
           </div>
         </div>
       )}
