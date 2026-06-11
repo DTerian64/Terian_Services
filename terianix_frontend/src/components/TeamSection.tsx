@@ -121,20 +121,22 @@ export default function TeamSection() {
   const isLoading = !members && !error;
 
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Our Team &amp; Partners</p>
+    <section className="border-t border-white/15">
+      <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Our Team &amp; Partners</p>
 
-      <div className="mt-6 grid gap-6">
-        {isLoading ? (
-          <>
-            <SkeletonCard />
-            <SkeletonCard />
-          </>
-        ) : error ? (
-          <p className="col-span-3 text-sm text-slate-500">Team information is temporarily unavailable.</p>
-        ) : (
-          members!.map((m) => <MemberCard key={m.id} member={m} />)
-        )}
+        <div className="mt-6 grid gap-6">
+          {isLoading ? (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          ) : error ? (
+            <p className="col-span-3 text-sm text-slate-500">Team information is temporarily unavailable.</p>
+          ) : (
+            members!.map((m) => <MemberCard key={m.id} member={m} />)
+          )}
+        </div>
       </div>
     </section>
   );

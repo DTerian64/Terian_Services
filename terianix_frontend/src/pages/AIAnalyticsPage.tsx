@@ -11,23 +11,25 @@ export default function AIAnalyticsPage() {
         primaryCta={{ label: "Talk to engineering", href: "/contact" }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Capabilities</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          The shape of work we deliver.
-        </h2>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Capabilities</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            The shape of work we deliver.
+          </h2>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Card title="Forecasting" description="Demand, headcount, spend, and capacity planning with quantified uncertainty bands." />
-          <Card title="Classification" description="Risk scoring, churn propensity, ticket triage — calibrated, monitored, with explanation layers." />
-          <Card title="Anomaly detection" description="Time-series, multivariate, and embedding-based outlier detection on operational data." />
-          <Card title="NLP on unstructured text" description="Topic modeling, entity extraction, sentiment, and policy-aware classification on documents and tickets." />
-          <Card title="Embedding-based search" description="Semantic search and retrieval over policies, contracts, knowledge bases, and historical resolutions." />
-          <Card title="Generative AI integration" description="LLM-powered features in line-of-business apps with retrieval, evals, and guardrails." />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Card title="Forecasting" description="Demand, headcount, spend, and capacity planning with quantified uncertainty bands." />
+            <Card title="Classification" description="Risk scoring, churn propensity, ticket triage — calibrated, monitored, with explanation layers." />
+            <Card title="Anomaly detection" description="Time-series, multivariate, and embedding-based outlier detection on operational data." />
+            <Card title="NLP on unstructured text" description="Topic modeling, entity extraction, sentiment, and policy-aware classification on documents and tickets." />
+            <Card title="Embedding-based search" description="Semantic search and retrieval over policies, contracts, knowledge bases, and historical resolutions." />
+            <Card title="Generative AI integration" description="LLM-powered features in line-of-business apps with retrieval, evals, and guardrails." />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Tech stack</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -46,7 +48,7 @@ export default function AIAnalyticsPage() {
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
             Integrity, provenance, and confidentiality
@@ -78,15 +80,17 @@ export default function AIAnalyticsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Engagement model</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Start with the metric. End with the proof.
-        </h2>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Step number="1" title="Frame" description="One-week framing sprint: target metric, baseline, success criteria, data access plan." />
-          <Step number="2" title="Build" description="Fixed-price pilot. Production-shaped pipelines, evals, monitoring — no throwaway notebooks." />
-          <Step number="3" title="Operate" description="Hand-off with retraining cadence, drift monitoring, runbooks. Optional ongoing ownership." />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Engagement model</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Start with the metric. End with the proof.
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Step number="1" title="Frame" description="One-week framing sprint: target metric, baseline, success criteria, data access plan." />
+            <Step number="2" title="Build" description="Fixed-price pilot. Production-shaped pipelines, evals, monitoring — no throwaway notebooks." />
+            <Step number="3" title="Operate" description="Hand-off with retraining cadence, drift monitoring, runbooks. Optional ongoing ownership." />
+          </div>
         </div>
       </section>
 

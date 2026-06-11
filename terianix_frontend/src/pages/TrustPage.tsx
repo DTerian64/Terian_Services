@@ -10,30 +10,32 @@ export default function TrustPage() {
         description="The security posture for Terian-operated products and services. Built around three commitments: secure, isolated, provable. For SOC controls in detail, contact security@terian-services.com."
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
-          The three commitments
-        </p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Secure. Isolated. Provable.
-        </h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          <Pillar
-            title="Secure"
-            description="Encryption at rest and in transit, identity-led access, threat-monitored. Defense-in-depth from identity through application."
-          />
-          <Pillar
-            title="Isolated"
-            description="Hard tenant boundaries enforced at the database, identity, and network layers. Your data never crosses into another customer's compute or storage."
-          />
-          <Pillar
-            title="Provable"
-            description="Every state change, approval, and model decision is captured in an immutable audit trail. Exportable, reviewable, defensible."
-          />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
+            The three commitments
+          </p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Secure. Isolated. Provable.
+          </h2>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <Pillar
+              title="Secure"
+              description="Encryption at rest and in transit, identity-led access, threat-monitored. Defense-in-depth from identity through application."
+            />
+            <Pillar
+              title="Isolated"
+              description="Hard tenant boundaries enforced at the database, identity, and network layers. Your data never crosses into another customer's compute or storage."
+            />
+            <Pillar
+              title="Provable"
+              description="Every state change, approval, and model decision is captured in an immutable audit trail. Exportable, reviewable, defensible."
+            />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Controls</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -54,7 +56,7 @@ export default function TrustPage() {
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Services engagements</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -69,7 +71,7 @@ export default function TrustPage() {
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Compliance posture</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -84,7 +86,7 @@ export default function TrustPage() {
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Reporting a vulnerability</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">

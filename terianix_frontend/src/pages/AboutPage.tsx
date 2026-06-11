@@ -1,32 +1,37 @@
 import PageLayout from "../components/PageLayout";
-import PageHero from "../components/PageHero";
 import TeamSection from "../components/TeamSection";
 
-export default function AboutPage() { 
+export default function AboutPage() {
   return (
     <PageLayout>
-      <PageHero
-        eyebrow="About"
-        title="Enterprise SaaS built to last."
-        description="Terianix ships AI-assisted SaaS for enterprises. We work where the data is sensitive, the workflows are real, and the outcomes are measurable."
-      />
-
-      <section className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-        <div className="grid gap-10 lg:grid-cols-2">
-          <Pillar
-            title="Award Nomination System"
-            description="Peer recognition and manager-led award workflows with full audit trail, approval chains, and an ML layer that flags bias and anomalous patterns."
-          />
-          <Pillar
-            title="Integrity Sentinel"
-            description="Fraud-detection SaaS — multi-tenant rule engine plus ML models for transactions, vendor master, and expense data. Currently in early access."
-          />
+      <section>
+        <div className="mx-auto max-w-5xl px-6 py-20 text-center lg:px-10 lg:py-24">
+          <h1 className="font-playfair text-4xl font-bold tracking-tight text-slate-100 md:text-5xl">About Terianix</h1>
+          <p className="mt-6 text-lg leading-8 text-slate-300">
+            The team, the philosophy, and why we build the way we do.
+          </p>
+        </div>
+        <div className="mx-auto max-w-5xl px-6 pb-20 lg:px-10 lg:pb-24">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] p-6 transition hover:border-violet-400">
+              <h2 className="font-playfair text-lg font-bold text-slate-100">Our mission</h2>
+              <p className="mt-2 text-sm leading-7 text-slate-300">
+                Is to build the integrity layer enterprises wrap around their most sensitive workflows — awards, expenses, vendor payments — so bias and fraud get caught before they cost you.
+              </p>
+            </div>
+            <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] p-6 transition hover:border-violet-400">
+              <h2 className="font-playfair text-lg font-bold text-slate-100">Our vision</h2>
+              <p className="mt-2 text-sm leading-7 text-slate-300">
+                Is to make ML/AI-enforced integrity standard infrastructure for enterprise software, the same way encryption and access control became standard.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       <TeamSection />
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">How we work</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -69,15 +74,6 @@ export default function AboutPage() {
         </div>
       </section>
     </PageLayout>
-  );
-}
-
-function Pillar({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-violet-400 p-6">
-      <h3 className="text-lg font-bold text-slate-100">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
-    </div>
   );
 }
 

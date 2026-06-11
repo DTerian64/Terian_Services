@@ -124,7 +124,8 @@ export default function AwardMetrics() {
   const isLoading = !data && !error;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+    <section className="border-t border-white/15">
+    <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400 flex items-center gap-2">
         Live platform metrics
         <button
@@ -307,6 +308,7 @@ export default function AwardMetrics() {
           </div>
         </div>
       )}
+    </div>
     </section>
   );
 }

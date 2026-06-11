@@ -11,19 +11,21 @@ export default function MLOpsPage() {
         primaryCta={{ label: "Book a pilot conversation", href: "/contact" }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Why MLOps</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Most "AI in production" is one failed retrain away from off.
-        </h2>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-          Models drift. Inputs change. Evaluation criteria shift as the business learns. MLOps is
-          the boring, durable infrastructure that turns "we trained a model once" into "we run a
-          family of models with confidence."
-        </p>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Why MLOps</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Most "AI in production" is one failed retrain away from off.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
+            Models drift. Inputs change. Evaluation criteria shift as the business learns. MLOps is
+            the boring, durable infrastructure that turns "we trained a model once" into "we run a
+            family of models with confidence."
+          </p>
+        </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Capabilities</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -38,20 +40,22 @@ export default function MLOpsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Reference architecture</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Familiar tools, sensibly wired.
-        </h2>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Pill label="Azure ML / Azure AI Foundry" />
-          <Pill label="MLflow" />
-          <Pill label="Evidently AI" />
-          <Pill label="Great Expectations" />
-          <Pill label="GitHub Actions / Azure DevOps" />
-          <Pill label="Microsoft Fabric / Synapse" />
-          <Pill label="Databricks (when applicable)" />
-          <Pill label="Promptfoo / DeepEval (LLMs)" />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Reference architecture</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Familiar tools, sensibly wired.
+          </h2>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Pill label="Azure ML / Azure AI Foundry" />
+            <Pill label="MLflow" />
+            <Pill label="Evidently AI" />
+            <Pill label="Great Expectations" />
+            <Pill label="GitHub Actions / Azure DevOps" />
+            <Pill label="Microsoft Fabric / Synapse" />
+            <Pill label="Databricks (when applicable)" />
+            <Pill label="Promptfoo / DeepEval (LLMs)" />
+          </div>
         </div>
       </section>
 

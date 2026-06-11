@@ -160,7 +160,7 @@ export default function IntegritySentinelPage() {
       </section>
 
       {/* ── Platform banner ── */}
-      <section className="border-t border-white/10 bg-[#07060f]">
+      <section className="border-t border-white/15 bg-[#07060f]">
         <div className="mx-auto max-w-6xl px-6 pt-10 pb-4 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
             Integrity Sentinel — Platform Overview
@@ -176,30 +176,32 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Strategic positioning</p>
-            <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-              Graph intelligence that surfaces hidden risk across every system where work happens.
-            </h2>
-          </div>
-          <div className="space-y-5 text-base leading-8 text-slate-300">
-            <p>
-              Traditional BI systems surface metrics. Integrity Sentinel is designed to surface
-              relationships, intent, behavioral anomalies, and operational risk across the systems
-              where work actually happens.
-            </p>
-            <p>
-              The platform concept combines graph analytics, behavioral modeling, explainable AI,
-              anomaly detection, relationship intelligence, and investigation workflows into one
-              enterprise operating layer.
-            </p>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Strategic positioning</p>
+              <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+                Graph intelligence that surfaces hidden risk across every system where work happens.
+              </h2>
+            </div>
+            <div className="space-y-5 text-base leading-8 text-slate-300">
+              <p>
+                Traditional BI systems surface metrics. Integrity Sentinel is designed to surface
+                relationships, intent, behavioral anomalies, and operational risk across the systems
+                where work actually happens.
+              </p>
+              <p>
+                The platform concept combines graph analytics, behavioral modeling, explainable AI,
+                anomaly detection, relationship intelligence, and investigation workflows into one
+                enterprise operating layer.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="capabilities">
+      <section id="capabilities" className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Core capabilities</p>
           <h2 className="mt-3 max-w-3xl font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -214,47 +216,49 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <div className="grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Behavioral risk example</p>
-            <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-              Alerts become evidence-backed narratives.
-            </h2>
-            <p className="mt-5 text-base leading-8 text-slate-300">
-              Investigators need more than a flagged record. Integrity Sentinel is envisioned to
-              explain the relationships, timing, similarity, and workflow context behind each risk
-              signal so teams can decide what deserves action.
-            </p>
-          </div>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <div className="grid gap-10 lg:grid-cols-[1fr_0.95fr] lg:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Behavioral risk example</p>
+              <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+                Alerts become evidence-backed narratives.
+              </h2>
+              <p className="mt-5 text-base leading-8 text-slate-300">
+                Investigators need more than a flagged record. Integrity Sentinel is envisioned to
+                explain the relationships, timing, similarity, and workflow context behind each risk
+                signal so teams can decide what deserves action.
+              </p>
+            </div>
 
-          <div className="rounded-lg border-2 border-white/10 bg-[#0f0d18] transition hover:border-violet-400 p-6">
-            <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Case signal</p>
-                <h3 className="mt-1 text-2xl font-bold text-slate-100">Approval network anomaly</h3>
-              </div>
-              <span className="rounded-md bg-rose-400/20 px-3 py-2 text-sm font-bold text-rose-300">High</span>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              {signalStats.map((stat) => (
-                <div key={stat.label} className="rounded-md bg-[#0a0916] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{stat.label}</p>
-                  <p className="mt-2 text-2xl font-bold text-slate-100">{stat.value}</p>
+            <div className="rounded-lg border-2 border-white/10 bg-[#0f0d18] transition hover:border-violet-400 p-6">
+              <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Case signal</p>
+                  <h3 className="mt-1 text-2xl font-bold text-slate-100">Approval network anomaly</h3>
                 </div>
-              ))}
+                <span className="rounded-md bg-rose-400/20 px-3 py-2 text-sm font-bold text-rose-300">High</span>
+              </div>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {signalStats.map((stat) => (
+                  <div key={stat.label} className="rounded-md bg-[#0a0916] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{stat.label}</p>
+                    <p className="mt-2 text-2xl font-bold text-slate-100">{stat.value}</p>
+                  </div>
+                ))}
+              </div>
+              <ul className="mt-6 space-y-3 text-sm leading-6 text-slate-300">
+                <EvidenceItem text="Semantic similarity detected across prior submissions" />
+                <EvidenceItem text="Shared approval network appears in multiple unrelated requests" />
+                <EvidenceItem text="Elevated after-hours activity and unusual submission velocity" />
+                <EvidenceItem text="Cross-department coordination deviates from the baseline" />
+              </ul>
             </div>
-            <ul className="mt-6 space-y-3 text-sm leading-6 text-slate-300">
-              <EvidenceItem text="Semantic similarity detected across prior submissions" />
-              <EvidenceItem text="Shared approval network appears in multiple unrelated requests" />
-              <EvidenceItem text="Elevated after-hours activity and unusual submission velocity" />
-              <EvidenceItem text="Cross-department coordination deviates from the baseline" />
-            </ul>
           </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Use cases</p>
           <h2 className="mt-3 max-w-3xl font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -269,29 +273,31 @@ export default function IntegritySentinelPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Product modules</p>
-            <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-              A modular path from concept to enterprise SaaS.
-            </h2>
-            <p className="mt-5 text-base leading-8 text-slate-300">
-              Integrity Sentinel is currently in strategic concept and architecture development,
-              with modules shaped around realistic implementation pathways and enterprise controls.
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {modules.map((module) => (
-              <div key={module} className="rounded-md border-2 border-white/10 bg-[#0a0916] transition hover:border-violet-400 px-4 py-3 text-sm font-semibold text-slate-200">
-                {module}
-              </div>
-            ))}
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Product modules</p>
+              <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+                A modular path from concept to enterprise SaaS.
+              </h2>
+              <p className="mt-5 text-base leading-8 text-slate-300">
+                Integrity Sentinel is currently in strategic concept and architecture development,
+                with modules shaped around realistic implementation pathways and enterprise controls.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {modules.map((module) => (
+                <div key={module} className="rounded-md border-2 border-white/10 bg-[#0a0916] transition hover:border-violet-400 px-4 py-3 text-sm font-semibold text-slate-200">
+                  {module}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Reference architecture</p>
           <h2 className="mt-3 max-w-3xl font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">

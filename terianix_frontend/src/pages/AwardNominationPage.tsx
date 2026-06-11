@@ -365,7 +365,7 @@ export default function AwardNominationPage() {
       />
 
       {/* ── Platform banner ── */}
-      <section className="border-t border-white/10 bg-[#07060f]">
+      <section className="border-t border-white/15 bg-[#07060f]">
         <div className="mx-auto max-w-6xl px-6 pt-10 pb-4 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
             Award Nomination System — Platform Overview
@@ -381,54 +381,56 @@ export default function AwardNominationPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">What it does</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Award Nomination: Peer-to-Peer Recognition
-        </h2>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">What it does</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Award Nomination: Peer-to-Peer Recognition
+          </h2>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Feature
-            title="Configurable SaaS per tenant"
-            description="Award categories, language, location, currency, and nomination limits are all configured per tenant. Every deployment is isolated — no shared data, no cross-tenant leakage."
-          />
-          <Feature
-            title="Peer-to-peer nominations"
-            description="Every submission feeds a Random Forest fraud model evaluating collusion patterns, financial anomalies, temporal signals, and semantic fit — before it reaches a human reviewer."
-          />
-          <Feature
-            title="ML-scored, human-reviewed approval"
-            description="ML fraud score computed across 18+ features — pair collusion rings, nomination concentration, amount anomalies, and semantic content. Flagged cases route to human-in-the-loop HRBP review → manager approval."
-            onDetail={() => setWorkflowOpen(true)}
-          />
-          <Feature
-            title="Full audit trail"
-            description="Every state change, comment, and approver decision is captured. Exportable for audit and compliance."
-            onSample={() => setAuditOpen(true)}
-          />
-          <Feature
-            title="Workflow Notifications"
-            description="Automated emails at every stage: nomination submitted, approval requested, fraud flag routed to HRBP, award approved, payout confirmed. Every stakeholder stays informed without manual follow-up."
-            onSample={() => setNotificationsOpen(true)}
-          />
-          <Feature
-            title="Analytics & Reporting"
-            description="Nomination pipeline by status, category, and business unit. Recognition equity trends and manager-level breakdowns — exportable data for HR leadership and audit."
-            onSample={() => setAnalyticsOpen(true)}
-          />
-          <Feature
-            title="Real-time dashboards"
-            description="Live platform telemetry: API requests, failure rate, P95 latency, active users, and compute health — refreshed every 5 minutes from the live sandbox."
-            href="#live-metrics"
-          />
-          <Feature
-            title="Azure AD SSO + B2B"
-            description="One-click sign-in for every employee. B2B guest access for partners, vendors, and demo environments."
-          />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <Feature
+              title="Configurable SaaS per tenant"
+              description="Award categories, language, location, currency, and nomination limits are all configured per tenant. Every deployment is isolated — no shared data, no cross-tenant leakage."
+            />
+            <Feature
+              title="Peer-to-peer nominations"
+              description="Every submission feeds a Random Forest fraud model evaluating collusion patterns, financial anomalies, temporal signals, and semantic fit — before it reaches a human reviewer."
+            />
+            <Feature
+              title="ML-scored, human-reviewed approval"
+              description="ML fraud score computed across 18+ features — pair collusion rings, nomination concentration, amount anomalies, and semantic content. Flagged cases route to human-in-the-loop HRBP review → manager approval."
+              onDetail={() => setWorkflowOpen(true)}
+            />
+            <Feature
+              title="Full audit trail"
+              description="Every state change, comment, and approver decision is captured. Exportable for audit and compliance."
+              onSample={() => setAuditOpen(true)}
+            />
+            <Feature
+              title="Workflow Notifications"
+              description="Automated emails at every stage: nomination submitted, approval requested, fraud flag routed to HRBP, award approved, payout confirmed. Every stakeholder stays informed without manual follow-up."
+              onSample={() => setNotificationsOpen(true)}
+            />
+            <Feature
+              title="Analytics & Reporting"
+              description="Nomination pipeline by status, category, and business unit. Recognition equity trends and manager-level breakdowns — exportable data for HR leadership and audit."
+              onSample={() => setAnalyticsOpen(true)}
+            />
+            <Feature
+              title="Real-time dashboards"
+              description="Live platform telemetry: API requests, failure rate, P95 latency, active users, and compute health — refreshed every 5 minutes from the live sandbox."
+              href="#live-metrics"
+            />
+            <Feature
+              title="Azure AD SSO + B2B"
+              description="One-click sign-in for every employee. B2B guest access for partners, vendors, and demo environments."
+            />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">AI/ML layer</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -460,30 +462,32 @@ export default function AwardNominationPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <div className="flex items-center gap-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">How it works</p>
-          <span className="text-slate-600">·</span>
-          <button
-            onClick={() => setArchOpen(true)}
-            className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 transition hover:text-violet-400"
-          >
-            Technical Architecture
-          </button>
-        </div>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Four steps from intent to paycheck.
-        </h2>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <div className="flex items-center gap-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">How it works</p>
+            <span className="text-slate-600">·</span>
+            <button
+              onClick={() => setArchOpen(true)}
+              className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 transition hover:text-violet-400"
+            >
+              Technical Architecture
+            </button>
+          </div>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Four steps from intent to paycheck.
+          </h2>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-4">
-          <Step number="1" title="Nominate" description="Employee or manager submits with category, justification, and optional attachments." />
-          <Step number="2" title="Approve" description="Routed through configured approval chain with SLAs, reminders, and audit logging." />
-          <Step number="3" title="Audit" description="ML layer flags anomalies and bias risk. HRBP review queue handles exceptions." />
-          <Step number="4" title="Pay" description="Approved awards post to your HR or payroll system as compensation events. Recognition is delivered, payroll handles the rest." />
+          <div className="mt-12 grid gap-6 md:grid-cols-4">
+            <Step number="1" title="Nominate" description="Employee or manager submits with category, justification, and optional attachments." />
+            <Step number="2" title="Approve" description="Routed through configured approval chain with SLAs, reminders, and audit logging." />
+            <Step number="3" title="Audit" description="ML layer flags anomalies and bias risk. HRBP review queue handles exceptions." />
+            <Step number="4" title="Pay" description="Approved awards post to your HR or payroll system as compensation events. Recognition is delivered, payroll handles the rest." />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-16 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Integrations</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -498,20 +502,22 @@ export default function AwardNominationPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Security & compliance</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Boring on purpose.
-        </h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Pill label="Azure AD authentication" />
-          <Pill label="Encryption at rest & in transit" />
-          <Pill label="Region: Azure West US 2" />
-          <Pill label="B2B guest access" />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Security & compliance</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Boring on purpose.
+          </h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Pill label="Azure AD authentication" />
+            <Pill label="Encryption at rest & in transit" />
+            <Pill label="Region: Azure West US 2" />
+            <Pill label="B2B guest access" />
+          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-300">
+            See our <a className="font-semibold text-violet-400 hover:text-violet-300" href="/trust">Trust & Security</a> page for the full posture.
+          </p>
         </div>
-        <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-300">
-          See our <a className="font-semibold text-violet-400 hover:text-violet-300" href="/trust">Trust & Security</a> page for the full posture.
-        </p>
       </section>
 
       <div id="live-metrics">

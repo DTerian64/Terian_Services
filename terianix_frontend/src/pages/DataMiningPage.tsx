@@ -11,28 +11,30 @@ export default function DataMiningPage() {
         primaryCta={{ label: "Talk to engineering", href: "/contact" }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">What it covers</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Three datasets where mining usually pays back fastest.
-        </h2>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Card
-            title="Operational"
-            description="Tickets, cases, incidents, and transactions. Find the drivers of cost, cycle time, and rework."
-          />
-          <Card
-            title="Financial"
-            description="Invoices, payables, receivables, expense reports. Find leakage, controls gaps, and pricing anomalies."
-          />
-          <Card
-            title="HR / Workforce"
-            description="Headcount, recognition, tenure, transfer history. Find equity gaps, attrition signals, and recognition patterns."
-          />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">What it covers</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Three datasets where mining usually pays back fastest.
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Card
+              title="Operational"
+              description="Tickets, cases, incidents, and transactions. Find the drivers of cost, cycle time, and rework."
+            />
+            <Card
+              title="Financial"
+              description="Invoices, payables, receivables, expense reports. Find leakage, controls gaps, and pricing anomalies."
+            />
+            <Card
+              title="HR / Workforce"
+              description="Headcount, recognition, tenure, transfer history. Find equity gaps, attrition signals, and recognition patterns."
+            />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Methods</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -47,15 +49,17 @@ export default function DataMiningPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Deliverables</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          What you walk away with.
-        </h2>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Deliverable title="Findings memo" description="Written narrative — what's true in your data, what's surprising, and what's worth acting on." />
-          <Deliverable title="Interactive dashboards" description="Power BI / Fabric or Looker workbooks pointed at the cleaned, modeled data so the findings stay live." />
-          <Deliverable title="Reusable feature pipeline" description="Versioned SQL / dbt / Spark transforms so the next analyst doesn't start from zero." />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Deliverables</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            What you walk away with.
+          </h2>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Deliverable title="Findings memo" description="Written narrative — what's true in your data, what's surprising, and what's worth acting on." />
+            <Deliverable title="Interactive dashboards" description="Power BI / Fabric or Looker workbooks pointed at the cleaned, modeled data so the findings stay live." />
+            <Deliverable title="Reusable feature pipeline" description="Versioned SQL / dbt / Spark transforms so the next analyst doesn't start from zero." />
+          </div>
         </div>
       </section>
 

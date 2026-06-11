@@ -148,7 +148,8 @@ export default function AwardNominationPricingPage() {
         description="Three tiers sized for any organization. Scale up as you grow — no hidden fees, no surprise overages."
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
 
         {loading && (
           <p className="text-sm text-slate-400">Loading pricing…</p>
@@ -204,6 +205,7 @@ export default function AwardNominationPricingPage() {
             </div>
           </>
         )}
+        </div>
       </section>
     </PageLayout>
   );

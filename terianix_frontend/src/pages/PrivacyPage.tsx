@@ -10,6 +10,7 @@ export default function PrivacyPage() {
         description="How Terian Services collects, uses, and protects your information."
       />
 
+      <div className="border-t border-white/15">
       <main className="mx-auto max-w-2xl px-6 py-16 lg:px-10">
         <p className="text-xs text-slate-400 mb-8">Effective date: May 2026</p>
 
@@ -123,6 +124,7 @@ export default function PrivacyPage() {
           </a>
         </footer>
       </main>
+      </div>
     </PageLayout>
   );
 }

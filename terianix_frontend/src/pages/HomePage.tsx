@@ -122,7 +122,7 @@ export default function HomePage() {
       </section>
 
       {/* Products */}
-      <section id="products" className="border-b border-white/15">
+      <section id="products">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Multi-tenant · Multi-lingual · ML-native"
@@ -152,7 +152,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Terianix */}
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Why Terianix.ai"

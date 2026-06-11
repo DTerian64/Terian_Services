@@ -471,7 +471,8 @@ export default function NewEngagementPage() {
         description={hero.description}
       />
 
-      <section className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-3">
 
           {/* Left: engagement badge only */}
@@ -533,6 +534,7 @@ export default function NewEngagementPage() {
             {step === 3 && <Step3 orgName={step2.org_name} />}
           </div>
 
+        </div>
         </div>
       </section>
     </PageLayout>

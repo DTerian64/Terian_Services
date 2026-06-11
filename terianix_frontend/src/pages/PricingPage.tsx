@@ -149,7 +149,8 @@ export default function PricingPage() {
         description="One product, three tiers. Scale as your organization grows — no hidden fees, no surprise overages."
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
 
         {loading && (
           <p className="text-sm text-slate-400">Loading pricing…</p>
@@ -226,6 +227,7 @@ export default function PricingPage() {
             )}
           </>
         )}
+        </div>
       </section>
     </PageLayout>
   );

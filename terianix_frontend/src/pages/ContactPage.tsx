@@ -98,7 +98,8 @@ export default function ContactPage() {
         description="Whether you're evaluating a product, scoping a services engagement, or just have a question — we read every message and reply within one business day."
       />
 
-      <section className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
         <div className="grid gap-10 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <h2 className="text-lg font-bold text-slate-100">Direct contacts</h2>
@@ -301,6 +302,7 @@ export default function ContactPage() {
               </span>
             </div>
           </form>
+        </div>
         </div>
       </section>
     </PageLayout>

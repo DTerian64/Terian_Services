@@ -11,26 +11,28 @@ export default function IntegrityFraudPage() {
         primaryCta={{ label: "Book a fraud-risk discovery call", href: "/contact" }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">The problem</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          The losses you see are a fraction of the losses you have.
-        </h2>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-          Most fraud is systemic, not transactional. Collusion between approvers and vendors, ghost
-          employees on payroll, duplicate payments hiding in different invoice formats, expense
-          reports tuned just under thresholds — none of it surfaces from rules alone.
-        </p>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">The problem</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            The losses you see are a fraction of the losses you have.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
+            Most fraud is systemic, not transactional. Collusion between approvers and vendors, ghost
+            employees on payroll, duplicate payments hiding in different invoice formats, expense
+            reports tuned just under thresholds — none of it surfaces from rules alone.
+          </p>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <Card title="Vendor collusion" description="Approver-vendor relationships, kickback patterns, and round-tripping." />
-          <Card title="Ghost vendors / employees" description="Master data anomalies, address overlaps, banking detail reuse." />
-          <Card title="Duplicate payments" description="Near-duplicate invoices across formats, vendors, and currencies." />
-          <Card title="Expense & benefit abuse" description="Threshold-tuning, repeated edge-cases, and fabricated receipts." />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <Card title="Vendor collusion" description="Approver-vendor relationships, kickback patterns, and round-tripping." />
+            <Card title="Ghost vendors / employees" description="Master data anomalies, address overlaps, banking detail reuse." />
+            <Card title="Duplicate payments" description="Near-duplicate invoices across formats, vendors, and currencies." />
+            <Card title="Expense & benefit abuse" description="Threshold-tuning, repeated edge-cases, and fabricated receipts." />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Our methodology</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -62,32 +64,34 @@ export default function IntegrityFraudPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Engagement model</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Three phases, fixed-price pilot.
-        </h2>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Engagement model</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Three phases, fixed-price pilot.
+          </h2>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <Step
-            number="1"
-            title="Risk assessment (2 weeks)"
-            description="Workshops, data access review, and a written risk register prioritized by exposure and feasibility."
-          />
-          <Step
-            number="2"
-            title="Pilot (6–8 weeks)"
-            description="Build the highest-priority detection on real historical data. Calibrate, validate against confirmed cases, and produce a triage queue."
-          />
-          <Step
-            number="3"
-            title="Production deployment"
-            description="Wire detections into your environment with monitoring, retraining cadence, and an investigator workflow. Hand-off documentation included."
-          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <Step
+              number="1"
+              title="Risk assessment (2 weeks)"
+              description="Workshops, data access review, and a written risk register prioritized by exposure and feasibility."
+            />
+            <Step
+              number="2"
+              title="Pilot (6–8 weeks)"
+              description="Build the highest-priority detection on real historical data. Calibrate, validate against confirmed cases, and produce a triage queue."
+            />
+            <Step
+              number="3"
+              title="Production deployment"
+              description="Wire detections into your environment with monitoring, retraining cadence, and an investigator workflow. Hand-off documentation included."
+            />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Outcomes we target</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">

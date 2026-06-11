@@ -11,23 +11,25 @@ export default function CloudMigrationPage() {
         primaryCta={{ label: "Scope a migration", href: "/contact" }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">The migration spectrum</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Six R's. We help you pick the right one per workload.
-        </h2>
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">The migration spectrum</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Six R's. We help you pick the right one per workload.
+          </h2>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <R title="Rehost" description="Lift and shift. Fastest path off the datacenter; minimal app changes." />
-          <R title="Replatform" description="Lift and reshape. Move to managed databases, container hosts, and identity services." />
-          <R title="Refactor" description="Rebuild for cloud-native patterns where the ROI justifies the rework." />
-          <R title="Repurchase" description="Replace with SaaS where a market alternative is cheaper than running it yourself." />
-          <R title="Retire" description="Identify and shut down workloads that nobody owns or uses." />
-          <R title="Retain" description="Keep on-prem where compliance, latency, or licensing dictates. Hybrid by design." />
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <R title="Rehost" description="Lift and shift. Fastest path off the datacenter; minimal app changes." />
+            <R title="Replatform" description="Lift and reshape. Move to managed databases, container hosts, and identity services." />
+            <R title="Refactor" description="Rebuild for cloud-native patterns where the ROI justifies the rework." />
+            <R title="Repurchase" description="Replace with SaaS where a market alternative is cheaper than running it yourself." />
+            <R title="Retire" description="Identify and shut down workloads that nobody owns or uses." />
+            <R title="Retain" description="Keep on-prem where compliance, latency, or licensing dictates. Hybrid by design." />
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Our 5-phase method</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
@@ -44,28 +46,30 @@ export default function CloudMigrationPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Stack</p>
-        <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-          Azure-first. IaC by default.
-        </h2>
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Pill label="Terraform / Bicep" />
-          <Pill label="Azure Migrate" />
-          <Pill label="Azure Arc (hybrid)" />
-          <Pill label="Azure AD / Entra ID" />
-          <Pill label="Azure Landing Zones" />
-          <Pill label="Azure Monitor / Log Analytics" />
-          <Pill label="Defender for Cloud" />
-          <Pill label="GitHub Actions / Azure DevOps" />
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Stack</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            Azure-first. IaC by default.
+          </h2>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Pill label="Terraform / Bicep" />
+            <Pill label="Azure Migrate" />
+            <Pill label="Azure Arc (hybrid)" />
+            <Pill label="Azure AD / Entra ID" />
+            <Pill label="Azure Landing Zones" />
+            <Pill label="Azure Monitor / Log Analytics" />
+            <Pill label="Defender for Cloud" />
+            <Pill label="GitHub Actions / Azure DevOps" />
+          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-300">
+            This very site is deployed via Terraform on Azure Static Web Apps — same toolchain we'll
+            use on yours.
+          </p>
         </div>
-        <p className="mt-6 max-w-3xl text-sm leading-7 text-slate-300">
-          This very site is deployed via Terraform on Azure Static Web Apps — same toolchain we'll
-          use on yours.
-        </p>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Risk & rollback</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">

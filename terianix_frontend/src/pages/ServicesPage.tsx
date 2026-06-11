@@ -49,26 +49,28 @@ export default function ServicesPage() {
         primaryCta={{ label: "Book a 30-minute call", href: "/contact" }}
       />
 
-      <section className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((service) => (
-            <a
-              key={service.href}
-              href={service.href}
-              className="group flex h-full flex-col rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-violet-400 p-6 transition hover:border-white/30 hover:bg-white/[0.13]"
-            >
-              <div className="text-2xl">{service.icon}</div>
-              <h3 className="mt-4 text-lg font-bold text-slate-100">{service.title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-7 text-slate-300">{service.description}</p>
-              <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-violet-400 group-hover:text-violet-300">
-                Learn more →
-              </span>
-            </a>
-          ))}
+      <section className="border-t border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {SERVICES.map((service) => (
+              <a
+                key={service.href}
+                href={service.href}
+                className="group flex h-full flex-col rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-violet-400 p-6 transition hover:border-white/30 hover:bg-white/[0.13]"
+              >
+                <div className="text-2xl">{service.icon}</div>
+                <h3 className="mt-4 text-lg font-bold text-slate-100">{service.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-7 text-slate-300">{service.description}</p>
+                <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-violet-400 group-hover:text-violet-300">
+                  Learn more →
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section>
+      <section className="border-t border-white/15">
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">How we engage</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
