@@ -8,7 +8,7 @@ const PRODUCTS = [
     title: "Award Nomination System",
     description:
       "Streamlined peer recognition and manager-led award workflows with full audit trail, approval chains, real-time dashboards, and an ML layer that flags bias, collusion, and anomalous nomination patterns. Native integrations with Azure AD and Workday.",
-    href: "/products/award-nomination",
+    href: "https://www.terianix.ai/products/award-nomination",
     cta: "See the product",
   },
   {
@@ -17,7 +17,7 @@ const PRODUCTS = [
     title: "Integrity Sentinel",
     description:
       "Productized fraud-detection SaaS — multi-tenant, configurable rule engine plus ML models for transactions, vendor master, and expense data. Pilot opening in 2026.",
-    href: "/products/integrity-sentinel",
+    href: "https://www.terianix.ai/products/integrity-sentinel",
     cta: "Get notified",
   },
 ];
@@ -37,6 +37,8 @@ export default function ProductsPage() {
             <a
               key={product.href}
               href={product.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="group flex flex-col rounded-xl border border-white/15 bg-[#0f0d18] p-8 transition hover:border-2 hover:border-teal-400"
             >
               <span

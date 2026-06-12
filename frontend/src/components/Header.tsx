@@ -1,9 +1,11 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 
-type MenuItem = { label: string; href: string; badge?: string };
+type MenuItem = { label: string; href: string; badge?: string; target?: string; rel?: string };
 type DropdownProps = {
   label: string;
   href?: string;
+  target?: string;
+  rel?: string;
   items: MenuItem[];
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -11,9 +13,22 @@ type DropdownProps = {
   widthClass: string;
 };
 
+const PRODUCTS_HOME_URL = "https://terianix.ai";
+
 const PRODUCT_ITEMS: MenuItem[] = [
-  { label: "Award Nomination System", href: "/products/award-nomination" },
-  { label: "Integrity Sentinel", href: "/products/integrity-sentinel", badge: "Coming Soon" },
+  {
+    label: "Award Nomination System",
+    href: "https://www.terianix.ai/products/award-nomination",
+    target: "_blank",
+    rel: "noopener noreferrer",
+  },
+  {
+    label: "Integrity Sentinel",
+    href: "https://www.terianix.ai/products/integrity-sentinel",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    badge: "Coming Soon",
+  },
 ];
 
 const SERVICE_ITEMS: MenuItem[] = [
@@ -25,8 +40,13 @@ const SERVICE_ITEMS: MenuItem[] = [
 ];
 
 const PRICING_ITEMS: MenuItem[] = [
-  { label: "Award Nomination", href: "/pricing/award-nomination" },
-  // { label: "Professional Services", href: "/pricing/professional-services" },  // coming soon
+  {
+    label: "Award Nomination",
+    href: "https://terianix.ai/pricing/award-nomination",
+    target: "_blank",
+    rel: "noopener noreferrer",
+  },
+  { label: "Contract Services", href: "/pricing/contract-services" },
 ];
 
 const NAV_ITEMS: MenuItem[] = [
@@ -54,7 +74,9 @@ export default function Header() {
         <nav className="hidden items-center gap-10 text-[15px] font-semibold text-white lg:flex" aria-label="Primary navigation">
           <Dropdown
             label="Products"
-            href="/products"
+            href={PRODUCTS_HOME_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             items={PRODUCT_ITEMS}
             open={productsOpen}
             setOpen={setProductsOpen}
@@ -142,7 +164,7 @@ export default function Header() {
   );
 }
 
-function Dropdown({ label, href, items, open, setOpen, onOpen, widthClass }: DropdownProps) {
+function Dropdown({ label, href, target, rel, items, open, setOpen, onOpen, widthClass }: DropdownProps) {
   const showMenu = () => {
     onOpen();
     setOpen(true);
@@ -153,6 +175,8 @@ function Dropdown({ label, href, items, open, setOpen, onOpen, widthClass }: Dro
       {href ? (
         <a
           href={href}
+          target={target}
+          rel={rel}
           className="flex items-center gap-2 rounded-md px-1 py-3 font-semibold text-white transition hover:text-teal-300"
         >
           {label}
@@ -177,6 +201,8 @@ function Dropdown({ label, href, items, open, setOpen, onOpen, widthClass }: Dro
             <a
               key={item.href}
               href={item.href}
+              target={item.target}
+              rel={item.rel}
               className="flex items-center justify-between gap-3 rounded px-4 py-3 text-sm text-white/90 transition hover:bg-white/10 hover:text-teal-300"
               role="menuitem"
             >
@@ -202,6 +228,8 @@ function MobileGroup({ label, items, onNavigate }: { label: string; items: MenuI
         <a
           key={item.href}
           href={item.href}
+          target={item.target}
+          rel={item.rel}
           onClick={onNavigate}
           className="flex items-center justify-between rounded-md px-3 py-3 text-base font-semibold text-white transition hover:bg-white/10 hover:text-teal-300"
         >

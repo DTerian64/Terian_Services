@@ -17,7 +17,7 @@ export default function HomePage() {
             <span className="text-teal-300">Secure. Isolated. Provable.</span>
           </h1>
           <p className="mt-8 max-w-3xl text-lg leading-8 text-white/70">
-            Terian Services builds AI/ML-empowered SaaS and delivers AI analytics, integrity &
+            Terian Services and its sub-brand <a href="https://terianix.ai" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-teal-300">Terianix.ai</a> builds AI/ML-empowered SaaS and delivers AI analytics, integrity &
             fraud detection, and cloud modernization for the enterprise. Every product we ship and
             every engagement we run is built around three commitments: your data stays{" "}
             <strong className="font-semibold text-white">secure</strong> (encrypted, least-privilege,
@@ -30,53 +30,31 @@ export default function HomePage() {
 
           <div className="mt-10 flex flex-wrap gap-3">
             <a
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+              href="https://www.terianix.ai/products"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-md border border-white/20 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:border-teal-300 hover:text-teal-300"
             >
-              Request a Demo →
+              Explore products →
             </a>
             <a
               href="/services"
               className="inline-flex items-center justify-center rounded-md border border-white/20 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:border-teal-300 hover:text-teal-300"
             >
-              Explore Services
+              Explore Services →
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            >
+              Contact Us →
             </a>
           </div>
         </div>
       </section>
 
-      {/* Products */}
-      <section id="products" className="border-b border-white/15">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <SectionHeading
-            eyebrow="Products"
-            title="SaaS we build, host, and operate"
-            description="Production software grounded in real enterprise constraints — Azure AD native, audit-ready, and AI-assisted from the inside out."
-          />
-
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
-            <ProductCard
-              tag="AI/ML-assisted"
-              title="Award Nomination System"
-              description="Streamlined peer recognition and manager-led award workflows with full audit trail, approval chains, real-time dashboards, and an ML layer that flags bias, collusion, and anomalous nomination patterns. Native integrations with Azure AD and Workday."
-              href="/products/award-nomination"
-              ctaLabel="See the product"
-              accent="teal"
-            />
-            <ProductCard
-              tag="Coming Soon"
-              title="Integrity Sentinel"
-              description="Productized fraud-detection SaaS — multi-tenant, configurable rule engine plus ML models for transactions, vendor master, and expense data. Get notified when we open the pilot."
-              href="/products/integrity-sentinel"
-              ctaLabel="Get notified"
-              accent="indigo"
-            />
-          </div>
-        </div>
-      </section>
-
       {/* Services */}
-      <section id="services">
+      <section id="services" className="border-b border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="Services"
@@ -126,22 +104,26 @@ export default function HomePage() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <SectionHeading
-            eyebrow="Why Terian"
-            title="An engineering firm with enterprise instincts"
+            eyebrow="Why Terian Services."
+            title="20+ years of engineering experience, AI-empowered, outcome-driven."
           />
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <ValueCard
               title="Engineering-led"
-              description="Senior engineers from day one. No offshore handoff, no junior shadow team — the people writing the code are the people on the call."
+              description="20+ years of systems design and development experience. Senior engineers from day one — no offshore handoff, no junior shadow team. The people writing the code are the people on the call."
+            />
+            <ValueCard
+              title="AI-empowered"
+              description="AI is woven into how we work — development, project management, and product ownership alike — so you get faster delivery without sacrificing rigor."
             />
             <ValueCard
               title="Azure-native"
-              description="We build on Azure AD, Workday, Microsoft Graph, and the Microsoft data stack so adoption is friction-free across your tenant."
+              description="We build on Azure AD and Microsoft Graph, with data and app platforms spanning Azure Data Factory, Container Apps, CosmosDB, and Azure SQL — all deployed inside private networks for enterprise-grade isolation."
             />
             <ValueCard
               title="Outcome-anchored"
-              description="Every engagement starts with the metric we're moving and ends with proof we moved it. No vanity dashboards, no dead reports."
+              description="Every engagement starts with a defined outcome — we scope it, build it, and hand off clean. No open-ended retainers, no lock-in."
             />
           </div>
         </div>
@@ -188,43 +170,6 @@ function SectionHeading({
   );
 }
 
-function ProductCard({
-  tag,
-  title,
-  description,
-  href,
-  ctaLabel,
-  accent,
-}: {
-  tag: string;
-  title: string;
-  description: string;
-  href: string;
-  ctaLabel: string;
-  accent: "teal" | "indigo";
-}) {
-  const accentClasses =
-    accent === "teal"
-      ? "border-teal-400/30 bg-teal-400/10 text-teal-300"
-      : "border-indigo-400/30 bg-indigo-400/10 text-indigo-300";
-
-  return (
-    <a
-      href={href}
-      className="group flex flex-col rounded-xl border-2 border-white/10 bg-[#0f0d18] p-8 transition hover:border-teal-400"
-    >
-      <span className={`inline-flex w-fit rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${accentClasses}`}>
-        {tag}
-      </span>
-      <h3 className="mt-5 text-2xl font-bold text-slate-100">{title}</h3>
-      <p className="mt-3 text-sm leading-7 text-slate-300">{description}</p>
-      <span className="mt-6 text-sm font-semibold text-teal-400 group-hover:text-teal-300">
-        {ctaLabel} →
-      </span>
-    </a>
-  );
-}
-
 function ServiceCard({
   icon,
   title,
@@ -244,7 +189,7 @@ function ServiceCard({
       <div className="text-2xl">{icon}</div>
       <h3 className="mt-4 text-lg font-bold text-slate-100">{title}</h3>
       <p className="mt-2 flex-1 text-sm leading-6 text-slate-300">{description}</p>
-      <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-teal-400 group-hover:text-teal-300">
+      <span className="mt-4 text-xs font-semibold tracking-wider text-teal-400 group-hover:text-teal-300">
         Learn more →
       </span>
     </a>

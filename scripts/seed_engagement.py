@@ -1,8 +1,8 @@
 """
 seed_engagement.py
 ──────────────────
-One-off script to upsert the Award Nomination engagement document into
-the CosmosDB engagement_details container.
+One-off script to upsert the engagement documents (Award Nomination,
+Contract Services) into the CosmosDB engagement_details container.
 
 Run locally (requires az login or AZURE_COSMOS_KEY env var):
 
@@ -142,6 +142,76 @@ AWARD_NOMINATION_DOC = {
     ),
 }
 
+CONTRACT_SERVICES_DOC = {
+    "id": "contract-services",
+    "service": "Contract Services",
+    "tagline": "Every engagement starts with a defined outcome — we scope it, build it, and hand off clean.",
+    "tiers": [
+        {
+            "name": "Focused Engagement",
+            "range": "$15K – $50K",
+            "duration": "4–8 weeks",
+            "description": "A single, well-defined deliverable: a fraud-detection proof of concept, an analytics module, or a cloud migration assessment.",
+            "examples": [
+                "Anomaly-detection POC",
+                "Migration readiness assessment",
+                "Dashboard / reporting module",
+            ],
+            "highlight": False,
+        },
+        {
+            "name": "Standard Engagement",
+            "range": "$50K – $150K",
+            "duration": "8–16 weeks",
+            "description": "A production-ready system: a full integrity-detection pipeline, a cloud migration phase, or an analytics platform with live data.",
+            "examples": [
+                "Production fraud-detection pipeline",
+                "Datacenter-to-Azure migration phase",
+                "End-to-end analytics platform",
+            ],
+            "highlight": True,
+        },
+        {
+            "name": "Enterprise Engagement",
+            "range": "$150K+",
+            "duration": "3–6 months",
+            "description": "Multi-phase builds: org-wide AI/ML rollouts, large-scale cloud migrations, or programs spanning several of our service areas.",
+            "examples": [
+                "Multi-phase migration program",
+                "Org-wide AI/ML platform rollout",
+                "Combined analytics + integrity program",
+            ],
+            "highlight": False,
+        },
+    ],
+    "payment_steps": [
+        {
+            "title": "Deposit",
+            "detail": "25–30% due at signing. Secures the schedule and covers ramp-up — environment access, data review, and planning.",
+        },
+        {
+            "title": "Milestone payments",
+            "detail": "Spread across phase deliverables — architecture sign-off, working prototype, UAT — so payment tracks visible progress.",
+        },
+        {
+            "title": "Final payment",
+            "detail": "Due at handoff, once documentation, runbooks, and knowledge transfer are complete.",
+        },
+    ],
+    "discovery_sprint": {
+        "title": "Start with a paid discovery sprint.",
+        "description": (
+            "A 1–2 week scoping sprint ($5K–$15K) gets you a concrete proposal — architecture sketch, scope, "
+            "timeline, and fixed price — before you commit to a full engagement. If you move forward, the "
+            "sprint fee is credited toward the contract."
+        ),
+    },
+    "services_note": (
+        "Every contract is priced as a fixed fee against a defined deliverable — not an open-ended hourly tab. "
+        "The ranges above reflect typical scope and duration; your discovery call gets you an exact number."
+    ),
+}
+
 
 async def seed() -> None:
     endpoint = os.environ.get("AZURE_COSMOS_ENDPOINT", "")
@@ -162,6 +232,10 @@ async def seed() -> None:
                 .get_container_client(_CONTAINER)
             )
             result = await container.upsert_item(body=AWARD_NOMINATION_DOC)
+            print(f"Upserted: id={result['id']}  service={result['service']}")
+            print(json.dumps(result, indent=2, default=str))
+
+            result = await container.upsert_item(body=CONTRACT_SERVICES_DOC)
             print(f"Upserted: id={result['id']}  service={result['service']}")
             print(json.dumps(result, indent=2, default=str))
 

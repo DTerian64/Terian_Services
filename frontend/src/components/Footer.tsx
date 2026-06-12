@@ -1,8 +1,18 @@
-type LinkItem = { label: string; href: string };
+type LinkItem = { label: string; href: string; target?: string; rel?: string };
 
 const PRODUCTS: LinkItem[] = [
-  { label: "Award Nomination System", href: "/products/award-nomination" },
-  { label: "Integrity Sentinel (Coming Soon)", href: "/products/integrity-sentinel" },
+  {
+    label: "Award Nomination System",
+    href: "https://www.terianix.ai/products/award-nomination",
+    target: "_blank",
+    rel: "noopener noreferrer",
+  },
+  {
+    label: "Integrity Sentinel (Coming Soon)",
+    href: "https://www.terianix.ai/products/integrity-sentinel",
+    target: "_blank",
+    rel: "noopener noreferrer",
+  },
 ];
 
 const SERVICES: LinkItem[] = [
@@ -62,7 +72,7 @@ function FooterColumn({ title, items }: { title: string; items: LinkItem[] }) {
       <ul className="mt-4 space-y-2 text-sm">
         {items.map((item) => (
           <li key={item.href}>
-            <a href={item.href} className="text-white/75 transition hover:text-teal-300">
+            <a href={item.href} target={item.target} rel={item.rel} className="text-white/75 transition hover:text-teal-300">
               {item.label}
             </a>
           </li>
