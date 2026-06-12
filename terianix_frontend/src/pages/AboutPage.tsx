@@ -62,8 +62,8 @@ export default function AboutPage() {
       <section className="bg-[#0f0d18] text-white">
         <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-6 px-6 py-14 lg:flex-row lg:items-center lg:px-10">
           <div>
-            <h2 className="text-2xl font-bold md:text-3xl">Have a problem worth talking about?</h2>
-            <p className="mt-2 text-white/70">We'll spend 30 minutes on it with you, no slides.</p>
+            <h2 className="text-2xl font-bold md:text-3xl">Like what you see?</h2>
+            <p className="mt-2 text-white/70">Let's talk about Award Nomination, Integrity Sentinel, or working together.</p>
           </div>
           <a
             href="/contact"

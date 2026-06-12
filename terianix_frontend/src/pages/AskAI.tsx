@@ -541,7 +541,7 @@ export default function AskAIPage() {
               <button
                 type="button"
                 onClick={startNewConversation}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-400"
               >
                 <SparkleIcon size={14} />
                 New conversation
@@ -639,9 +639,9 @@ export default function AskAIPage() {
             >
               {chatMessages.length === 0 && !isDragOver && (
                 <div className="flex h-full flex-col items-center justify-center text-center">
-                  <SendIcon size={40} className="mb-6 text-gray-300 md:mb-4 md:text-gray-200" />
+                  <SparkleIcon size={40} className="mb-6 text-violet-400 md:mb-4" />
                   <p className="mb-2 text-xl font-semibold text-gray-800 md:mb-1 md:text-base md:font-medium md:text-gray-500">
-                    Ask anything about Terian's products and services
+                    Ask anything about Terianix.ai products
                   </p>
                   <p className="text-sm text-gray-500 md:text-gray-400">
                     Trends, fraud patterns, integrations, security posture — all in one conversation.
@@ -664,7 +664,7 @@ export default function AskAIPage() {
                   <div
                     className={`max-w-3xl rounded-2xl px-4 py-3 ${
                       msg.role === "user"
-                        ? "rounded-br-sm bg-blue-600 text-white"
+                        ? "rounded-br-sm bg-violet-500 text-white"
                         : "rounded-bl-sm bg-gray-100 text-gray-800"
                     }`}
                   >
@@ -787,7 +787,7 @@ export default function AskAIPage() {
                     className="flex-1 resize-none overflow-hidden bg-transparent px-4 py-3 text-sm
                                leading-relaxed focus:outline-none
                                md:rounded-xl md:border md:border-gray-300 md:bg-white
-                               md:focus:border-blue-500 md:focus:ring-2 md:focus:ring-blue-500"
+                               md:focus:border-violet-400 md:focus:ring-2 md:focus:ring-violet-400"
                     style={{ maxHeight: "160px", overflowY: "auto" }}
                   />
 
@@ -802,7 +802,7 @@ export default function AskAIPage() {
                         title="Attach image"
                         className={`flex items-center justify-center rounded-full p-1.5 transition-colors disabled:opacity-40 ${
                           attachedFile
-                            ? "bg-blue-100 text-blue-600"
+                            ? "bg-violet-100 text-violet-600"
                             : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                         }`}
                       >
@@ -834,7 +834,7 @@ export default function AskAIPage() {
                   title="Attach image (or drag and drop)"
                   className={`hidden md:flex items-center justify-center rounded-xl p-3 transition-colors disabled:opacity-40 ${
                     attachedFile
-                      ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                      ? "bg-violet-100 text-violet-600 hover:bg-violet-200"
                       : "border border-gray-300 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                   }`}
                 >
@@ -846,7 +846,7 @@ export default function AskAIPage() {
                   type="button"
                   onClick={handleAskQuestion}
                   disabled={!canSend}
-                  className="hidden md:flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 bg-blue-600 hover:bg-blue-700"
+                  className="hidden md:flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-medium text-white transition-colors disabled:bg-gray-300 bg-violet-500 hover:bg-violet-400"
                 >
                   <SendIcon size={16} />
                   {aiLoading ? "Thinking…" : "Send"}

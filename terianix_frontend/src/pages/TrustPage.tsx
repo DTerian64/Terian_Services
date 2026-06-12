@@ -6,8 +6,8 @@ export default function TrustPage() {
     <PageLayout>
       <PageHero
         eyebrow="Trust & Security"
-        title="Boring on purpose."
-        description="The security posture for Terian-operated products and services. Built around three commitments: secure, isolated, provable. For SOC controls in detail, contact security@terian-services.com."
+        title="Built to be trusted with your data."
+        description="The security posture for Terianix.ai-operated products. Built around three commitments: secure, isolated, provable. For SOC controls in detail, contact security@terian-services.com."
       />
 
       <section className="border-t border-white/15">
@@ -19,15 +19,15 @@ export default function TrustPage() {
             Secure. Isolated. Provable.
           </h2>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
-            <Pillar
+            <Card
               title="Secure"
               description="Encryption at rest and in transit, identity-led access, threat-monitored. Defense-in-depth from identity through application."
             />
-            <Pillar
+            <Card
               title="Isolated"
               description="Hard tenant boundaries enforced at the database, identity, and network layers. Your data never crosses into another customer's compute or storage."
             />
-            <Pillar
+            <Card
               title="Provable"
               description="Every state change, approval, and model decision is captured in an immutable audit trail. Exportable, reviewable, defensible."
             />
@@ -46,28 +46,13 @@ export default function TrustPage() {
             <Card title="Identity" description="Microsoft Azure AD / Entra ID for all user authentication. SSO and MFA enforced. B2B guest access for partners and demo environments — invitation-only, time-bound." />
             <Card title="Encryption" description="Encryption at rest (Azure-managed keys; customer-managed keys on request) and in transit (TLS 1.2+ everywhere). Secrets in Azure Key Vault." />
             <Card title="Defense in depth" description="Layered controls: identity → network → data → application. No single control is the last line. WAF, private endpoints, RBAC, and runtime monitoring all working in concert." />
-            <Card title="Tenant isolation" description="Per-tenant database schemas (or separate databases for higher tiers), row-level security, and identity-scoped storage paths. ML models are tenant-isolated — your data never trains a model used elsewhere." />
-            <Card title="Least privilege by default" description="Role-based access control with no standing admin. Just-in-time elevation via Azure Privileged Identity Management. Service principals scoped to the smallest possible permission set." />
+            <Card title="Tenant isolation" description="Shared-schema architecture enforced with row-level security and identity-scoped storage paths, with dedicated databases available for higher tiers. ML models are tenant-isolated — your data never trains a model used elsewhere." />
+            <Card title="Least privilege by default" description="Role-based access control at the application layer — users, admins, and HR business partners in Award Nomination, with product-specific roles for Integrity Sentinel. Each role can see and do only what its function requires." />
             <Card title="Confidentiality of inference" description="For AI features, your prompts, embeddings, and inputs are not used to train cross-tenant models. LLM calls go through tenant-scoped endpoints with logging you control." />
-            <Card title="Logging & monitoring" description="Azure Monitor, Log Analytics, Microsoft Defender for Cloud. Audit logs retained per engagement; export available. Anomaly alerts on identity, network, and data-plane signals." />
+            <Card title="Logging & monitoring" description="Azure Monitor, Log Analytics, and Microsoft Defender for Cloud cover infrastructure and security signals, with anomaly alerts on identity, network, and data-plane activity. Application-level audit trails (see Provable, above) are retained independently and are exportable on request." />
             <Card title="Audit trail (provable)" description="Every nomination, approval, model flag, and configuration change is captured with actor, timestamp, and prior/next state. Exportable for SOX, internal audit, and regulator review." />
             <Card title="Data sovereignty" description="Primary region: Microsoft Azure West US 2. Customer data stays in the elected region. EU / UK / Canada landing zones available on request for regulated workloads." />
           </div>
-        </div>
-      </section>
-
-      <section className="border-t border-white/15">
-        <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Services engagements</p>
-          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-            Your tenant. Your data. Our discipline.
-          </h2>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-            For services engagements (AI Analytics, Integrity & Fraud Detection, Data Mining, Cloud
-            Migration, MLOps), we typically operate inside the client's Azure tenant under MSA and
-            DPA. Sensitive data does not leave the client environment. Engineers are background-checked
-            and use ephemeral, MFA-protected access scoped to the engagement.
-          </p>
         </div>
       </section>
 
@@ -78,9 +63,9 @@ export default function TrustPage() {
             Where we are today.
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-            Terian Services builds on the inherited compliance posture of Microsoft Azure (SOC 2, ISO
+            Terianix.ai builds on the inherited compliance posture of Microsoft Azure (SOC 2, ISO
             27001, HIPAA, FedRAMP — see the Microsoft Trust Center). For our own products, we are
-            working toward independent SOC 2 Type II attestation. Specific control documentation is
+            working toward an independent SOC 2 Type II attestation. Specific control documentation is
             available under NDA.
           </p>
         </div>
@@ -110,15 +95,6 @@ function Card({ title, description }: { title: string; description: string }) {
     <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-violet-400 p-6">
       <h3 className="text-base font-bold text-slate-100">{title}</h3>
       <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
-    </div>
-  );
-}
-
-function Pillar({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-6">
-      <h3 className="text-lg font-bold text-violet-300">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-violet-100/80">{description}</p>
     </div>
   );
 }

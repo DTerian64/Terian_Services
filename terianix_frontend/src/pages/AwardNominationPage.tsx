@@ -359,9 +359,23 @@ export default function AwardNominationPage() {
         eyebrow="Product · ML/AI Integrity-enforced"
         title="Award Nomination System"
         description="Peer-to-peer and manager-led recognition with ML/AI integrity enforcement baked in — bias detection and collusion surfacing run on every nomination, flagged cases are routed through human-in-the-loop HRBP review, then manager approval, before awards drop directly into your HR or payroll system."
-        primaryCta={{ label: "Join Demo Inc.", href: DEMO_REQUEST_URL, target: "_blank", rel: "noreferrer" }}
-        secondaryCta={{ label: "Product presentation →", onClick: () => setDeckModalOpen(true) }}
-        tertiaryCta={{ label: "Book live demo →", href: "/contact" }}
+        primaryCta={{
+          label: "Join Demo Inc.",
+          href: DEMO_REQUEST_URL,
+          target: "_blank",
+          rel: "noreferrer",
+          tooltip: "Sign into a live sandbox tenant — \"Demo Inc.\" — pre-loaded with sample nominations, fraud flags, and approval queues. No setup, explore the real product right away.",
+        }}
+        secondaryCta={{
+          label: "Product presentation →",
+          onClick: () => setDeckModalOpen(true),
+          tooltip: "Generate a short PowerPoint overview of the Award Nomination System, personalized with your organization's name — ready to download and share internally.",
+        }}
+        tertiaryCta={{
+          label: "Book live demo →",
+          href: "/contact",
+          tooltip: "Schedule time with our team for a guided walkthrough of the platform, tailored to your organization's nomination categories and approval workflow.",
+        }}
       />
 
       {/* ── Platform banner ── */}

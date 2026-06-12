@@ -4,7 +4,7 @@ import PageHero from "../components/PageHero";
 
 const INQUIRY_TYPES = [
   "Product demo",
-  "Services consultation",
+  "Potential engagement",
   "Partnership",
   "Press",
   "Other",
@@ -27,7 +27,7 @@ export default function ContactPage() {
   const [name, setName]       = useState("");
   const [email, setEmail]     = useState("");
   const [company, setCompany] = useState("");
-  const [inquiry, setInquiry] = useState<InquiryType>("Services consultation");
+  const [inquiry, setInquiry] = useState<InquiryType>("Product demo");
   const [message, setMessage] = useState("");
   const [status, setStatus]   = useState<Status>("idle");
   const [files, setFiles]     = useState<File[]>([]);
@@ -94,8 +94,8 @@ export default function ContactPage() {
     <PageLayout>
       <PageHero
         eyebrow="Contact"
-        title="Tell us what you're working on."
-        description="Whether you're evaluating a product, scoping a services engagement, or just have a question — we read every message and reply within one business day."
+        title="We would like to hear from you."
+        description="Whether you're requesting a demo, exploring a partnership, or just have a question — we read every message and reply within one business day."
       />
 
       <section className="border-t border-white/15">
