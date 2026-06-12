@@ -238,6 +238,17 @@ export default function ContractServicesPage() {
                 <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
                   {doc.discovery_sprint.description}
                 </p>
+                {(() => {
+                  const sprintTier = doc.tiers.find((t) => t.slug === "discovery-sprint");
+                  return sprintTier ? (
+                    <a
+                      href={sprintTier.cta_href}
+                      className="mt-6 inline-flex items-center justify-center rounded-lg border border-white/20 px-5 py-3 text-sm font-bold uppercase tracking-wider text-slate-100 transition hover:bg-white/10"
+                    >
+                      {sprintTier.cta_label} →
+                    </a>
+                  ) : null;
+                })()}
               </div>
             </>
           )}

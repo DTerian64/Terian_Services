@@ -157,6 +157,23 @@ CONTRACT_SERVICES_DOC = {
     "tagline": "Every engagement starts with a defined outcome — we scope it, build it, and hand off clean.",
     "tiers": [
         {
+            "name": "Paid Discovery Sprint",
+            "slug": "discovery-sprint",
+            "summary": "$5K–$15K · 1–2 weeks",
+            "range": "$5K – $15K",
+            "duration": "1–2 weeks",
+            "description": "A short scoping sprint that produces an architecture sketch, defined scope, timeline, and fixed price for a full engagement. If you move forward, the sprint fee is credited toward the contract.",
+            "examples": [
+                "Architecture sketch & scope",
+                "Fixed-price proposal",
+                "Credited toward a full engagement",
+            ],
+            "highlight": False,
+            "show_in_pricing": False,
+            "cta_label": "Get started",
+            "cta_href": "/engagement/new?tier=discovery-sprint&service=contract-services&type=Contract+Services",
+        },
+        {
             "name": "Focused Engagement",
             "slug": "focused-engagement",
             "summary": "$15K–$50K · 4–8 weeks",
@@ -206,23 +223,6 @@ CONTRACT_SERVICES_DOC = {
             "show_in_pricing": True,
             "cta_label": "Get started",
             "cta_href": "/engagement/new?tier=enterprise-engagement&service=contract-services&type=Contract+Services",
-        },
-        {
-            "name": "Paid Discovery Sprint",
-            "slug": "discovery-sprint",
-            "summary": "$5K–$15K · 1–2 weeks",
-            "range": "$5K – $15K",
-            "duration": "1–2 weeks",
-            "description": "A short scoping sprint that produces an architecture sketch, defined scope, timeline, and fixed price for a full engagement. If you move forward, the sprint fee is credited toward the contract.",
-            "examples": [
-                "Architecture sketch & scope",
-                "Fixed-price proposal",
-                "Credited toward a full engagement",
-            ],
-            "highlight": False,
-            "show_in_pricing": False,
-            "cta_label": "Get started",
-            "cta_href": "/engagement/new?tier=discovery-sprint&service=contract-services&type=Contract+Services",
         },
     ],
     "payment_steps": [

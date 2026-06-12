@@ -528,7 +528,7 @@ export default function NewEngagementPage() {
                   href={`/pricing/${SERVICE_SLUG}`}
                   className="mt-3 block text-xs text-slate-500 transition hover:text-teal-400"
                 >
-                  ← Change plan
+                  ← Change tier
                 </a>
               </div>
             )}

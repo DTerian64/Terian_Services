@@ -492,7 +492,7 @@ export default function NewEngagementPage() {
                   href="/pricing/award-nomination"
                   className="mt-3 block text-xs text-slate-500 transition hover:text-violet-400"
                 >
-                  ← Change plan
+                  ← Change tier
                 </a>
               </div>
             )}
