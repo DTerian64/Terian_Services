@@ -8,11 +8,14 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 interface EngagementTier {
   name: string;
+  slug: string;
+  summary: string;
   range: string;
   duration: string;
   description: string;
   examples: string[];
   highlight: boolean;
+  show_in_pricing: boolean;
   cta_label: string;
   cta_href: string;
 }
@@ -160,7 +163,7 @@ export default function ContractServicesPage() {
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">{doc.services_note}</p>
 
               <div className="mt-12 grid gap-6 lg:grid-cols-3">
-                {doc.tiers.map((tier) => (
+                {doc.tiers.filter((tier) => tier.show_in_pricing).map((tier) => (
                   <div
                     key={tier.name}
                     className={`relative flex flex-col rounded-2xl p-8 transition-all duration-200 ${

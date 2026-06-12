@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 
@@ -7,6 +7,18 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 // Read tier + type pre-selected from query string (set by pricing page CTA links)
 function getQueryParam(key: string): string {
   return new URLSearchParams(window.location.search).get(key) ?? "";
+}
+
+// ── Tier options (fetched from CosmosDB engagement_details) ───────────────────
+
+interface TierOption {
+  name: string;
+  slug: string;
+  summary: string;
+}
+
+interface EngagementDoc {
+  tiers: TierOption[];
 }
 
 // ── Field component ───────────────────────────────────────────────────────────
@@ -168,12 +180,16 @@ function Step2({
   onNext,
   onBack,
   submitting,
+  tierOptions,
+  tiersLoading,
 }: {
   data: Step2Data;
   onChange: (d: Partial<Step2Data>) => void;
   onNext: () => void;
   onBack: () => void;
   submitting: boolean;
+  tierOptions: TierOption[];
+  tiersLoading: boolean;
 }) {
   const [errors, setErrors] = useState<Partial<Record<keyof Step2Data, string>>>({});
 
@@ -239,12 +255,15 @@ function Step2({
           id="tier_interest"
           value={data.tier_interest}
           onChange={(e) => onChange({ tier_interest: e.target.value })}
+          disabled={tiersLoading}
           className={inputCls}
         >
-          <option value="">Select a tier…</option>
-          <option value="Starter">Starter — up to 50 users</option>
-          <option value="Professional">Professional — 50–500 users</option>
-          <option value="Enterprise">Enterprise — 500+ users</option>
+          <option value="">{tiersLoading ? "Loading tiers…" : "Select a tier…"}</option>
+          {tierOptions.map((tier) => (
+            <option key={tier.slug} value={tier.slug}>
+              {tier.name} — {tier.summary}
+            </option>
+          ))}
         </select>
         {errors.tier_interest && (
           <p className="mt-1 text-xs text-red-400">{errors.tier_interest}</p>
@@ -391,10 +410,15 @@ function StepIndicator({ current }: { current: number }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+// Slug of the service this engagement request is for (set by pricing page CTA links).
+const SERVICE_SLUG = getQueryParam("service") || "award-nomination";
+
 export default function NewEngagementPage() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [tierOptions, setTierOptions] = useState<TierOption[]>([]);
+  const [tiersLoading, setTiersLoading] = useState(true);
 
   const [step1, setStep1] = useState<Step1Data>({
     full_name: "",
@@ -411,6 +435,17 @@ export default function NewEngagementPage() {
     tier_interest: getQueryParam("tier"),
     engagement_type: getQueryParam("type") || "Award Nomination",
   });
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/engagement/${SERVICE_SLUG}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json() as Promise<EngagementDoc>;
+      })
+      .then((doc) => setTierOptions(doc.tiers ?? []))
+      .catch(() => setTierOptions([]))
+      .finally(() => setTiersLoading(false));
+  }, []);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -485,10 +520,12 @@ export default function NewEngagementPage() {
                   {step2.engagement_type}
                 </p>
                 {step2.tier_interest && (
-                  <p className="mt-1 text-sm text-teal-400">{step2.tier_interest} tier</p>
+                  <p className="mt-1 text-sm text-teal-400">
+                    {tierOptions.find((t) => t.slug === step2.tier_interest)?.name ?? step2.tier_interest} tier
+                  </p>
                 )}
                 <a
-                  href="/pricing/award-nomination"
+                  href={`/pricing/${SERVICE_SLUG}`}
                   className="mt-3 block text-xs text-slate-500 transition hover:text-teal-400"
                 >
                   ← Change plan
@@ -523,6 +560,8 @@ export default function NewEngagementPage() {
                   onNext={handleSubmit}
                   onBack={() => setStep(1)}
                   submitting={submitting}
+                  tierOptions={tierOptions}
+                  tiersLoading={tiersLoading}
                 />
                 {submitError && (
                   <p className="mt-4 text-sm text-red-400">{submitError}</p>
