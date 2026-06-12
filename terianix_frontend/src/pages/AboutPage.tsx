@@ -6,9 +6,9 @@ export default function AboutPage() {
     <PageLayout>
       <section>
         <div className="mx-auto max-w-5xl px-6 py-20 text-center lg:px-10 lg:py-24">
-          <h1 className="font-playfair text-4xl font-bold tracking-tight text-slate-100 md:text-5xl">About Terianix</h1>
+          <h1 className="font-playfair text-4xl font-bold tracking-tight text-slate-100 md:text-5xl">About Terianix.ai</h1>
           <p className="mt-6 text-lg leading-8 text-slate-300">
-            The team, the philosophy, and why we build the way we do.
+            An Azure-native engineering team building the integrity layer for enterprise data.
           </p>
         </div>
         <div className="mx-auto max-w-5xl px-6 pb-20 lg:px-10 lg:pb-24">
@@ -16,13 +16,13 @@ export default function AboutPage() {
             <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] p-6 transition hover:border-violet-400">
               <h2 className="font-playfair text-lg font-bold text-slate-100">Our mission</h2>
               <p className="mt-2 text-sm leading-7 text-slate-300">
-                Is to build the integrity layer enterprises wrap around their most sensitive workflows — awards, expenses, vendor payments — so bias and fraud get caught before they cost you.
+                Our mission is to make integrity the default state of enterprise data. We set out to build the integrity layer enterprises wrap around their most sensitive workflows — awards, expenses, vendor payments — so bias and fraud are caught before they cost, and honest work is never in doubt.
               </p>
             </div>
             <div className="rounded-xl border-2 border-white/10 bg-[#0a0916] p-6 transition hover:border-violet-400">
               <h2 className="font-playfair text-lg font-bold text-slate-100">Our vision</h2>
               <p className="mt-2 text-sm leading-7 text-slate-300">
-                Is to make ML/AI-enforced integrity standard infrastructure for enterprise software, the same way encryption and access control became standard.
+                Enterprise software where integrity is part of the architecture, not an afterthought. We see a future where every transaction, record, and decision is verifiable by design — and where machine learning quietly does the auditing that organizations today do manually, late, or not at all. Our vision is to make AI-enforced integrity standard infrastructure, the same way encryption and access control became standard.
               </p>
             </div>
           </div>
@@ -33,27 +33,27 @@ export default function AboutPage() {
 
       <section className="border-t border-white/15">
         <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">How we work</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">How we build</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-            Four habits we don't compromise on.
+            Principles that shape every system we deliver.
           </h2>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2">
             <Habit
-              title="Security by default"
-              description="Azure AD authentication, encryption at rest and in transit, least-privilege access, and audit trails on every state change. The boring stuff, done early."
+              title="Multi-tenant from the ground up"
+              description="Security, data isolation, and per-tenant configurability aren't features we added — they're the foundation. Every tenant gets its own isolated data, its own configuration, and its own trained model."
             />
             <Habit
-              title="Measure everything"
-              description="If we can't tell whether the change made things better, we don't ship it. Every engagement has a baseline metric and a target."
+              title="Measurable, observable, traceable"
+              description="Instrumentation is part of development, not a post-launch chore. Every release ships with metrics, distributed tracing, and dashboards already wired in."
             />
             <Habit
-              title="Ship in production"
-              description="Demos die in dev. We work toward production from day one — feature flags, staged rollouts, observability wired in."
+              title="The right model for the problem"
+              description="Random Forest, XGBoost, LightGBM — we maintain multiple ML approaches and pick per problem, per tenant. No one-size-fits-all model pretending to fit all."
             />
             <Habit
-              title="Right-size the solution"
-              description="A LightGBM model and a SQL view often beat a deep learning architecture. We pick the smallest tool that solves the problem."
+              title="Never finished"
+              description="Models retrain as data grows. Features ship continuously. The product you buy improves every month you run it."
             />
           </div>
         </div>
