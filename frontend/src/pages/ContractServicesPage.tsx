@@ -13,6 +13,8 @@ interface EngagementTier {
   description: string;
   examples: string[];
   highlight: boolean;
+  cta_label: string;
+  cta_href: string;
 }
 
 interface PaymentStep {
@@ -191,6 +193,17 @@ export default function ContractServicesPage() {
                         </li>
                       ))}
                     </ul>
+
+                    <a
+                      href={tier.cta_href}
+                      className={`mt-8 flex w-full items-center justify-center rounded-lg px-5 py-3 text-sm font-bold uppercase tracking-wider transition ${
+                        tier.highlight
+                          ? "bg-teal-400 text-[#0f0d18] hover:bg-teal-300"
+                          : "border border-white/20 text-slate-100 hover:bg-white/10"
+                      }`}
+                    >
+                      {tier.cta_label} →
+                    </a>
                   </div>
                 ))}
               </div>

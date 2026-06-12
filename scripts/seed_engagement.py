@@ -158,6 +158,8 @@ CONTRACT_SERVICES_DOC = {
                 "Dashboard / reporting module",
             ],
             "highlight": False,
+            "cta_label": "Get started",
+            "cta_href": "/engagement/new?tier=focused-engagement&type=Contract+Services",
         },
         {
             "name": "Standard Engagement",
@@ -170,6 +172,8 @@ CONTRACT_SERVICES_DOC = {
                 "End-to-end analytics platform",
             ],
             "highlight": True,
+            "cta_label": "Get started",
+            "cta_href": "/engagement/new?tier=standard-engagement&type=Contract+Services",
         },
         {
             "name": "Enterprise Engagement",
@@ -182,6 +186,8 @@ CONTRACT_SERVICES_DOC = {
                 "Combined analytics + integrity program",
             ],
             "highlight": False,
+            "cta_label": "Get started",
+            "cta_href": "/engagement/new?tier=enterprise-engagement&type=Contract+Services",
         },
     ],
     "payment_steps": [
