@@ -1,9 +1,21 @@
+import { useEffect, useState } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 
+// A "proof" sample drawn from our flagship build — the Award Nomination System.
+// Each maps a capability claim on this page to a tangible artifact from that product.
+type Sample = {
+  src: string;
+  eyebrow: string;
+  caption: string;
+};
+
 export default function AIAnalyticsPage() {
+  const [sample, setSample] = useState<Sample | null>(null);
+
   return (
     <PageLayout>
+      {sample && <SampleModal sample={sample} onClose={() => setSample(null)} />}
       <PageHero
         eyebrow="Service"
         title="AI Analytics"
@@ -19,11 +31,79 @@ export default function AIAnalyticsPage() {
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <Card title="Forecasting" description="Demand, headcount, spend, and capacity planning with quantified uncertainty bands." />
-          <Card title="Classification" description="Risk scoring, churn propensity, ticket triage — calibrated, monitored, with explanation layers." />
-          <Card title="Anomaly detection" description="Time-series, multivariate, and embedding-based outlier detection on operational data." />
-          <Card title="NLP on unstructured text" description="Topic modeling, entity extraction, sentiment, and policy-aware classification on documents and tickets." />
-          <Card title="Embedding-based search" description="Semantic search and retrieval over policies, contracts, knowledge bases, and historical resolutions." />
-          <Card title="Generative AI integration" description="LLM-powered features in line-of-business apps with retrieval, evals, and guardrails." />
+          <Card
+            title="Classification"
+            description="Risk scoring, churn propensity, ticket triage — calibrated, monitored, with explanation layers."
+            onSample={() =>
+              setSample({
+                src: "/fraud_feature_importance.png",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Feature importance from the shipped per-tenant Random Forest — collusion and concentration signals dominate, so every fraud score is attributable to inputs like these.",
+              })
+            }
+          />
+          <Card
+            title="Anomaly detection"
+            description="Time-series, multivariate, and embedding-based outlier detection on operational data."
+            onSample={() =>
+              setSample({
+                src: "/award_anomaly_super_nominator.png",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Behavioural outlier detection — a single user's nomination volume flagged against the tenant's statistical baseline (mean 5.0, threshold 14.5).",
+              })
+            }
+          />
+          <Card
+            title="Graph & relationship analytics"
+            description="Entity-and-relationship graphs over the people and approvals in your workflows — surfacing collusion rings, reciprocal cycles, approver affinity, and volume outliers that row-by-row metrics miss."
+            onSample={() =>
+              setSample({
+                src: "/award_graph_nomination_ring.png",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Relationship-graph analysis — a directed cycle of mutual nominations (a collusion ring) traced across four users and their approvers.",
+              })
+            }
+          />
+          <Card
+            title="NLP on unstructured text"
+            description="Semantic analysis of free-text submissions — category-alignment scoring, duplicate and copied-content detection, and policy-aware classification of unstructured descriptions."
+            onSample={() =>
+              setSample({
+                src: "/award_category_mismatch.png",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Policy-aware text analysis — a nomination auto-returned because its description scored only 0.12 semantic similarity to the award category (minimum 0.12).",
+              })
+            }
+          />
+          <Card
+            title="Embedding-based search"
+            description="Embedding-based similarity and nearest-neighbour retrieval over historical records — surfacing duplicates, near-matches, and copied content in real time."
+            onSample={() =>
+              setSample({
+                src: "/award_embedding_pair_history.png",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Nearest-neighbour retrieval — a new submission matched to its most-similar prior nomination (0.94 similarity) with the full pair history surfaced for review.",
+              })
+            }
+          />
+          <Card
+            title="Generative AI integration"
+            description="LLM-powered features in line-of-business apps with retrieval, evals, and guardrails."
+            sampleLabel="View architecture →"
+            onSample={() =>
+              setSample({
+                src: "/ask_ai_orchestration_flow.svg",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Analytics Q&A agent — an LLM tool-calling loop wired to schema, export, fraud, and graph skills.",
+              })
+            }
+          />
         </div>
       </section>
 
@@ -65,10 +145,26 @@ export default function AIAnalyticsPage() {
             <Card
               title="Data lineage"
               description="Versioned datasets, feature pipelines, and model artifacts wired through MLflow / Azure ML. Every prediction is reproducible from inputs and weights."
+              onSample={() =>
+                setSample({
+                  src: "/award_nomination_architecture.svg",
+                  eyebrow: "Sample · Award Nomination System",
+                  caption:
+                    "Production architecture — per-tenant models versioned in Blob Storage, retrained and re-streamed without redeploy.",
+                })
+              }
             />
             <Card
               title="Decision provenance"
               description="Each model output is logged with its model version, input snapshot, and explanation layer (SHAP, integrated gradients, or token-level attribution for LLMs)."
+              onSample={() =>
+                setSample({
+                  src: "/awards-nomination-log-analytics.png",
+                  eyebrow: "Sample · Award Nomination System",
+                  caption:
+                    "Audit trail — every nomination decision traced through its review and approval chain, exportable for compliance.",
+                })
+              }
             />
             <Card
               title="Confidentiality of inference"
@@ -108,11 +204,70 @@ export default function AIAnalyticsPage() {
   );
 }
 
-function Card({ title, description }: { title: string; description: string }) {
+function Card({
+  title,
+  description,
+  onSample,
+  sampleLabel = "View sample →",
+}: {
+  title: string;
+  description: string;
+  onSample?: () => void;
+  sampleLabel?: string;
+}) {
   return (
     <div className="rounded-xl border-2 border-white/10 bg-[#0f0d18] transition hover:border-teal-400 p-6">
       <h3 className="text-base font-bold text-slate-100">{title}</h3>
       <p className="mt-2 text-sm leading-7 text-slate-300">{description}</p>
+      {onSample && (
+        <button
+          type="button"
+          onClick={onSample}
+          className="mt-3 text-xs font-semibold text-teal-400 transition hover:text-teal-300"
+        >
+          {sampleLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function SampleModal({ sample, onClose }: { sample: Sample; onClose: () => void }) {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border-2 border-white/10 bg-[#0f0d18] shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">{sample.eyebrow}</p>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-300">{sample.caption}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close sample"
+            className="ml-4 flex-none rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="overflow-auto p-6">
+          <img src={sample.src} alt={sample.caption} className="mx-auto w-full rounded-lg bg-white" />
+        </div>
+      </div>
     </div>
   );
 }
