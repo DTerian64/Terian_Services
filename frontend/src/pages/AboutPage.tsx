@@ -75,9 +75,9 @@ export default function AboutPage() {
           </div>
           <a
             href="/contact"
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
           >
-            Get in touch →
+            Contact us →
           </a>
         </div>
       </section>

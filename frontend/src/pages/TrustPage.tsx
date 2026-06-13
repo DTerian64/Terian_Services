@@ -6,7 +6,7 @@ export default function TrustPage() {
     <PageLayout>
       <PageHero
         eyebrow="Trust & Security"
-        title="Boring on purpose."
+        title="Built to be trusted with your data."
         description="The security posture for Terian-operated products and services. Built around three commitments: secure, isolated, provable. For SOC controls in detail, contact security@terian-services.com."
       />
 
@@ -18,15 +18,15 @@ export default function TrustPage() {
           Secure. Isolated. Provable.
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          <Pillar
+          <Card
             title="Secure"
             description="Encryption at rest and in transit, identity-led access, threat-monitored. Defense-in-depth from identity through application."
           />
-          <Pillar
+          <Card
             title="Isolated"
             description="Hard tenant boundaries enforced at the database, identity, and network layers. Your data never crosses into another customer's compute or storage."
           />
-          <Pillar
+          <Card
             title="Provable"
             description="Every state change, approval, and model decision is captured in an immutable audit trail. Exportable, reviewable, defensible."
           />
@@ -58,13 +58,12 @@ export default function TrustPage() {
         <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Services engagements</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-            Your tenant. Your data. Our discipline.
+            Scoped, time-bound access to your tenant.
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-            For services engagements (AI Analytics, Integrity & Fraud Detection, Data Mining, Cloud
-            Migration, MLOps), we typically operate inside the client's Azure tenant under MSA and
-            DPA. Sensitive data does not leave the client environment. Engineers are background-checked
-            and use ephemeral, MFA-protected access scoped to the engagement.
+            For services engagements, we typically operate inside the client's Azure tenant under MSA
+            and DPA. Sensitive data does not leave the client environment. Engineers are
+            background-checked and use ephemeral, MFA-protected access scoped to the engagement.
           </p>
         </div>
       </section>
@@ -112,11 +111,3 @@ function Card({ title, description }: { title: string; description: string }) {
   );
 }
 
-function Pillar({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="rounded-xl border border-teal-400/30 bg-teal-400/10 p-6">
-      <h3 className="text-lg font-bold text-teal-300">{title}</h3>
-      <p className="mt-2 text-sm leading-7 text-teal-100/80">{description}</p>
-    </div>
-  );
-}
