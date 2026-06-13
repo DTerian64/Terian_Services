@@ -149,6 +149,12 @@ AWARD_NOMINATION_DOC = {
         "Typical projects run 8–16 weeks. "
         "Contact us to start a conversation."
     ),
+    "notifications": {
+        "sending_corporation": "Terianix.ai",
+        "corporate_heads_up_email": "award-nomination-corporate-heads-up-email",
+        "user_welcome_email": "award-nomination-user-welcome-email",
+        "user_presentation_email": "award-nomination-user-presentation-email",
+    },
 }
 
 CONTRACT_SERVICES_DOC = {
@@ -251,6 +257,12 @@ CONTRACT_SERVICES_DOC = {
         "Every contract is priced as a fixed fee against a defined deliverable — not an open-ended hourly tab. "
         "The ranges above reflect typical scope and duration; your discovery call gets you an exact number."
     ),
+    "notifications": {
+        "sending_corporation": "Terian Services",
+        "corporate_heads_up_email": "contract-services-corporate-heads-up-email",
+        "user_welcome_email": "contract-services-user-welcome-email",
+        "user_presentation_email": "contract-services-user-presentation-email",
+    },
 }
 
 
