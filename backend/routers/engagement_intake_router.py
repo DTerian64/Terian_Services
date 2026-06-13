@@ -50,6 +50,9 @@ from azure.storage.queue.aio import QueueClient
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr, Field
 
+from services.email_template_service import get_template, render
+from services.engagement_service import get_engagement_by_service
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -67,7 +70,7 @@ _QUEUE_NAME     = os.getenv("ENGAGEMENT_INTAKE_QUEUE_NAME", "engagement-intake")
 _SMTP_USER     = os.getenv("SMTP_USER", "")
 _SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 _NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", "sales@terian-services.com")
-_FROM_NAME     = "Terianix.ai"
+_DEFAULT_FROM_NAME = "Terian Services"
 _SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 
@@ -170,254 +173,108 @@ async def _create_engagement(db_client, account_id: str, body: EngagementRegiste
     return engagement_id
 
 
-def _send_emails_sync(body: EngagementRegisterRequest, account_id: str, engagement_id: str) -> None:
+def _send_emails_sync(messages: list[tuple[str, str, str]], from_name: str) -> None:
     """
-    Send both outbound emails in a SINGLE SMTP session to avoid Gmail
-    throttling two rapid back-to-back connections from the same App Password.
+    Send one or more pre-rendered HTML emails in a SINGLE SMTP session to
+    avoid throttling back-to-back connections from the same App Password.
 
-      Msg 1 → _NOTIFY_TO   : [New Engagement] internal notification for sales@
-      Msg 2 → body.email   : Welcome / confirmation to the requester
+    Args:
+        messages: list of (subject, html_body, to_addr) tuples, already
+            rendered from CosmosDB email_templates documents.
+        from_name: display name for the From: header — this is the
+            per-service `notifications.sending_corporation` value
+            ("Terianix.ai" or "Terian Services"). Both services share the
+            same Zoho mailbox/credentials; only the display name differs.
 
     Called via asyncio.to_thread.
     """
     if not _SMTP_PASSWORD:
-        logger.warning("GMAIL_APP_PASSWORD not set — skipping all outbound emails")
+        logger.warning("SMTP_PASSWORD not set — skipping all outbound emails")
         return
 
-    from_header = f"{_FROM_NAME} <{_SMTP_USER}>"
+    if not messages:
+        return
 
-    # ── Message 1: internal notification ─────────────────────────────────────
-
-    notify_subject = f"[New Engagement] {body.org_name} — {body.engagement_type}"
-    notify_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0"
-         style="background:#f3f4f6;padding:40px 0;">
-    <tr><td align="center">
-      <table width="580" cellpadding="0" cellspacing="0"
-             style="background:#ffffff;border-radius:12px;overflow:hidden;
-                    box-shadow:0 2px 8px rgba(0,0,0,.08);max-width:580px;">
-
-        <!-- Header -->
-        <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
-                     padding:32px 40px;">
-            <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;
-                       letter-spacing:-0.3px;">New Engagement Request</h1>
-            <p style="margin:6px 0 0;color:#c4b5fd;font-size:13px;">
-              terianix.ai
-            </p>
-          </td>
-        </tr>
-
-        <!-- Body -->
-        <tr>
-          <td style="padding:32px 40px;">
-
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="border:1px solid #e5e7eb;border-radius:8px;
-                          overflow:hidden;margin-bottom:24px;">
-              <tr style="background:#f9fafb;">
-                <td colspan="2"
-                    style="padding:12px 16px;font-size:11px;font-weight:700;
-                           color:#6b7280;text-transform:uppercase;
-                           letter-spacing:0.5px;">Contact</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;width:130px;">Name</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#111827;">{body.full_name}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Email</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;">
-                  <a href="mailto:{body.email}" style="color:#0d9488;text-decoration:none;">{body.email}</a>
-                </td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Organization</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#111827;">{body.org_name}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Industry</td>
-                <td style="padding:10px 16px;font-size:13px;color:#111827;">{body.industry or "—"}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Est. Users</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#111827;">{body.user_count:,}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Engagement</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#8b5cf6;">{body.engagement_type}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Tier Interest</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#111827;">{body.tier_interest}</td>
-              </tr>
-            </table>
-
-            {"<p style='margin:0 0 8px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;'>Use Case</p><div style='background:#f9fafb;border:1px solid #e5e7eb;border-left:4px solid #8b5cf6;border-radius:6px;padding:16px;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap;'>" + body.use_case + "</div>" if body.use_case else ""}
-
-            <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;">
-              Account ID: {account_id}<br>
-              Engagement ID: {engagement_id}
-            </p>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="padding:16px 40px;border-top:1px solid #e5e7eb;
-                     background:#f9fafb;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#9ca3af;">
-              Terianix.ai · terianix.ai
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>"""
-
-    notify_msg = MIMEMultipart("alternative")
-    notify_msg["Subject"] = notify_subject
-    notify_msg["From"]    = from_header
-    notify_msg["To"]      = _NOTIFY_TO
-    notify_msg.attach(MIMEText(notify_html, "html"))
-
-    # ── Message 2: requester welcome ──────────────────────────────────────────
-
-    first_name = body.full_name.split()[0]
-    welcome_subject = "Welcome to Terianix.ai — we've received your request"
-    welcome_html = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-</head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0"
-         style="background:#f3f4f6;padding:40px 0;">
-    <tr><td align="center">
-      <table width="580" cellpadding="0" cellspacing="0"
-             style="background:#ffffff;border-radius:12px;overflow:hidden;
-                    box-shadow:0 2px 8px rgba(0,0,0,.08);max-width:580px;">
-
-        <!-- Header -->
-        <tr>
-          <td style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
-                     padding:32px 40px;">
-            <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;
-                       letter-spacing:-0.3px;">Welcome to Terianix.ai</h1>
-            <p style="margin:6px 0 0;color:#c4b5fd;font-size:13px;">
-              terianix.ai
-            </p>
-          </td>
-        </tr>
-
-        <!-- Body -->
-        <tr>
-          <td style="padding:32px 40px;">
-
-            <p style="margin:0 0 20px;font-size:15px;color:#111827;line-height:1.6;">
-              Hi {first_name},
-            </p>
-            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              Thank you for reaching out — we're glad you're here. We've received your engagement
-              request for <strong style="color:#111827;">{body.org_name}</strong> and our team
-              will be in touch shortly to discuss next steps.
-            </p>
-
-            <!-- Summary card -->
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="border:1px solid #e5e7eb;border-radius:8px;
-                          overflow:hidden;margin-bottom:24px;">
-              <tr style="background:#f9fafb;">
-                <td colspan="2"
-                    style="padding:12px 16px;font-size:11px;font-weight:700;
-                           color:#6b7280;text-transform:uppercase;
-                           letter-spacing:0.5px;">Your Request Summary</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;width:140px;">Engagement</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#8b5cf6;">{body.engagement_type}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Tier</td>
-                <td style="padding:10px 16px;font-size:13px;font-weight:600;color:#111827;">{body.tier_interest}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Organization</td>
-                <td style="padding:10px 16px;font-size:13px;color:#111827;">{body.org_name}</td>
-              </tr>
-              <tr style="border-top:1px solid #e5e7eb;background:#f9fafb;">
-                <td style="padding:10px 16px;color:#6b7280;font-size:13px;">Est. Users</td>
-                <td style="padding:10px 16px;font-size:13px;color:#111827;">{body.user_count:,}</td>
-              </tr>
-            </table>
-
-            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              We're preparing a personalised overview of how Terianix.ai can address your
-              needs. You'll receive it via a follow-up email shortly — keep an eye on your inbox.
-            </p>
-
-            <p style="margin:0 0 8px;font-size:15px;color:#374151;line-height:1.6;">
-              In the meantime, feel free to reach us at
-              <a href="mailto:sales@terian-services.com"
-                 style="color:#8b5cf6;text-decoration:none;">sales@terian-services.com</a>
-              with any questions.
-            </p>
-
-            <p style="margin:28px 0 0;font-size:15px;color:#374151;line-height:1.6;">
-              Warm regards,<br>
-              <strong style="color:#111827;">The Terianix.ai Team</strong>
-            </p>
-
-            <p style="margin:24px 0 0;font-size:11px;color:#d1d5db;">
-              Reference: {engagement_id}
-            </p>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="padding:16px 40px;border-top:1px solid #e5e7eb;
-                     background:#f9fafb;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#9ca3af;">
-              Terianix.ai · terianix.ai
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>"""
-
-    welcome_msg = MIMEMultipart("alternative")
-    welcome_msg["Subject"] = welcome_subject
-    welcome_msg["From"]    = from_header
-    welcome_msg["To"]      = str(body.email)
-    welcome_msg.attach(MIMEText(welcome_html, "html"))
-
-    # ── Single SMTP session — send both messages ───────────────────────────────
+    from_header = f"{from_name} <{_SMTP_USER}>"
 
     with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
         server.starttls()
         server.login(_SMTP_USER, _SMTP_PASSWORD)
-        server.sendmail(_SMTP_USER, [_NOTIFY_TO], notify_msg.as_string())
-        server.sendmail(_SMTP_USER, [str(body.email)], welcome_msg.as_string())
+        for subject, html_body, to_addr in messages:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"]    = from_header
+            msg["To"]      = to_addr
+            msg.attach(MIMEText(html_body, "html"))
+            server.sendmail(_SMTP_USER, [to_addr], msg.as_string())
+
+    logger.info("Emails sent: %d message(s) from '%s'", len(messages), from_name)
+
+
+async def _send_intake_emails(body: EngagementRegisterRequest, account_id: str, engagement_id: str) -> None:
+    """
+    Resolve the per-service notifications config + email templates from
+    CosmosDB, render Email #1 (internal heads-up) and Email #2 (requester
+    welcome), and send them in a single SMTP session.
+
+    Skip + log (non-fatal) if:
+      - no engagement_details document matches body.engagement_type
+      - that document has no `notifications` block
+      - a referenced email_templates document is missing
+    """
+    engagement_doc = await get_engagement_by_service(body.engagement_type)
+    if not engagement_doc or "notifications" not in engagement_doc:
+        logger.warning(
+            "No notifications config for engagement_type '%s' — skipping intake emails",
+            body.engagement_type,
+        )
+        return
+
+    notifications = engagement_doc["notifications"]
+    sending_corporation = notifications.get("sending_corporation", _DEFAULT_FROM_NAME)
+
+    tokens = {
+        "first_name":      body.full_name.split()[0] if body.full_name.strip() else "",
+        "full_name":       body.full_name,
+        "org_name":        body.org_name,
+        "email":           str(body.email),
+        "industry":        body.industry or "—",
+        "user_count":      f"{body.user_count:,}",
+        "use_case":        body.use_case,
+        "tier_interest":   body.tier_interest,
+        "engagement_type": body.engagement_type,
+        "account_id":      account_id,
+        "engagement_id":   engagement_id,
+    }
+
+    messages: list[tuple[str, str, str]] = []
+
+    heads_up_type = notifications.get("corporate_heads_up_email")
+    if heads_up_type:
+        template = await get_template(heads_up_type)
+        if template:
+            subject, html_body = render(template, tokens)
+            messages.append((subject, html_body, _NOTIFY_TO))
+
+    welcome_type = notifications.get("user_welcome_email")
+    if welcome_type:
+        template = await get_template(welcome_type)
+        if template:
+            subject, html_body = render(template, tokens)
+            messages.append((subject, html_body, str(body.email)))
+
+    if not messages:
+        logger.warning(
+            "No email templates resolved for engagement_type '%s' — skipping intake emails",
+            body.engagement_type,
+        )
+        return
+
+    await asyncio.to_thread(_send_emails_sync, messages, sending_corporation)
 
     logger.info(
-        "Emails sent: engagement_id=%s notification→%s welcome→%s",
-        engagement_id, _NOTIFY_TO, body.email,
+        "Intake emails dispatched: engagement_id=%s engagement_type=%s sender=%s",
+        engagement_id, body.engagement_type, sending_corporation,
     )
 
 
@@ -503,7 +360,7 @@ async def register_engagement(body: EngagementRegisterRequest) -> EngagementRegi
         )
 
     try:
-        await asyncio.to_thread(_send_emails_sync, body, account_id, engagement_id)
+        await _send_intake_emails(body, account_id, engagement_id)
     except Exception as exc:
         logger.warning("Email send failed (records saved): %s", exc)
 

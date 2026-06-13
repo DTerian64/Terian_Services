@@ -66,6 +66,8 @@ from azure.identity.aio import DefaultAzureCredential, ManagedIdentityCredential
 from azure.storage.queue.aio import QueueClient
 
 from agents.presentation_agent import PresentationAgent
+from services.email_template_service import get_template, render
+from services.engagement_service import get_engagement_by_service
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +83,7 @@ _FAILED_JOBS_CTR  = "failed_engagement_jobs"
 _SMTP_USER     = os.getenv("SMTP_USER", "")
 _SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 _NOTIFY_TO     = os.getenv("CONTACT_NOTIFY_EMAIL", "sales@terian-services.com")
-_FROM_NAME     = "Terian Services"
+_DEFAULT_FROM_NAME = "Terian Services"
 _SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
 _SMTP_PORT     = 587
 
@@ -101,76 +103,35 @@ def _credential():
 
 # ── Email #2 ──────────────────────────────────────────────────────────────────
 
-def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
-    """Send Email #2 with the PPTX attached — runs in asyncio.to_thread."""
+def _send_pptx_email_sync(
+    subject: str,
+    html_body: str,
+    to_addr: str,
+    pptx_bytes: bytes,
+    org_name: str,
+    from_name: str,
+) -> None:
+    """
+    Send the onboarding-presentation email with the PPTX attached.
+
+    subject/html_body are pre-rendered from the engagement's
+    `user_presentation_email` CosmosDB template (services/email_template_service.py).
+    from_name is the per-service `notifications.sending_corporation` value
+    ("Terianix.ai" or "Terian Services") — only the From: display name
+    differs per service; both share the same Zoho mailbox/credentials.
+
+    Runs in asyncio.to_thread.
+    """
     if not _SMTP_PASSWORD:
-        logger.warning("worker: GMAIL_APP_PASSWORD not set — skipping Email #2")
+        logger.warning("worker: SMTP_PASSWORD not set — skipping Email #2")
         return
-
-    to_addr    = job["email"]
-    first_name = job.get("full_name", "").split()[0] or "there"
-    org_name   = job.get("org_name", "your organisation")
-
-    subject = f"Your Terian Services onboarding overview — {org_name}"
-    html = f"""<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 0;">
-    <tr><td align="center">
-      <table width="580" cellpadding="0" cellspacing="0"
-             style="background:#ffffff;border-radius:12px;overflow:hidden;
-                    box-shadow:0 2px 8px rgba(0,0,0,.08);max-width:580px;">
-
-        <tr>
-          <td style="background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);padding:32px 40px;">
-            <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;">Your Onboarding Overview</h1>
-            <p style="margin:6px 0 0;color:#99f6e4;font-size:13px;">terian-services.com</p>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:32px 40px;">
-            <p style="margin:0 0 20px;font-size:15px;color:#111827;line-height:1.6;">Hi {first_name},</p>
-            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              Please find attached your personalised onboarding overview of the Terian Services
-              <strong style="color:#111827;">Award Nomination</strong> SaaS platform for
-              <strong style="color:#111827;">{org_name}</strong>.
-              The deck covers the system capabilities and engagement tiers, and will serve as
-              the foundation for our first meeting, expected in the coming days.
-            </p>
-            <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6;">
-              Our team will be in touch within <strong>two business days</strong> to schedule
-              a brief discovery call. If you have any questions before then, don't hesitate to
-              reach us at
-              <a href="mailto:sales@terian-services.com" style="color:#0d9488;text-decoration:none;">
-                sales@terian-services.com</a>.
-            </p>
-            <p style="margin:28px 0 0;font-size:15px;color:#374151;line-height:1.6;">
-              Looking forward to working with you,<br>
-              <strong style="color:#111827;">The Terian Services Team</strong>
-            </p>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:16px 40px;border-top:1px solid #e5e7eb;background:#f9fafb;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#9ca3af;">Terian Services · terian-services.com</p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>"""
 
     msg = MIMEMultipart("mixed")
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
+    msg["From"]    = f"{from_name} <{_SMTP_USER}>"
     msg["To"]      = to_addr
 
-    msg.attach(MIMEText(html, "html"))
+    msg.attach(MIMEText(html_body, "html"))
 
     # Attach PPTX
     part = MIMEBase(
@@ -182,7 +143,7 @@ def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
     part.add_header(
         "Content-Disposition",
         "attachment",
-        filename=f"Terian_Services_{org_name.replace(' ', '_')}_Onboarding.pptx",
+        filename=f"{from_name.replace(' ', '_')}_{org_name.replace(' ', '_')}_Onboarding.pptx",
     )
     msg.attach(part)
 
@@ -192,6 +153,67 @@ def _send_pptx_email_sync(job: dict, pptx_bytes: bytes) -> None:
         server.sendmail(_SMTP_USER, [to_addr], msg.as_string())
 
     logger.info("worker: Email #2 sent → %s", to_addr)
+
+
+async def _send_presentation_email(job: dict, pptx_bytes: bytes) -> None:
+    """
+    Resolve the per-service notifications config + `user_presentation_email`
+    template from CosmosDB, render it with the job's fields, and send
+    Email #2 with the PPTX attached.
+
+    Skip + log (non-fatal) if:
+      - no engagement_details document matches job["engagement_type"]
+      - that document has no `notifications` block
+      - the referenced email_templates document is missing
+    """
+    engagement_type = job.get("engagement_type", "")
+
+    engagement_doc = await get_engagement_by_service(engagement_type)
+    if not engagement_doc or "notifications" not in engagement_doc:
+        logger.warning(
+            "worker: no notifications config for engagement_type '%s' — skipping Email #2",
+            engagement_type,
+        )
+        return
+
+    notifications = engagement_doc["notifications"]
+    sending_corporation = notifications.get("sending_corporation", _DEFAULT_FROM_NAME)
+
+    template_type = notifications.get("user_presentation_email")
+    if not template_type:
+        logger.warning(
+            "worker: no user_presentation_email configured for '%s' — skipping Email #2",
+            engagement_type,
+        )
+        return
+
+    template = await get_template(template_type)
+    if not template:
+        return
+
+    full_name = job.get("full_name", "")
+    org_name  = job.get("org_name", "your organisation")
+
+    tokens = {
+        "first_name":      full_name.split()[0] if full_name.strip() else "there",
+        "full_name":       full_name,
+        "org_name":        org_name,
+        "email":           job.get("email", ""),
+        "industry":        job.get("industry", "") or "—",
+        "user_count":      f"{job.get('user_count', 0):,}",
+        "use_case":        job.get("use_case", ""),
+        "tier_interest":   job.get("tier_interest", ""),
+        "engagement_type": engagement_type,
+        "account_id":      job.get("account_id", ""),
+        "engagement_id":   job.get("engagement_id", ""),
+    }
+
+    subject, html_body = render(template, tokens)
+
+    await asyncio.to_thread(
+        _send_pptx_email_sync,
+        subject, html_body, job["email"], pptx_bytes, org_name, sending_corporation,
+    )
 
 
 # ── CosmosDB helpers ──────────────────────────────────────────────────────────
@@ -268,7 +290,7 @@ def _send_alert_sync(job: dict, error: str) -> None:
     )
     msg = MIMEMultipart()
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
+    msg["From"]    = f"{_DEFAULT_FROM_NAME} <{_SMTP_USER}>"
     msg["To"]      = _NOTIFY_TO
     msg.attach(MIMEText(body, "plain"))
     try:
@@ -297,7 +319,7 @@ async def _process_job(job: dict, engagement_id: str) -> None:
     )
 
     # 4. Send Email #2 with PPTX attached
-    await asyncio.to_thread(_send_pptx_email_sync, job, result.pptx_bytes)
+    await _send_presentation_email(job, result.pptx_bytes)
 
     # 5. Update CosmosDB
     await _mark_presentation_sent(engagement_id, result.blob_path)

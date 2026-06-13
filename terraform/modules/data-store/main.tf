@@ -245,14 +245,29 @@ resource "azurerm_cosmosdb_sql_container" "failed_engagement_jobs" {
 }
 
 # ── Email templates ───────────────────────────────────────────────────────────
-# One document per email template, keyed by template_type.
-# The backend reads the subject and html_body at send time so templates can be
-# updated without a backend redeploy. Tokens ({{first_name}}, {{org_name}}, …)
-# are substituted server-side before dispatch.
+# One document per email template, keyed by template_type (also used as the
+# document id). The backend reads the subject and html_body at send time so
+# templates can be updated without a backend redeploy. Tokens ({{first_name}},
+# {{org_name}}, …) are substituted server-side before dispatch
+# (services/email_template_service.py).
 #
-# Initial template_types:
-#   "engagement_receive_confirmation" — internal notification to sales@
-#   "welcome_to_terian_services"      — requester welcome / confirmation
+# Each engagement_details document carries a `notifications` block that
+# references three template_types by service slug:
+#   <slug>-corporate-heads-up-email — internal notification to sales@ (Email #1)
+#   <slug>-user-welcome-email       — requester welcome / confirmation (Email #2)
+#   <slug>-user-presentation-email  — onboarding deck delivery (Email #3)
+#
+# Current template_types (seeded via scripts/seed_email_templates.py):
+#   award-nomination-corporate-heads-up-email
+#   award-nomination-user-welcome-email
+#   award-nomination-user-presentation-email
+#   contract-services-corporate-heads-up-email
+#   contract-services-user-welcome-email
+#   contract-services-user-presentation-email
+#
+# A missing template (or missing `notifications` block) causes that email to
+# be skipped + logged — non-fatal, consistent with the existing fire-and-forget
+# SMTP error handling.
 
 resource "azurerm_cosmosdb_sql_container" "email_templates" {
   name                = "email_templates"

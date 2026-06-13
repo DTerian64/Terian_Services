@@ -115,3 +115,74 @@ async def get_engagement(service_id: str) -> dict[str, Any]:
     _cache_ts[service_id] = time.monotonic()
     logger.info("engagement_service: loaded and cached '%s'", service_id)
     return doc
+
+
+# ── Lookup by display name ────────────────────────────────────────────────────
+
+async def get_engagement_by_service(engagement_type: str) -> dict[str, Any] | None:
+    """
+    Return the engagement document whose `service` field matches
+    `engagement_type` exactly (e.g. "Award Nomination", "Contract Services").
+
+    Unlike get_engagement, this does NOT raise on a miss — it returns None
+    so callers (email senders) can skip + log rather than failing the
+    request. This avoids needing to slugify the display string to derive
+    the document id.
+
+    Returns:
+        The cached/fetched document, or None if:
+          - AZURE_COSMOS_ENDPOINT is not configured
+          - no document matches `engagement_type`
+          - any Cosmos error occurs
+    """
+    cache_key = f"by_service:{engagement_type}"
+
+    if _is_cache_valid(cache_key):
+        logger.debug("engagement_service: cache hit for service '%s'", engagement_type)
+        return _cache[cache_key]
+
+    endpoint = os.environ.get("AZURE_COSMOS_ENDPOINT", "")
+    database_name = os.environ.get("AZURE_COSMOS_DATABASE", "terian-services")
+
+    if not endpoint:
+        logger.warning(
+            "engagement_service: AZURE_COSMOS_ENDPOINT not configured — "
+            "skipping lookup for service '%s'", engagement_type,
+        )
+        return None
+
+    try:
+        async with DefaultAzureCredential() as credential:
+            async with CosmosClient(endpoint, credential=credential) as client:
+                container = (
+                    client
+                    .get_database_client(database_name)
+                    .get_container_client(_CONTAINER)
+                )
+                query = "SELECT * FROM c WHERE c.service = @service"
+                params = [{"name": "@service", "value": engagement_type}]
+                results: list[dict] = []
+                async for doc in container.query_items(
+                    query=query,
+                    parameters=params,
+                ):
+                    results.append(doc)
+    except Exception as exc:
+        logger.exception(
+            "engagement_service: Cosmos error looking up service '%s': %s",
+            engagement_type, exc,
+        )
+        return None
+
+    if not results:
+        logger.warning(
+            "engagement_service: no engagement document found for service '%s'",
+            engagement_type,
+        )
+        return None
+
+    doc = results[0]
+    _cache[cache_key] = doc
+    _cache_ts[cache_key] = time.monotonic()
+    logger.info("engagement_service: loaded and cached service '%s'", engagement_type)
+    return doc
