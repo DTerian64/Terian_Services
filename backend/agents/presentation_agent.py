@@ -57,6 +57,17 @@ from agents.skills.presentation.tools import (
 
 logger = logging.getLogger(__name__)
 
+# ── Contract Services tier slug → display name ─────────────────────────────
+# Mirrors the kebab-case `slug` values in the Contract Services engagement_details
+# document (see scripts/seed_engagement.py). Used to render a human-readable
+# {{TIER_NAME}} in the onboarding deck from the stored tier_interest slug.
+_CONTRACT_SERVICES_TIER_NAMES: dict[str, str] = {
+    "discovery-sprint":      "Paid Discovery Sprint",
+    "focused-engagement":    "Focused Engagement",
+    "standard-engagement":   "Standard Engagement",
+    "enterprise-engagement": "Enterprise Engagement",
+}
+
 # ── Context extraction prompt ─────────────────────────────────────────────────
 # Used for the single LLM call that reads the conversation and returns the
 # prospect context we need before calling generate_presentation_core().
@@ -322,6 +333,9 @@ class PresentationAgent(AskAgent):
         if raw_type in ("award nomination", "award-nomination", ""):
             return await self.generate_award_onboarding(job)
 
+        if raw_type in ("contract services", "contract-services"):
+            return await self.generate_contract_services_onboarding(job)
+
         raise ValueError(
             f"PresentationAgent: unknown engagement_type {job.get('engagement_type')!r}. "
             "Add a branch in generate() and a concrete method."
@@ -373,6 +387,61 @@ class PresentationAgent(AskAgent):
             tokens=tokens,
             engagement_id=job.get("engagement_id"),
             company_copy_slug=subdomain,
+            presentation_label="award-nomination",
+        )
+
+    async def generate_contract_services_onboarding(self, job: dict) -> PresentationResult:
+        """
+        Generate a Contract Services onboarding presentation using the
+        master template stored in blob-templates.
+
+        Template: contract_services_onboarding_template.pptx
+        Tokens substituted:
+          {{CLIENT_NAME}}       — org_name from job payload, full name as typed
+          {{CLIENT_SUBDOMAIN}}  — URL-safe slug derived from the trimmed org name
+                                   (legal-entity suffixes like Inc./LLC stripped)
+          {{PRESENTATION_DATE}} — current month + year (e.g. "May 2026")
+          {{TIER_NAME}}         — selected tier's display name (e.g. "Standard
+                                   Engagement"), falling back to the raw
+                                   tier_interest value if no display name is known
+
+        job keys used: org_name, tier_interest, engagement_id (optional).
+
+        Returns a PresentationResult with pptx_bytes, blob_path, sas_url.
+        """
+        org_name = (job.get("org_name") or "").strip()
+
+        # Strip trailing legal-entity suffixes (Inc., LLC, Ltd, Corp, ...) before
+        # deriving the subdomain slug, so "Acme Corp, LLC" -> "Acme" rather than
+        # "Acme-Corp-Llc". CLIENT_NAME keeps the full name as typed — only the
+        # slug/subdomain (and downstream filenames) use the trimmed name.
+        display_name = normalize_org_name(org_name)
+
+        # Derive a URL-safe subdomain slug: lowercase, spaces/special chars → hyphens
+        subdomain = re.sub(r"[^a-z0-9]+", "-", display_name.lower()).strip("-") or "your-company"
+
+        tier_interest = (job.get("tier_interest") or "").strip()
+        tier_name = _CONTRACT_SERVICES_TIER_NAMES.get(tier_interest, tier_interest) or "your selected tier"
+
+        tokens = {
+            "CLIENT_NAME":       org_name or "Your Organisation",
+            "CLIENT_SUBDOMAIN":  subdomain,
+            "PRESENTATION_DATE": datetime.now(timezone.utc).strftime("%B %Y"),
+            "TIER_NAME":         tier_name,
+        }
+
+        logger.info(
+            "PresentationAgent: generating Contract Services onboarding "
+            "org=%r display_name=%r subdomain=%r tier=%r",
+            org_name, display_name, subdomain, tier_name,
+        )
+
+        return await generate_from_template(
+            template_name="contract_services_onboarding_template.pptx",
+            tokens=tokens,
+            engagement_id=job.get("engagement_id"),
+            company_copy_slug=subdomain,
+            presentation_label="contract-services",
         )
 
     async def generate_award_screen_flows(self, job: dict) -> PresentationResult:
