@@ -121,32 +121,12 @@ export default function ContractServicesPage() {
         secondaryCta={{ label: "Talk to engineering", href: "/contact" }}
       />
 
-      {/* Process */}
-      <section className="border-b border-white/15">
-        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Process</p>
-          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-            From first call to clean handoff.
-          </h2>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-5">
-            {STEPS.map((s) => (
-              <div key={s.step} className="rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 transition hover:border-teal-400">
-                <p className="font-playfair text-3xl font-bold text-teal-400">{s.step}</p>
-                <h3 className="mt-3 text-base font-bold text-slate-100">{s.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-300">{s.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Investment / pricing */}
       <section className="border-b border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Investment</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Pricing</p>
           <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-            What an engagement costs — in plain terms.
+            Fixed fees, scoped to the deliverable.
           </h2>
 
           {loading && (
@@ -252,6 +232,26 @@ export default function ContractServicesPage() {
               </div>
             </>
           )}
+        </div>
+      </section>
+
+      {/* Process */}
+      <section className="border-b border-white/15">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-400">Process</p>
+          <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
+            From first call to clean handoff.
+          </h2>
+
+          <div className="mt-12 grid gap-6 lg:grid-cols-5">
+            {STEPS.map((s) => (
+              <div key={s.step} className="rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 transition hover:border-teal-400">
+                <p className="font-playfair text-3xl font-bold text-teal-400">{s.step}</p>
+                <h3 className="mt-3 text-base font-bold text-slate-100">{s.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{s.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

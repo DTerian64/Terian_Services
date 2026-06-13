@@ -40,13 +40,13 @@ const SERVICE_ITEMS: MenuItem[] = [
 ];
 
 const PRICING_ITEMS: MenuItem[] = [
+  { label: "Contract Services", href: "/pricing/contract-services" },
   {
     label: "Award Nomination",
     href: "https://terianix.ai/pricing/award-nomination",
     target: "_blank",
     rel: "noopener noreferrer",
   },
-  { label: "Contract Services", href: "/pricing/contract-services" },
 ];
 
 const NAV_ITEMS: MenuItem[] = [
@@ -73,6 +73,14 @@ export default function Header() {
 
         <nav className="hidden items-center gap-10 text-[15px] font-semibold text-white lg:flex" aria-label="Primary navigation">
           <Dropdown
+            label="Services"
+            items={SERVICE_ITEMS}
+            open={servicesOpen}
+            setOpen={setServicesOpen}
+            onOpen={() => { setProductsOpen(false); setPricingOpen(false); }}
+            widthClass="w-[22rem]"
+          />
+          <Dropdown
             label="Products"
             href={PRODUCTS_HOME_URL}
             target="_blank"
@@ -82,14 +90,6 @@ export default function Header() {
             setOpen={setProductsOpen}
             onOpen={() => { setServicesOpen(false); setPricingOpen(false); }}
             widthClass="w-80"
-          />
-          <Dropdown
-            label="Services"
-            items={SERVICE_ITEMS}
-            open={servicesOpen}
-            setOpen={setServicesOpen}
-            onOpen={() => { setProductsOpen(false); setPricingOpen(false); }}
-            widthClass="w-[22rem]"
           />
           <Dropdown
             label="Pricing"
@@ -134,8 +134,8 @@ export default function Header() {
       {menuOpen && (
         <nav className="border-t border-white/10 bg-[#0f0d18] px-6 pb-6 pt-2 lg:hidden overflow-y-auto max-h-[calc(100vh-5.4rem)]" aria-label="Mobile navigation">
           <div className="mx-auto max-w-7xl space-y-1">
-            <MobileGroup label="Products" items={PRODUCT_ITEMS} onNavigate={() => setMenuOpen(false)} />
             <MobileGroup label="Services" items={SERVICE_ITEMS} onNavigate={() => setMenuOpen(false)} />
+            <MobileGroup label="Products" items={PRODUCT_ITEMS} onNavigate={() => setMenuOpen(false)} />
             <MobileGroup label="Pricing" items={PRICING_ITEMS} onNavigate={() => setMenuOpen(false)} />
 
             {NAV_ITEMS.map((item) => (

@@ -98,7 +98,7 @@ export default function HomePage() {
             <span className="text-violet-300">Secure. Isolated. Provable.</span>
           </h1>
           <p className="mt-8 max-w-3xl text-lg leading-8 text-white/70">
-            Terianix.ai, a sub-brand of <a href="https://terian-services.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-violet-300">Terian Services</a>, builds AI-assisted SaaS for enterprises — intelligent analytics to surface
+            Terianix.ai, a sub-brand of <a href="https://terian-services.com" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-violet-300">Terian Services</a>, builds AI/ML empowered SaaS for enterprises — intelligent analytics to surface
             patterns, and integrity tooling to detect fraud, collusion, and anomalous behaviour
             before it costs you. Every product we operate is built around three commitments: your
             data stays{" "}

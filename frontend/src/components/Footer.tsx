@@ -48,8 +48,8 @@ export default function Footer() {
             </p>
           </div>
 
-          <FooterColumn title="Products" items={PRODUCTS} />
           <FooterColumn title="Services" items={SERVICES} />
+          <FooterColumn title="Products" items={PRODUCTS} />
           <FooterColumn title="Company" items={COMPANY} />
           <FooterColumn title="Legal" items={LEGAL} />
         </div>
