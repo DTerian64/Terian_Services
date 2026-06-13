@@ -271,7 +271,7 @@ function Step2({
       </Field>
 
       <Field
-        label="How do you plan to use Award Nomination? (optional)"
+        label="What else would you like us to know? (optional)"
         id="use_case"
         hint="A short description helps us prepare the right engagement letter."
       >
@@ -280,7 +280,7 @@ function Step2({
           rows={4}
           value={data.use_case}
           onChange={(e) => onChange({ use_case: e.target.value })}
-          placeholder="e.g. We want to replace our manual peer-recognition process with an automated, analytics-driven system…"
+          placeholder="e.g. project goals, timeline, or specific requirements…"
           className={`${inputCls} resize-none`}
         />
       </Field>
