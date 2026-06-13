@@ -7,7 +7,7 @@ export default function PrivacyPage() {
       <PageHero
         eyebrow="Legal"
         title="Privacy Notice"
-        description="How Terian Services collects, uses, and protects your information."
+        description="How Terianix.ai collects, uses, and protects your information."
       />
 
       <div className="border-t border-white/15">
@@ -18,23 +18,11 @@ export default function PrivacyPage() {
           <Section title="1. Who We Are">
             <p>
               This site and its associated demo environments are operated by{" "}
-              <strong className="text-slate-100">Terian Services</strong>{" "}
-              (<a href="https://terian-services.com" className="text-violet-400 hover:text-violet-300">terian-services.com</a>).
-              Terian Services builds AI/ML-empowered enterprise software (such as the Award
-              Nomination System and Integrity Sentinel) and delivers professional services in AI
-              analytics, integrity & fraud detection, data mining, and cloud migration. This notice
-              covers data we collect through this website and through Terian-operated demo
-              environments.
-            </p>
-          </Section>
-
-          <Section title="1a. Services Engagements">
-            <p>
-              For client services engagements, we typically operate{" "}
-              <strong className="text-slate-100">inside the client's Azure tenant</strong>, under an
-              MSA and Data Processing Agreement specific to the engagement. In those engagements,
-              Terian Services acts as a processor; the client's own privacy notice governs end-user
-              data, and this notice does not apply.
+              <strong className="text-slate-100">Terianix.ai</strong>{" "}
+              (<a href="https://terianix.ai" className="text-violet-400 hover:text-violet-300">terianix.ai</a>).
+              Terianix.ai builds AI/ML-empowered SaaS enterprise software products, including the Award
+              Nomination System and Integrity Sentinel. This notice covers data we collect through
+              this website and through Terianix.ai-operated demo environments.
             </p>
           </Section>
 
@@ -54,7 +42,7 @@ export default function PrivacyPage() {
 
           <Section title="3. How We Use Your Information">
             <ul className="list-disc pl-5 space-y-1 text-slate-300">
-              <li>To create your guest account in the Demo Terian Services Azure AD tenant</li>
+              <li>To create your guest account in the Demo Terianix.ai Azure AD tenant</li>
               <li>To send you the invitation email needed to access the platform</li>
               <li>To enable sign-in and maintain your session within the demo</li>
               <li>To prevent abuse of the self-registration endpoint</li>
@@ -72,7 +60,7 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="5. Data Retention">
-            <div className="rounded-md border border-violet-400/30 bg-violet-500/10 px-5 py-4 my-4 text-sm text-violet-100">
+            <div className="rounded-md border-2 border-white/10 bg-[#0f0d18] px-5 py-4 my-4 text-sm text-slate-300">
               Demo data is retained for the duration of the demo program. You may request deletion
               of your account and associated data at any time by emailing{" "}
               <a href="mailto:support@terian-services.com" className="text-violet-400 hover:text-violet-300 underline">
@@ -109,7 +97,7 @@ export default function PrivacyPage() {
           <Section title="8. Contact">
             <p>
               For privacy-related questions or concerns, please reach out to:<br />
-              <strong className="text-slate-100">Terian Services</strong><br />
+              <strong className="text-slate-100">Terianix.ai</strong><br />
               <a href="mailto:support@terian-services.com" className="text-violet-400 hover:text-violet-300">
                 support@terian-services.com
               </a>
@@ -118,7 +106,7 @@ export default function PrivacyPage() {
         </div>
 
         <footer className="text-xs text-slate-400 mt-12 pt-6 border-t border-white/10">
-          &copy; 2026 Terian Services &nbsp;·&nbsp;
+          &copy; 2026 Terianix.ai &nbsp;·&nbsp;
           <a href="/" className="text-slate-400 hover:text-slate-200">
             Back to home
           </a>
