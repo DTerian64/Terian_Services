@@ -30,7 +30,18 @@ export default function AIAnalyticsPage() {
         </h2>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Card title="Forecasting" description="Demand, headcount, spend, and capacity planning with quantified uncertainty bands." />
+          <Card
+            title="Forecasting"
+            description="Demand, headcount, spend, and capacity planning with quantified uncertainty bands."
+            onSample={() =>
+              setSample({
+                src: "/awards_analytics_forecasting.png",
+                eyebrow: "Sample · Award Nomination System",
+                caption:
+                  "Forward projections of nomination volume, HRBP review load, and award spend — each with prediction intervals, from backtested models (ETS, LightGBM) reporting MAE, sMAPE, and interval coverage.",
+              })
+            }
+          />
           <Card
             title="Classification"
             description="Risk scoring, churn propensity, ticket triage — calibrated, monitored, with explanation layers."
@@ -168,7 +179,15 @@ export default function AIAnalyticsPage() {
             />
             <Card
               title="Confidentiality of inference"
-              description="Your prompts, embeddings, and inputs are never used to train cross-tenant models. Customer-managed keys and private endpoints supported on request."
+              description="Your prompts, embeddings, and inputs are never used to train cross-tenant models — each tenant's data trains and serves only its own model."
+              onSample={() =>
+                setSample({
+                  src: "/award_tenant_isolation.svg",
+                  eyebrow: "Sample · Award Nomination System",
+                  caption:
+                    "Per-tenant model isolation — each tenant's nominations train and serve only that tenant's own model (model_tenant_1.pkl, model_tenant_2.pkl); nothing is pooled across tenants.",
+                })
+              }
             />
           </div>
         </div>
