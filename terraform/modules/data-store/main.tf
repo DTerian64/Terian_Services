@@ -279,6 +279,37 @@ resource "azurerm_cosmosdb_sql_container" "email_templates" {
   default_ttl = -1
 }
 
+# ── Jobs ─────────────────────────────────────────────────────────────────────
+# job listings published on the /jobs page. Each document carries top-level
+# fields (title, tagline, location, type, status, posted_at) and a sections[]
+# array for structured content (heading + body + bullets). Partition key /id
+# keeps each listing self-contained.
+
+resource "azurerm_cosmosdb_sql_container" "jobs" {
+  name                = "jobs"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/id"]
+
+  default_ttl = -1
+}
+
+# ── Job applications ──────────────────────────────────────────────────────────
+# One document per application submitted via POST /api/jobs/{id}/apply.
+# Fields: id, job_id, name, email, linkedin_url, message, resume_blob_path,
+# submitted_at. Partition key /job_id groups all applications per listing.
+
+resource "azurerm_cosmosdb_sql_container" "job_applications" {
+  name                = "job_applications"
+  resource_group_name = var.resource_group_name
+  account_name        = azurerm_cosmosdb_account.main.name
+  database_name       = azurerm_cosmosdb_sql_database.main.name
+  partition_key_paths = ["/job_id"]
+
+  default_ttl = -1
+}
+
 # ── Engagement async worker infrastructure ────────────────────────────────────
 # Storage Queue: engagement-intake
 #   Producers: POST /api/accounts/register drops a message after CosmosDB write.
@@ -329,6 +360,16 @@ resource "azurerm_storage_container" "blob_templates" {
 
 resource "azurerm_storage_container" "client_com_attachments" {
   name                  = "client-com-attachments"
+  storage_account_name  = azurerm_storage_account.media.name
+  container_access_type = "private"
+}
+
+# Blob container for job application resumes.
+# Always private — written by the backend UAMI at application time.
+# Path convention: {job_id}/{application_id}/{filename}
+
+resource "azurerm_storage_container" "job_applications" {
+  name                  = "job-applications"
   storage_account_name  = azurerm_storage_account.media.name
   container_access_type = "private"
 }

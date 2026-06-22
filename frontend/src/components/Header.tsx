@@ -52,6 +52,7 @@ const PRICING_ITEMS: MenuItem[] = [
 const NAV_ITEMS: MenuItem[] = [
   { label: "About", href: "/about" },
   { label: "Trust", href: "/trust" },
+  { label: "Jobs", href: "/jobs" },
   { label: "Contact", href: "/contact" },
 ];
 
