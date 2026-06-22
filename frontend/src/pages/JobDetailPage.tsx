@@ -74,24 +74,22 @@ export default function JobDetailPage({ jobId }: Props) {
         eyebrow="Open Position"
         title={job.title}
         description={job.tagline}
-      >
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+      />
+
+      {/* Sections */}
+      <section className="mx-auto max-w-3xl px-6 py-16 lg:px-10">
+        <div className="flex flex-wrap items-center gap-3 mb-8">
           <Tag>{job.location}</Tag>
           <Tag>{job.type}</Tag>
-        </div>
-        <div className="mt-8">
           <button
             type="button"
             onClick={() => setShowApply(true)}
-            className="inline-flex items-center justify-center rounded-md bg-teal-400 px-7 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="rounded-md bg-teal-400 px-5 py-2 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
           >
             Apply Now
           </button>
         </div>
-      </PageHero>
 
-      {/* Sections */}
-      <section className="mx-auto max-w-3xl px-6 py-16 lg:px-10">
         <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 transition hover:text-teal-300">
           <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none">
             <path d="M12.5 5 7.5 10 12.5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
