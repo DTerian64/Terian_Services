@@ -7,6 +7,7 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 const DEMO_REQUEST_URL = "https://demo-awards.terianix.ai/demo/request";
 const PRESENTATION_DECK_URL = `${API_BASE}/api/introductory/award-nomination/presentation-deck`;
+const SCREENSHOT_WALKTHROUGH_URL = `${API_BASE}/api/introductory/award-nomination/screenshot-walkthrough`;
 
 // Mirrors backend/agents/presentation_agent.py's normalize_org_name(): strips a
 // trailing legal-entity suffix (Inc., LLC, Ltd, Corp, ...) so "Acme Corp, LLC"
@@ -306,12 +307,37 @@ export default function AwardNominationPage() {
   const [orgName, setOrgName] = useState("");
   const [deckLoading, setDeckLoading] = useState(false);
   const [deckError, setDeckError] = useState<string | null>(null);
+  const [walkthroughLoading, setWalkthroughLoading] = useState(false);
+  const [walkthroughError, setWalkthroughError] = useState<string | null>(null);
 
   function closeDeckModal() {
-    if (deckLoading) return;
+    if (deckLoading || walkthroughLoading) return;
     setDeckModalOpen(false);
     setOrgName("");
     setDeckError(null);
+    setWalkthroughError(null);
+  }
+
+  async function handleDownloadWalkthrough() {
+    setWalkthroughLoading(true);
+    setWalkthroughError(null);
+    try {
+      const res = await fetch(SCREENSHOT_WALKTHROUGH_URL);
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Award_Nomination_Screenshot_Walkthrough.pptx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setWalkthroughError("Could not download the walkthrough. Please try again, or email sales@terian-services.com.");
+    } finally {
+      setWalkthroughLoading(false);
+    }
   }
 
   async function handleDownloadDeck(e: FormEvent) {
@@ -564,11 +590,11 @@ export default function AwardNominationPage() {
           onClick={closeDeckModal}
         >
           <div
-            className="relative w-full max-w-md rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 shadow-2xl"
+            className="relative w-full max-w-2xl rounded-xl border-2 border-white/10 bg-[#0f0d18] p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-100">Download presentation</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-slate-100">Download presentations</h3>
               <button
                 type="button"
                 onClick={closeDeckModal}
@@ -578,34 +604,52 @@ export default function AwardNominationPage() {
                 ✕
               </button>
             </div>
-            <p className="mt-2 text-sm leading-7 text-slate-300">
-              We'll personalize the Award Nomination System overview deck for your organization.
-            </p>
-            <form onSubmit={handleDownloadDeck} className="mt-5">
-              <label htmlFor="org-name" className="block text-xs font-semibold uppercase tracking-wider text-violet-400">
-                Organization name
-              </label>
-              <input
-                id="org-name"
-                type="text"
-                required
-                autoFocus
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
-                placeholder="e.g. Acme Corp"
-                className="mt-2 w-full rounded-md border-2 border-white/10 bg-transparent px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-violet-400"
-              />
-              {deckError ? (
-                <p className="mt-2 text-sm text-red-400">{deckError}</p>
-              ) : null}
-              <button
-                type="submit"
-                disabled={deckLoading}
-                className="mt-5 inline-flex w-full items-center justify-center rounded-md bg-violet-500 px-7 py-3 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {deckLoading ? "Preparing your deck…" : "Download presentation →"}
-              </button>
-            </form>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Left card: personalized overview deck */}
+              <div className="rounded-lg border-2 border-white/10 bg-[#0a0916] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Overview Deck</p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">Personalized with your organization's name.</p>
+                <form onSubmit={handleDownloadDeck} className="mt-4">
+                  <label htmlFor="org-name" className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Organization name
+                  </label>
+                  <input
+                    id="org-name"
+                    type="text"
+                    required
+                    autoFocus
+                    value={orgName}
+                    onChange={(e) => setOrgName(e.target.value)}
+                    placeholder="e.g. Acme Corp"
+                    className="mt-2 w-full rounded-md border-2 border-white/10 bg-transparent px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-violet-400"
+                  />
+                  {deckError && <p className="mt-2 text-sm text-red-400">{deckError}</p>}
+                  <button
+                    type="submit"
+                    disabled={deckLoading}
+                    className="mt-4 inline-flex w-full items-center justify-center rounded-md bg-violet-500 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {deckLoading ? "Preparing…" : "Download →"}
+                  </button>
+                </form>
+              </div>
+
+              {/* Right card: screenshot walkthrough */}
+              <div className="rounded-lg border-2 border-white/10 bg-[#0a0916] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">Screenshot Walkthrough</p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">A visual walkthrough of the platform — ready to share as-is.</p>
+                {walkthroughError && <p className="mt-2 text-sm text-red-400">{walkthroughError}</p>}
+                <button
+                  type="button"
+                  onClick={handleDownloadWalkthrough}
+                  disabled={walkthroughLoading}
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-md bg-violet-500 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {walkthroughLoading ? "Preparing…" : "Download →"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

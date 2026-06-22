@@ -56,6 +56,7 @@ from email.mime.text import MIMEText
 
 from azure.cosmos.aio import CosmosClient
 from azure.identity.aio import DefaultAzureCredential, ManagedIdentityCredential
+from azure.storage.blob.aio import BlobServiceClient
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, Field, field_validator
 
@@ -70,6 +71,9 @@ router = APIRouter()
 _COSMOS_ENDPOINT = os.getenv("AZURE_COSMOS_ENDPOINT", "")
 _COSMOS_DATABASE = os.getenv("AZURE_COSMOS_DATABASE", "terian-services")
 _INTRO_REQUESTS_CTR = "intro_requests"
+
+_BLOB_ENDPOINT       = os.getenv("AZURE_STORAGE_BLOB_ENDPOINT", "")
+_TEMPLATES_CONTAINER = os.getenv("BLOB_TEMPLATES_CONTAINER", "blob-templates")
 
 _PPTX_CONTENT_TYPE = (
     "application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -331,4 +335,28 @@ async def introductory_presentation_deck(service_id: str, body: PresentationDeck
         content=result.pptx_bytes,
         media_type=_PPTX_CONTENT_TYPE,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/api/introductory/award-nomination/screenshot-walkthrough")
+async def award_nomination_screenshot_walkthrough() -> Response:
+    """Stream the static Award Nomination screenshot walkthrough deck from blob storage."""
+    if not _BLOB_ENDPOINT:
+        raise HTTPException(status_code=503, detail="Storage not configured.")
+    try:
+        async with _credential() as cred:
+            async with BlobServiceClient(account_url=_BLOB_ENDPOINT, credential=cred) as svc:
+                blob = svc.get_blob_client(
+                    container=_TEMPLATES_CONTAINER,
+                    blob="Award_Nomination_Screenshot_Walkthrough.pptx",
+                )
+                stream = await blob.download_blob()
+                pptx_bytes = await stream.readall()
+    except Exception as exc:
+        logger.exception("introductory_router: failed to fetch screenshot walkthrough: %s", exc)
+        raise HTTPException(status_code=500, detail="Could not retrieve walkthrough.")
+    return Response(
+        content=pptx_bytes,
+        media_type=_PPTX_CONTENT_TYPE,
+        headers={"Content-Disposition": 'attachment; filename="Award_Nomination_Screenshot_Walkthrough.pptx"'},
     )
