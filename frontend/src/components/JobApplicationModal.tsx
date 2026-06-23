@@ -2,6 +2,14 @@ import { useCallback, useRef, useState } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+type FieldErrors = {
+  name?: string;
+  email?: string;
+  linkedin?: string;
+  message?: string;
+  resume?: string;
+};
+
 const API_BASE    = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 const MAX_BYTES   = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_TYPES = new Set([
@@ -9,6 +17,8 @@ const ALLOWED_TYPES = new Set([
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
+const EMAIL_RE   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const URL_RE     = /^https?:\/\/.+/i;
 
 function formatBytes(n: number): string {
   if (n < 1024)        return `${n} B`;
@@ -23,28 +33,51 @@ type Props = {
 };
 
 export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props) {
-  const [name,        setName]        = useState("");
-  const [email,       setEmail]       = useState("");
-  const [linkedin,    setLinkedin]    = useState("");
-  const [message,     setMessage]     = useState("");
-  const [resume,      setResume]      = useState<File | null>(null);
-  const [fileError,   setFileError]   = useState("");
-  const [isDragOver,  setIsDragOver]  = useState(false);
-  const [status,      setStatus]      = useState<Status>("idle");
-  const [errorMsg,    setErrorMsg]    = useState("");
+  const [name,       setName]       = useState("");
+  const [email,      setEmail]      = useState("");
+  const [linkedin,   setLinkedin]   = useState("");
+  const [message,    setMessage]    = useState("");
+  const [resume,     setResume]     = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [errors,     setErrors]     = useState<FieldErrors>({});
+  const [status,     setStatus]     = useState<Status>("idle");
+  const [submitError, setSubmitError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // ── Validation ────────────────────────────────────────────────────────────
+
+  function validate(): FieldErrors {
+    const e: FieldErrors = {};
+    if (!name.trim())                              e.name     = "Full name is required.";
+    if (!email.trim())                             e.email    = "Email is required.";
+    else if (!EMAIL_RE.test(email.trim()))         e.email    = "Please enter a valid email address.";
+    if (linkedin.trim() && !URL_RE.test(linkedin.trim()))
+                                                   e.linkedin = "Please enter a valid URL (starting with http:// or https://).";
+    if (!message.trim())                           e.message  = "Cover note is required.";
+    if (!resume)                                   e.resume   = "Please attach your resume.";
+    return e;
+  }
+
+  function clearFieldError(field: keyof FieldErrors) {
+    if (errors[field]) setErrors((prev) => { const next = { ...prev }; delete next[field]; return next; });
+  }
+
+  // ── File handling ─────────────────────────────────────────────────────────
+
   const pickFile = useCallback((f: File) => {
-    setFileError("");
+    const next: FieldErrors = {};
     if (!ALLOWED_TYPES.has(f.type)) {
-      setFileError("Please upload a PDF or Word document (.pdf, .doc, .docx).");
+      next.resume = "Please upload a PDF or Word document (.pdf, .doc, .docx).";
+      setErrors((prev) => ({ ...prev, ...next }));
       return;
     }
     if (f.size > MAX_BYTES) {
-      setFileError(`"${f.name}" exceeds the 10 MB limit (${formatBytes(f.size)}).`);
+      next.resume = `"${f.name}" exceeds the 10 MB limit (${formatBytes(f.size)}).`;
+      setErrors((prev) => ({ ...prev, ...next }));
       return;
     }
     setResume(f);
+    setErrors((prev) => { const n = { ...prev }; delete n.resume; return n; });
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -54,18 +87,25 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
     if (file) pickFile(file);
   }, [pickFile]);
 
+  // ── Submit ────────────────────────────────────────────────────────────────
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resume) { setFileError("Please attach your resume."); return; }
+    const fieldErrors = validate();
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors);
+      return;
+    }
+
     setStatus("submitting");
-    setErrorMsg("");
+    setSubmitError("");
 
     const fd = new FormData();
     fd.append("name",         name.trim());
     fd.append("email",        email.trim());
     fd.append("linkedin_url", linkedin.trim());
     fd.append("message",      message.trim());
-    fd.append("resume",       resume, resume.name);
+    fd.append("resume",       resume!, resume!.name);
 
     try {
       const res = await fetch(`${API_BASE}/api/jobs/${jobId}/apply`, {
@@ -78,14 +118,23 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
       }
       setStatus("success");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "An unexpected error occurred.");
+      setSubmitError(err instanceof Error ? err.message : "An unexpected error occurred.");
       setStatus("error");
     }
   };
 
-  const inputClass =
-    "w-full rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-teal-400 focus:outline-none focus:ring-1 focus:ring-teal-400 transition";
+  // ── Styles ────────────────────────────────────────────────────────────────
+
+  const inputBase = "w-full rounded-lg border bg-white/5 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition";
+  const inputOk   = "border-white/15 focus:border-teal-400 focus:ring-teal-400";
+  const inputErr  = "border-red-500/60 focus:border-red-400 focus:ring-red-400";
   const labelClass = "block text-xs font-semibold uppercase tracking-[0.12em] text-slate-400 mb-1.5";
+
+  function fieldClass(field: keyof FieldErrors) {
+    return `${inputBase} ${errors[field] ? inputErr : inputOk}`;
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div
@@ -93,7 +142,7 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[#0f0d18] p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-        {/* Close button */}
+        {/* Close */}
         <button
           type="button"
           onClick={onClose}
@@ -137,12 +186,13 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                 <input
                   id="ja-name"
                   type="text"
-                  required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => { setName(e.target.value); clearFieldError("name"); }}
                   placeholder="Jane Smith"
-                  className={inputClass}
+                  className={fieldClass("name")}
+                  aria-describedby={errors.name ? "ja-name-err" : undefined}
                 />
+                {errors.name && <FieldError id="ja-name-err">{errors.name}</FieldError>}
               </div>
 
               {/* Email */}
@@ -151,25 +201,30 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                 <input
                   id="ja-email"
                   type="email"
-                  required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); clearFieldError("email"); }}
                   placeholder="jane@example.com"
-                  className={inputClass}
+                  className={fieldClass("email")}
+                  aria-describedby={errors.email ? "ja-email-err" : undefined}
                 />
+                {errors.email && <FieldError id="ja-email-err">{errors.email}</FieldError>}
               </div>
 
               {/* LinkedIn */}
               <div>
-                <label className={labelClass} htmlFor="ja-linkedin">LinkedIn URL <span className="normal-case font-normal text-slate-500">(optional)</span></label>
+                <label className={labelClass} htmlFor="ja-linkedin">
+                  LinkedIn URL <span className="normal-case font-normal text-slate-500">(optional)</span>
+                </label>
                 <input
                   id="ja-linkedin"
                   type="url"
                   value={linkedin}
-                  onChange={(e) => setLinkedin(e.target.value)}
+                  onChange={(e) => { setLinkedin(e.target.value); clearFieldError("linkedin"); }}
                   placeholder="https://linkedin.com/in/janesmith"
-                  className={inputClass}
+                  className={fieldClass("linkedin")}
+                  aria-describedby={errors.linkedin ? "ja-linkedin-err" : undefined}
                 />
+                {errors.linkedin && <FieldError id="ja-linkedin-err">{errors.linkedin}</FieldError>}
               </div>
 
               {/* Cover note */}
@@ -177,18 +232,21 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                 <label className={labelClass} htmlFor="ja-message">Cover note *</label>
                 <textarea
                   id="ja-message"
-                  required
                   rows={5}
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  onChange={(e) => { setMessage(e.target.value); clearFieldError("message"); }}
                   placeholder="Tell us why you're a strong fit for this role..."
-                  className={`${inputClass} resize-y min-h-[120px]`}
+                  className={`${fieldClass("message")} resize-y min-h-[120px]`}
+                  aria-describedby={errors.message ? "ja-message-err" : undefined}
                 />
+                {errors.message && <FieldError id="ja-message-err">{errors.message}</FieldError>}
               </div>
 
-              {/* Resume upload */}
+              {/* Resume */}
               <div>
-                <label className={labelClass}>Resume * <span className="normal-case font-normal text-slate-500">PDF or Word, max 10 MB</span></label>
+                <label className={labelClass}>
+                  Resume * <span className="normal-case font-normal text-slate-500">PDF or Word, max 10 MB</span>
+                </label>
 
                 {resume ? (
                   <div className="flex items-center justify-between rounded-lg border border-white/15 bg-white/5 px-4 py-3">
@@ -202,7 +260,7 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                     </div>
                     <button
                       type="button"
-                      onClick={() => { setResume(null); setFileError(""); }}
+                      onClick={() => { setResume(null); setErrors((prev) => { const n = { ...prev }; delete n.resume; return n; }); }}
                       className="ml-3 shrink-0 text-xs text-slate-500 hover:text-slate-300 transition"
                     >
                       Remove
@@ -211,7 +269,11 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                 ) : (
                   <div
                     className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-8 text-center transition ${
-                      isDragOver ? "border-teal-400 bg-teal-400/5" : "border-white/15 hover:border-white/30"
+                      errors.resume
+                        ? "border-red-500/60"
+                        : isDragOver
+                        ? "border-teal-400 bg-teal-400/5"
+                        : "border-white/15 hover:border-white/30"
                     }`}
                     onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                     onDragLeave={() => setIsDragOver(false)}
@@ -238,14 +300,12 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                   </div>
                 )}
 
-                {fileError && (
-                  <p className="mt-2 text-xs text-red-400">{fileError}</p>
-                )}
+                {errors.resume && <FieldError>{errors.resume}</FieldError>}
               </div>
 
               {status === "error" && (
                 <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                  {errorMsg || "Something went wrong. Please try again."}
+                  {submitError || "Something went wrong. Please try again."}
                 </p>
               )}
 
@@ -261,5 +321,16 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
         )}
       </div>
     </div>
+  );
+}
+
+function FieldError({ id, children }: { id?: string; children: React.ReactNode }) {
+  return (
+    <p id={id} className="mt-1.5 flex items-center gap-1.5 text-xs text-red-400" role="alert">
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0" fill="currentColor">
+        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm0 10.5a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM7.25 5.5a.75.75 0 0 1 1.5 0v3a.75.75 0 0 1-1.5 0v-3Z" />
+      </svg>
+      {children}
+    </p>
   );
 }
