@@ -70,16 +70,18 @@ JOBS: list[dict] = [
                     "Strong technical writing skills — able to translate complex ML/AI concepts (Random Forest, LightGBM, LLM-based pipelines) into clear, compelling narratives for non-technical reviewers.",
                     "Familiarity with SaaS business models and the ability to articulate ARR potential, TAM, and scalability in grant applications.",
                     "Existing relationships or prior success with programs focused on fraud detection, public-sector integrity, or enterprise AI.",
+                    "Working knowledge of federal cost-allowability rules (FAR 31.205, 2 CFR 200) as they apply to consultant compensation on federal awards.",
                     "Self-directed with the ability to manage multiple submissions simultaneously and meet hard deadlines without hand-holding.",
                 ],
             },
             {
                 "heading": "Compensation Structure",
-                "body": "This engagement is structured in two phases with performance-based upside:",
+                "body": "This engagement is structured in two phases, with the fee model tailored to each funding source's rules:",
                 "bullets": [
-                    "Phase 0 (scoping, 2–4 weeks): Flat research fee to identify and prioritize the top 5–10 fundable opportunities. Paid regardless of outcome.",
-                    "Phase 1 (execution): Success-fee model — a percentage of awarded funds on each grant won. Rate negotiated based on grant size and program complexity.",
-                    "Bonus: Accelerated rate on any award exceeding $500K, reflecting the additional complexity of large federal or multi-year programs.",
+                    "Phase 0 (scoping, 2–4 weeks): Flat research fee to identify and prioritize the top 5–10 fundable opportunities across both federal and philanthropic/mission-aligned sources. Paid regardless of outcome.",
+                    "Phase 1 — Federal programs (SBIR/STTR, NSF, and similar): Fixed hourly or per-proposal rate, paid by Terian Services directly (not from any awarded federal funds). This reflects federal cost-allowability rules (FAR 31.205-33(f), 2 CFR §200.209), which prohibit contingent or success-based fees on federal grant awards.",
+                    "Phase 1 — Philanthropic and mission-aligned programs: Success-fee model — a percentage of awarded funds, rate negotiated based on grant size and program complexity, where the funder's own rules permit it.",
+                    "Bonus: Accelerated success-fee rate on any philanthropic/private award exceeding $500K, reflecting the added complexity of large or multi-year programs.",
                 ],
             },
             {
@@ -90,9 +92,8 @@ JOBS: list[dict] = [
                     "1. One to three specific grant programs or funding sources you believe are a "
                     "strong fit for Terianix.ai and why.\n"
                     "2. Your proposed approach and timeline for Phase 0.\n"
-                    "3. Your preferred success-fee range for Phase 1.\n\n"
-                    "This brief replaces the cover letter field below. Attach it as a PDF or Word "
-                    "document alongside your resume."
+                    "3. Your preferred fixed rate for federal-program work and preferred success-fee "
+                    "range for philanthropic/private-program work."
                 ),
                 "bullets": [],
             },

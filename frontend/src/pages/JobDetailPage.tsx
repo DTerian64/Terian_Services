@@ -77,7 +77,7 @@ export default function JobDetailPage({ jobId }: Props) {
       />
 
       {/* Sections */}
-      <section className="mx-auto max-w-3xl px-6 py-16 lg:px-10">
+      <section className="mx-auto max-w-3xl bg-white px-6 py-16 text-black lg:px-10">
         <div className="flex flex-wrap items-center gap-3 mb-8">
           <Tag>{job.location}</Tag>
           <Tag>{job.type}</Tag>
@@ -90,7 +90,7 @@ export default function JobDetailPage({ jobId }: Props) {
           </button>
         </div>
 
-        <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 transition hover:text-teal-300">
+        <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-teal-600">
           <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none">
             <path d="M12.5 5 7.5 10 12.5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -135,15 +135,15 @@ export default function JobDetailPage({ jobId }: Props) {
 function JobSection({ section }: { section: Section }) {
   return (
     <div>
-      <h2 className="font-playfair text-xl font-bold text-slate-100">{section.heading}</h2>
+      <h2 className="font-playfair text-xl font-bold text-black">{section.heading}</h2>
       {section.body && (
-        <p className="mt-3 text-sm leading-7 text-slate-300 whitespace-pre-line">{section.body}</p>
+        <p className="mt-3 text-sm leading-7 text-slate-800 whitespace-pre-line">{section.body}</p>
       )}
       {section.bullets.length > 0 && (
         <ul className="mt-4 space-y-2">
           {section.bullets.map((bullet, i) => (
-            <li key={i} className="flex gap-3 text-sm leading-7 text-slate-300">
-              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" />
+            <li key={i} className="flex gap-3 text-sm leading-7 text-slate-800">
+              <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
               {bullet}
             </li>
           ))}
@@ -155,7 +155,7 @@ function JobSection({ section }: { section: Section }) {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-white/20 px-4 py-1.5 text-xs font-semibold text-slate-400">
+    <span className="rounded-full border border-slate-300 px-4 py-1.5 text-xs font-semibold text-slate-600">
       {children}
     </span>
   );
