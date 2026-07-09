@@ -259,179 +259,186 @@ export default function RoiCalculator() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
-        {/* ── Inputs ─────────────────────────────────────────── */}
-        <div className="space-y-5">
-          <Field label="Number of employees" hint="Used to suggest a plan.">
-            <input
-              type="number"
-              min={1}
-              max={100000}
-              value={inputs.employees}
-              onChange={(e) => set("employees", Math.round(Number(e.target.value)))}
-              className={inputClass}
-            />
-          </Field>
-
-          <Field
-            label="Annual recognition budget ($)"
-            hint="Total monetary awards paid per year."
-          >
-            <input
-              type="number"
-              min={0}
-              step={1000}
-              value={inputs.annualBudget}
-              onChange={(e) => set("annualBudget", Number(e.target.value))}
-              className={inputClass}
-            />
-          </Field>
-
-          {/* Plan */}
-          <Field label="Plan" hint="Auto-suggested from employees; override if needed.">
-            <select
-              value={inputs.planName ?? activeTierName}
-              onChange={(e) => set("planName", e.target.value)}
-              className={inputClass}
-            >
-              {tiers.map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          {/* Payroll lever */}
-          <div className="rounded-xl border border-white/10 bg-[#0f0d18] p-4">
-            <label className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-200">
-                Payroll automation savings
-                <InfoDot text="Pays out through your existing payroll — no IT, no manual processing, live in 4 weeks. Estimates finance time saved not manually processing award payouts." />
-              </span>
-              <input
-                type="checkbox"
-                checked={inputs.payrollEnabled}
-                onChange={(e) => set("payrollEnabled", e.target.checked)}
-                className="h-4 w-4 accent-violet-500"
-              />
-            </label>
-            {inputs.payrollEnabled && (
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <Field label="Payroll frequency">
-                  <select
-                    value={inputs.payFrequency}
-                    onChange={(e) => set("payFrequency", e.target.value as PayFrequencyId)}
-                    className={inputClass}
-                  >
-                    {PAY_FREQUENCIES.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.label}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-                <Field
-                  label="Manual hrs / pay run"
-                  hint="Finance time spent manually processing award payouts today, per pay run."
-                >
-                  <input
-                    type="number"
-                    min={0}
-                    step={0.5}
-                    value={inputs.manualHoursPerRun}
-                    onChange={(e) => set("manualHoursPerRun", Number(e.target.value))}
-                    className={inputClass}
-                  />
-                </Field>
-                <Field
-                  label="Loaded hourly cost ($/hr)"
-                  hint="Fully-loaded finance/HR cost (salary + overhead)."
-                >
-                  <input
-                    type="number"
-                    min={0}
-                    value={inputs.loadedHourlyCost}
-                    onChange={(e) => set("loadedHourlyCost", Number(e.target.value))}
-                    className={inputClass}
-                  />
-                </Field>
-              </div>
-            )}
-          </div>
-
-          {/* Assumptions */}
-          <h3 className="pt-2 text-sm font-bold uppercase tracking-[0.18em] text-violet-400">
-            Assumptions
+      <div className="mt-6 space-y-8">
+        {/* ── Settings ──────────────────────────────────────── */}
+        <div>
+          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-violet-400">
+            Settings
           </h3>
-
-          <Field
-            label={`Budget lost to fraud / favoritism: ${(assumptions.leakagePct * 100).toFixed(0)}%`}
-            hint="Modest by default (3–5%) for credibility. Adjust to your reality."
-          >
-            <input
-              type="range"
-              min={0}
-              max={10}
-              step={0.5}
-              value={assumptions.leakagePct * 100}
-              onChange={(e) => setAssumption("leakagePct", Number(e.target.value) / 100)}
-              className="w-full accent-violet-500"
-            />
-          </Field>
-
-          <Field
-            label={`Detection effectiveness: ${(assumptions.detectionEffectiveness * 100).toFixed(0)}%`}
-            hint="Share of that leakage the integrity engine prevents. It reduces, but won't claim to eliminate."
-          >
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={assumptions.detectionEffectiveness * 100}
-              onChange={(e) =>
-                setAssumption("detectionEffectiveness", Number(e.target.value) / 100)
-              }
-              className="w-full accent-violet-500"
-            />
-          </Field>
-
-          <div className="rounded-xl border border-white/10 bg-[#0f0d18] p-4">
-            <label className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-slate-200">
-                Include budget-overrun avoidance
-                <InfoDot text="Optional and off by default (the softest lever). Assumes forecasting keeps you from overspending your recognition budget." />
-              </span>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <Field label="Number of employees" hint="Used to suggest a plan.">
               <input
-                type="checkbox"
-                checked={inputs.overrunEnabled}
-                onChange={(e) => set("overrunEnabled", e.target.checked)}
-                className="h-4 w-4 accent-violet-500"
+                type="number"
+                min={1}
+                max={100000}
+                value={inputs.employees}
+                onChange={(e) => set("employees", Math.round(Number(e.target.value)))}
+                className={inputClass}
               />
-            </label>
-            {inputs.overrunEnabled && (
-              <div className="mt-4">
-                <Field
-                  label={`Overrun avoided: ${(assumptions.overrunPct * 100).toFixed(0)}% of budget`}
-                >
-                  <input
-                    type="range"
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    value={assumptions.overrunPct * 100}
-                    onChange={(e) => setAssumption("overrunPct", Number(e.target.value) / 100)}
-                    className="w-full accent-violet-500"
-                  />
-                </Field>
-              </div>
-            )}
+            </Field>
+
+            <Field
+              label="Annual recognition budget ($)"
+              hint="Total monetary awards paid per year."
+            >
+              <input
+                type="number"
+                min={0}
+                step={1000}
+                value={inputs.annualBudget}
+                onChange={(e) => set("annualBudget", Number(e.target.value))}
+                className={inputClass}
+              />
+            </Field>
+
+            <Field label="Plan" hint="Auto-suggested from employees; override if needed.">
+              <select
+                value={inputs.planName ?? activeTierName}
+                onChange={(e) => set("planName", e.target.value)}
+                className={inputClass}
+              >
+                {tiers.map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            {/* Payroll lever */}
+            <div className="rounded-xl border border-white/10 bg-[#0f0d18] p-4 sm:col-span-2">
+              <label className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-slate-200">
+                  Payroll automation savings
+                  <InfoDot text="Pays out through your existing payroll — no IT, no manual processing, live in 4 weeks. Estimates finance time saved not manually processing award payouts." />
+                </span>
+                <input
+                  type="checkbox"
+                  checked={inputs.payrollEnabled}
+                  onChange={(e) => set("payrollEnabled", e.target.checked)}
+                  className="h-4 w-4 accent-violet-500"
+                />
+              </label>
+              {inputs.payrollEnabled && (
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <Field label="Payroll frequency">
+                    <select
+                      value={inputs.payFrequency}
+                      onChange={(e) => set("payFrequency", e.target.value as PayFrequencyId)}
+                      className={inputClass}
+                    >
+                      {PAY_FREQUENCIES.map((f) => (
+                        <option key={f.id} value={f.id}>
+                          {f.label}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field
+                    label="Manual hrs / pay run"
+                    hint="Finance time spent manually processing award payouts today, per pay run."
+                  >
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      value={inputs.manualHoursPerRun}
+                      onChange={(e) => set("manualHoursPerRun", Number(e.target.value))}
+                      className={inputClass}
+                    />
+                  </Field>
+                  <Field
+                    label="Loaded hourly cost ($/hr)"
+                    hint="Fully-loaded finance/HR cost (salary + overhead)."
+                  >
+                    <input
+                      type="number"
+                      min={0}
+                      value={inputs.loadedHourlyCost}
+                      onChange={(e) => set("loadedHourlyCost", Number(e.target.value))}
+                      className={inputClass}
+                    />
+                  </Field>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* ── Results ────────────────────────────────────────── */}
-        <div className="space-y-5">
+        {/* ── Assumptions ───────────────────────────────────── */}
+        <div>
+          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-violet-400">
+            Assumptions
+          </h3>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            <Field
+              label={`Budget lost to fraud / favoritism: ${(assumptions.leakagePct * 100).toFixed(0)}%`}
+              hint="Modest by default (3–5%) for credibility. Adjust to your reality."
+            >
+              <input
+                type="range"
+                min={0}
+                max={10}
+                step={0.5}
+                value={assumptions.leakagePct * 100}
+                onChange={(e) => setAssumption("leakagePct", Number(e.target.value) / 100)}
+                className="w-full accent-violet-500"
+              />
+            </Field>
+
+            <Field
+              label={`Detection effectiveness: ${(assumptions.detectionEffectiveness * 100).toFixed(0)}%`}
+              hint="Share of that leakage the integrity engine prevents. It reduces, but won't claim to eliminate."
+            >
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={assumptions.detectionEffectiveness * 100}
+                onChange={(e) =>
+                  setAssumption("detectionEffectiveness", Number(e.target.value) / 100)
+                }
+                className="w-full accent-violet-500"
+              />
+            </Field>
+
+            <div className="rounded-xl border border-white/10 bg-[#0f0d18] p-4 sm:col-span-2">
+              <label className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-slate-200">
+                  Include budget-overrun avoidance
+                  <InfoDot text="Optional and off by default (the softest lever). Assumes forecasting keeps you from overspending your recognition budget." />
+                </span>
+                <input
+                  type="checkbox"
+                  checked={inputs.overrunEnabled}
+                  onChange={(e) => set("overrunEnabled", e.target.checked)}
+                  className="h-4 w-4 accent-violet-500"
+                />
+              </label>
+              {inputs.overrunEnabled && (
+                <div className="mt-4">
+                  <Field
+                    label={`Overrun avoided: ${(assumptions.overrunPct * 100).toFixed(0)}% of budget`}
+                  >
+                    <input
+                      type="range"
+                      min={0}
+                      max={10}
+                      step={0.5}
+                      value={assumptions.overrunPct * 100}
+                      onChange={(e) => setAssumption("overrunPct", Number(e.target.value) / 100)}
+                      className="w-full accent-violet-500"
+                    />
+                  </Field>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Results ───────────────────────────────────────── */}
+        <div className="space-y-5 border-t border-white/10 pt-8">
           <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-violet-400">
             Estimate
           </h3>
@@ -444,15 +451,13 @@ export default function RoiCalculator() {
 
           {result.isCustomPricing ? (
             <div className="rounded-2xl border border-violet-400/50 bg-[#0f1a19] p-6">
-              <p className="text-sm text-slate-300">
-                Estimated annual value
-              </p>
+              <p className="text-sm text-slate-300">Estimated annual value</p>
               <p className="mt-1 font-playfair text-4xl font-bold text-slate-100">
                 {formatUsd(result.annualValue)}
               </p>
               <p className="mt-4 text-sm leading-6 text-slate-300">
-                Enterprise pricing is tailored to your needs, so we don't show a
-                fabricated ROI here. Talk to us for a precise number.
+                Enterprise pricing is tailored to your needs, so we don't show a fabricated ROI
+                here. Talk to us for a precise number.
               </p>
               <a
                 href="/contact"
@@ -463,19 +468,11 @@ export default function RoiCalculator() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4">
-                <HeadlineCard
-                  label="Est. annual value"
-                  value={formatUsd(result.annualValue)}
-                  accent
-                />
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <HeadlineCard label="Est. annual value" value={formatUsd(result.annualValue)} accent />
                 <HeadlineCard
                   label="Net annual benefit"
-                  value={
-                    result.netAnnualBenefit == null
-                      ? "—"
-                      : formatUsd(result.netAnnualBenefit)
-                  }
+                  value={result.netAnnualBenefit == null ? "—" : formatUsd(result.netAnnualBenefit)}
                   accent
                 />
                 <HeadlineCard
@@ -484,17 +481,12 @@ export default function RoiCalculator() {
                 />
                 <HeadlineCard
                   label="Payback"
-                  value={
-                    result.paybackMonths == null
-                      ? "n/a"
-                      : `${result.paybackMonths.toFixed(1)} mo`
-                  }
+                  value={result.paybackMonths == null ? "n/a" : `${result.paybackMonths.toFixed(1)} mo`}
                 />
               </div>
 
-              {/* Chart */}
               <div className="rounded-2xl border border-white/10 bg-[#0f0d18] p-4">
-                <ResponsiveContainer width="100%" height={180}>
+                <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 0 }}>
                     <XAxis
                       dataKey="name"
