@@ -150,6 +150,7 @@ export default function RoiCalculator() {
   const [inputs, setInputs] = useState<RoiInputs>(() => readInputsFromUrl(DEFAULT_INPUTS));
   const [assumptions, setAssumptions] = useState<RoiAssumptions>(DEFAULT_ASSUMPTIONS);
   const [preset, setPreset] = useState<"conservative" | "typical" | "custom">("typical");
+  const [resetNonce, setResetNonce] = useState(0);
 
   const viewedFired = useRef(false);
 
@@ -214,6 +215,8 @@ export default function RoiCalculator() {
     setInputs(DEFAULT_INPUTS);
     setAssumptions(DEFAULT_ASSUMPTIONS);
     setPreset("typical");
+    // Remount LeadCapture so a prior "Sent" state clears and the user can send again.
+    setResetNonce((n) => n + 1);
   };
 
   const activeTierName =
@@ -535,7 +538,7 @@ export default function RoiCalculator() {
             )}
           </div>
 
-          <LeadCapture inputs={inputs} result={result} tierName={activeTierName} />
+          <LeadCapture key={resetNonce} inputs={inputs} result={result} tierName={activeTierName} />
 
           <p className="text-xs leading-5 text-slate-500">
             Estimate for illustration only, based on your inputs and stated assumptions; not a

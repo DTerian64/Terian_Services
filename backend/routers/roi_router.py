@@ -154,42 +154,132 @@ def _results_rows(req: RoiEmailRequest) -> str:
     return html
 
 
-def _wrap(title: str, intro: str, req: RoiEmailRequest) -> str:
+SITE_URL     = "https://terianix.ai"
+LOGO_URL     = "https://terianix.ai/logo-email.png"
+PRODUCT_URL  = "https://terianix.ai/products/award-nomination"
+CONTACT_URL  = "https://terianix.ai/contact"
+CALC_URL     = "https://terianix.ai/pricing/award-nomination/roi_calculator"
+
+
+def _months_short(n: float | None) -> str:
+    return "n/a" if n is None else f"{n:.1f} mo"
+
+
+def _highlight(req: "RoiEmailRequest") -> str:
+    """Big, cheerful stat chips at the top of the results."""
+    if req.roi_percent is not None:
+        chips = [
+            ("ROI", _pct(req.roi_percent), "#047857"),
+            ("Payback", _months_short(req.payback_months), "#6d28d9"),
+            ("Annual value", _usd(req.annual_value), "#6d28d9"),
+        ]
+    else:
+        chips = [("Estimated annual value", _usd(req.annual_value), "#6d28d9")]
+
+    width = 100 // len(chips)
+    cells = ""
+    for label, value, color in chips:
+        cells += (
+            f'<td width="{width}%" style="padding:6px;" valign="top">'
+            '<table width="100%" cellpadding="0" cellspacing="0" role="presentation"'
+            ' style="background:#f5f3ff;border:1px solid #ede9fe;border-radius:12px;">'
+            '<tr><td style="padding:16px 14px;text-align:center;">'
+            f'<div style="font-size:11px;font-weight:700;letter-spacing:0.5px;'
+            f'text-transform:uppercase;color:#7c3aed;">{label}</div>'
+            f'<div style="margin-top:6px;font-size:26px;font-weight:800;color:{color};">{value}</div>'
+            '</td></tr></table></td>'
+        )
+    return (
+        '<table width="100%" cellpadding="0" cellspacing="0" role="presentation"'
+        ' style="margin:0 0 24px;"><tr>' + cells + "</tr></table>"
+    )
+
+
+def _button(href: str, label: str, primary: bool) -> str:
+    if primary:
+        style = ("background:#7c3aed;color:#ffffff;border:1px solid #7c3aed;")
+    else:
+        style = ("background:#ffffff;color:#7c3aed;border:1px solid #c4b5fd;")
+    return (
+        f'<a href="{href}" style="display:inline-block;{style}'
+        "text-decoration:none;font-size:14px;font-weight:700;padding:12px 22px;"
+        f'border-radius:10px;margin:0 8px 8px 0;">{label}</a>'
+    )
+
+
+def _wrap(title: str, intro: str, req: "RoiEmailRequest") -> str:
     return f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 0;">
+<body style="margin:0;padding:0;background:#f4f2fb;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f4f2fb;padding:32px 0;">
     <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0"
-             style="background:#ffffff;border-radius:12px;overflow:hidden;
-                    box-shadow:0 2px 8px rgba(0,0,0,.08);max-width:560px;">
-        <tr><td style="background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);padding:32px 40px;">
-          <h1 style="margin:0;color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.3px;">{title}</h1>
-          <p style="margin:6px 0 0;color:#ddd6fe;font-size:13px;">Award Nomination System · terianix.ai</p>
+      <table width="600" cellpadding="0" cellspacing="0" role="presentation"
+             style="background:#ffffff;border-radius:16px;overflow:hidden;max-width:600px;
+                    box-shadow:0 4px 16px rgba(76,29,149,.10);">
+
+        <!-- Brand bar -->
+        <tr><td style="padding:22px 40px;border-bottom:1px solid #ece9f7;">
+          <a href="{SITE_URL}" style="text-decoration:none;">
+            <img src="{LOGO_URL}" width="38" height="42" alt="Terianix.ai"
+                 style="vertical-align:middle;border:0;">
+            <span style="vertical-align:middle;margin-left:12px;font-size:20px;
+                         font-weight:800;color:#4c1d95;letter-spacing:-0.3px;">Terianix.ai</span>
+          </a>
         </td></tr>
-        <tr><td style="padding:32px 40px;">
-          <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.7;">{intro}</p>
-          <table width="100%" cellpadding="0" cellspacing="0"
-                 style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px;">
-            <tr style="background:#f9fafb;"><td colspan="2"
-              style="padding:12px 16px;font-size:11px;font-weight:700;color:#6b7280;
-                     text-transform:uppercase;letter-spacing:0.5px;">Your ROI estimate</td></tr>
+
+        <!-- Product banner -->
+        <tr><td bgcolor="#6d28d9"
+                style="background:#6d28d9;background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
+                       padding:26px 40px;">
+          <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.3px;">
+            Award Nomination System</h1>
+          <p style="margin:6px 0 0;color:#ddd6fe;font-size:13px;line-height:1.5;">
+            Monetary employee recognition with an AI integrity engine — fraud, favoritism, and
+            collusion caught before payout.</p>
+        </td></tr>
+
+        <!-- Body -->
+        <tr><td style="padding:30px 40px;">
+          <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.5px;
+                    text-transform:uppercase;color:#7c3aed;">{title}</p>
+          <p style="margin:0 0 22px;font-size:15px;color:#374151;line-height:1.7;">{intro}</p>
+
+          {_highlight(req)}
+
+          <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+                 style="border:1px solid #ede9fe;border-radius:12px;overflow:hidden;margin-bottom:26px;">
+            <tr style="background:#f5f3ff;"><td colspan="2"
+              style="padding:12px 16px;font-size:11px;font-weight:700;color:#7c3aed;
+                     text-transform:uppercase;letter-spacing:0.5px;">Full breakdown</td></tr>
             {_results_rows(req)}
           </table>
+
+          <div style="text-align:center;margin:0 0 24px;">
+            {_button(PRODUCT_URL, "Explore the platform →", True)}
+            {_button(CONTACT_URL, "Book a walkthrough", False)}
+          </div>
+
           <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
             Estimate for illustration only, based on your inputs and stated assumptions;
-            not a guarantee of results.
+            not a guarantee of results.</p>
+        </td></tr>
+
+        <!-- Footer -->
+        <tr><td style="padding:20px 40px;border-top:1px solid #ece9f7;background:#faf9ff;text-align:center;">
+          <p style="margin:0;font-size:13px;color:#6b7280;">
+            <a href="{SITE_URL}" style="color:#7c3aed;font-weight:700;text-decoration:none;">terianix.ai</a>
+            &nbsp;·&nbsp; Award Nomination System
+          </p>
+          <p style="margin:8px 0 0;font-size:11px;color:#b6b0c9;">
+            <a href="{CALC_URL}" style="color:#a78bfa;text-decoration:none;">Re-run the ROI calculator</a>
           </p>
         </td></tr>
-        <tr><td style="padding:16px 40px;border-top:1px solid #e5e7eb;background:#f9fafb;text-align:center;">
-          <p style="margin:0;font-size:12px;color:#9ca3af;">Terian Services · terianix.ai</p>
-        </td></tr>
+
       </table>
     </td></tr>
   </table>
 </body></html>"""
-
 
 def _send_sync(to_addr: str, subject: str, html: str) -> None:
     """Blocking SMTP send — called via asyncio.to_thread."""
