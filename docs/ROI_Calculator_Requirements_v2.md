@@ -1,7 +1,7 @@
 # Requirements v2 — Award Nomination System: Total-Cost / ROI Calculator (terianix.ai)
 
 **Owner:** David Terian / Terian Services Inc.
-**Status:** Decisions locked · implementation in progress
+**Status:** Decisions locked · implemented (v2.1 revisions applied)
 **Supersedes:** `ROI_Calculator_Requirements.md` (v1). This version records the decisions made at kickoff (§11 of v1) and the model change that followed.
 
 ---
@@ -32,10 +32,10 @@ The **Award Nomination System** is a multi-tenant SaaS platform for **monetary e
 
 ## 4. Placement & entry points — **DECIDED: "Both"**
 
-- **Section on the Pricing page** (`/pricing/award-nomination`) — a "Calculate your ROI" block below the tier cards. Cost and value in one scroll. Reuses the pricing data the page already fetches.
-- **Dedicated route** `/pricing/award-nomination/roi` — same component, its own URL, so **sales can share a deep link** (query-param prefill supported).
+- **Dedicated calculator page** `/pricing/award-nomination/roi_calculator` — the calculator lives here (its own URL, deep-link/query-param prefill supported for sales).
+- **Section on the Pricing page** (`/pricing/award-nomination`) — a "Calculate your ROI" section header + **button** linking to the calculator page (the calculator is NOT embedded on the pricing page).
 - **Product-page CTA** — a "Calculate your ROI" button on `/products/award-nomination` linking to the calculator (§4 secondary entry point). **DECIDED: include.**
-- **Decision Maker soliciting document** — the `/pricing/award-nomination/roi` link is added to `Documentation_Structured/.../01_Decision_Maker_Overview.md` so prospects can jump straight to it.
+- **Decision Maker soliciting document** — the `/pricing/award-nomination/roi_calculator` link is added to `01_Decision_Maker_Overview.md` (in the David64_Award_Nominations repo) so prospects can jump straight to it.
 
 ## 5. The ROI model (implement exactly)
 
@@ -53,7 +53,8 @@ Consequently the **"nominations per year"** and **"current approval time"** inpu
 | Annual recognition budget ($) | currency | 500,000 | ≥ 0 | Total monetary awards paid per year. |
 | Loaded hourly cost of finance/HR ($/hr) | currency | 60 | ≥ 0 | Fully-loaded (salary + overhead). Used by the payroll lever. |
 | Plan | select | auto by employees | Starter / Professional / Enterprise | Auto-suggest; user can override. |
-| Billing | toggle | Annual | Annual / Monthly | Drives the price used. |
+
+> **Billing is fixed to Annual** and not shown in the calculator (the Annual/Monthly toggle was dropped as confusing). The pricing *page* still has its own Annual/Monthly toggle for the cards.
 | **Payroll frequency** | select | **Monthly (12)** | Weekly (52) / Biweekly (26) / Semi-monthly (24) / Monthly (12) | Only used by the payroll lever. |
 | **Manual hours per pay run** | number | **1.5** | ≥ 0 | Finance time spent manually processing award payouts today, per pay run. |
 
@@ -110,19 +111,19 @@ payback_months           = annual_subscription_cost / (annual_value / 12)
 - Plan auto-selects from employee count; user can override.
 - Number fields + sliders where helpful; currency formatting; validation.
 - **Conservative / Typical** preset toggle that sets the assumption bundle.
+- No "Copy shareable link" control (dropped). Deep-link prefill via query params still works for hand-built or sales-sent URLs.
 - "Reset to defaults" control.
-- **Shareable deep link:** a "Copy link" control that encodes current inputs as query params for sales to send pre-filled estimates.
 
 ## 7. Lead capture
 
 - **Do not gate** the estimate behind a form. Show the result, then offer **"Email me these results"** / **"Book a walkthrough."** (DECIDED: open, no gate.)
-- Route to the existing **`POST /api/contact`** endpoint (reused — no backend change): sends email + a structured summary of inputs/assumptions/outputs, tagged inquiry "ROI Calculator." "Book a walkthrough" links to `/contact`.
+- **Option A (implemented):** submit posts to a new **`POST /api/roi/email`** endpoint (`backend/routers/roi_router.py`) which (1) **emails the prospect their own results** — the promised action — (2) emails the Terian team a lead notification, and (3) writes a lead doc to Cosmos (`client_communications`, source `roi-calculator`). All three steps best-effort. "Book a walkthrough" links to `/contact`.
 - **Analytics — Azure Application Insights** (existing `telemetry.ts`): fire `roi_calculator_viewed`, `roi_calculated`, `roi_lead_submitted`.
 
 ## 8. Technical
 
 - **Stack (confirmed from repo):** React 19 + Vite + TypeScript + Tailwind; **recharts** already a dependency; App Insights already wired. Build as a self-contained component.
-- **All math client-side.** Backend only for lead capture (reuses `/api/contact`).
+- **All math client-side.** Backend only for lead capture (new `POST /api/roi/email`, reuses the existing SMTP + Cosmos setup).
 - **Pricing as shared config** — same `/api/engagement/award-nomination` endpoint as the pricing page (single source of truth).
 - Responsive + accessible (keyboard, labels, contrast).
 - **Currency: USD only** for v1.
@@ -136,9 +137,9 @@ payback_months           = annual_subscription_cost / (annual_value / 12)
 
 1. `src/data/awardRoiModel.ts` — pure model (types, defaults, presets, compute).
 2. `src/components/RoiCalculator.tsx` — the calculator component.
-3. Section on `AwardNominationPricingPage` + dedicated `/pricing/award-nomination/roi` route.
+3. Dedicated `/pricing/award-nomination/roi_calculator` page (`AwardNominationRoiPage`); pricing page shows a header + button linking to it.
 4. "Calculate your ROI" CTA on the product page.
-5. Lead-capture (`/api/contact`) + App Insights events.
+5. Backend `roi_router.py` (`POST /api/roi/email`, prospect + internal email + lead) + App Insights events.
 6. `/roi` link added to the Decision Maker Overview doc.
 
 ## 11. Decisions resolved (were open in v1 §11)
@@ -147,11 +148,12 @@ payback_months           = annual_subscription_cost / (annual_value / 12)
 2. Budget-overrun avoidance — **off by default** (only opt-in lever).
 3. Approval-time lever — **removed entirely** (see §5.1).
 4. Payroll automation — **on by default**, frequency dropdown (default Monthly/12), 1.5 hr/run seed.
-5. Gate results — **no gate**; open "email/book" CTA.
-6. CRM / endpoint — reuse **`POST /api/contact`**; analytics — **App Insights**.
+5. Gate results — **no gate**; open "email/book" CTA. "Email me these results" now truly emails the prospect (Option A).
+6. Endpoint — new **`POST /api/roi/email`** (prospect + internal email + lead); analytics — **App Insights**.
 7. Stack — **React/Vite/TS/Tailwind/recharts** (matches repo).
 8. Currency — **USD only** for v1.
-9. Placement — **both** (pricing-page section + dedicated route) + product-page CTA + Decision Maker doc link.
+9. Placement — calculator on dedicated **`/roi_calculator`** page; pricing page = header + button; product-page CTA; Decision Maker doc link.
+10. Dropped from the calculator: Annual/Monthly billing toggle (Annual only), "Copy shareable link", and all "your organization" wording; "Your estimate" → "Estimate".
 
 ---
 *Terian Services Inc. · Award Nomination System · ROI Calculator brief v2.*

@@ -429,11 +429,11 @@ export default function AwardNominationPage() {
               Total-cost / ROI
             </p>
             <p className="mt-1.5 text-lg font-semibold text-slate-100">
-              See what the platform is worth to your organization.
+              See what the platform is worth to you.
             </p>
           </div>
           <a
-            href="/pricing/award-nomination/roi"
+            href="/pricing/award-nomination/roi_calculator"
             className="inline-flex shrink-0 items-center justify-center rounded-lg bg-violet-500 px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-violet-400"
           >
             Calculate your ROI →

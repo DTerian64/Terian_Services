@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
-import RoiCalculator from "../components/RoiCalculator";
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
@@ -205,21 +204,24 @@ export default function AwardNominationPricingPage() {
               ))}
             </div>
 
-            {/* ROI calculator */}
+            {/* ROI calculator CTA */}
             <div id="roi" className="mt-24 scroll-mt-28 border-t border-white/10 pt-16">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-400">
                 Calculate your ROI
               </p>
               <h2 className="mt-3 font-playfair text-2xl font-bold tracking-tight text-slate-100 md:text-3xl">
-                See the value for your organization
+                See the value in numbers
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-                Enter a few numbers to estimate annual value, net benefit, ROI, and payback.
-                Conservative defaults, editable assumptions, and live pricing.
+                Estimate annual value, net benefit, ROI, and payback in under a minute —
+                conservative defaults, editable assumptions, and live pricing.
               </p>
-              <div className="mt-8">
-                <RoiCalculator />
-              </div>
+              <a
+                href="/pricing/award-nomination/roi_calculator"
+                className="mt-6 inline-flex items-center justify-center rounded-lg bg-violet-500 px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-violet-400"
+              >
+                Calculate your ROI →
+              </a>
             </div>
           </>
         )}

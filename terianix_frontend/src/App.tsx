@@ -29,7 +29,7 @@ const routes: RouteEntry[] = [
   { match: (p) => p === "/ask-ai",                                       component: AskAIPage,                  title: "Ask AI" },
   { match: (p) => p === "/trust",                                        component: TrustPage,                  title: "Trust & Security" },
   { match: (p) => p === "/pricing" || p === "/pricing/",                 component: PricingPage,                title: "Pricing" },
-  { match: (p) => p === "/pricing/award-nomination/roi",                 component: AwardNominationRoiPage,     title: "Award Nomination ROI Calculator" },
+  { match: (p) => p === "/pricing/award-nomination/roi_calculator",      component: AwardNominationRoiPage,     title: "Award Nomination ROI Calculator" },
   { match: (p) => p === "/pricing/award-nomination",                     component: AwardNominationPricingPage, title: "Award Nomination Pricing" },
   { match: (p) => p.startsWith("/engagement/new"),                        component: NewEngagementPage,          title: "New Engagement" },
   { match: (p) => p === "/privacy" || p === "/privacy.html",             component: PrivacyPage,                title: "Privacy Policy" },

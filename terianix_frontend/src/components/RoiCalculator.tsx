@@ -6,7 +6,7 @@
  * • Pricing is read live from GET /api/engagement/award-nomination — the SAME
  *   endpoint the pricing page uses, so prices never drift.
  * • All math is client-side (see data/awardRoiModel.ts).
- * • Lead capture reuses POST /api/contact (no backend change).
+ * • Lead capture posts to POST /api/roi/email (emails the prospect + notifies sales).
  * • Analytics via Azure Application Insights (telemetry.ts).
  *
  * See ROI_Calculator_Requirements_v2.md for the specification.
@@ -31,7 +31,6 @@ import {
   PAY_FREQUENCIES,
   PRESETS,
   resolveTier,
-  type Billing,
   type PayFrequencyId,
   type RoiAssumptions,
   type RoiInputs,
@@ -46,7 +45,7 @@ interface EngagementDoc {
   tiers: Tier[];
 }
 
-// ── URL <-> state (deep-link prefill + shareable link) ────────────────────────
+// ── URL -> state (deep-link prefill) ─────────────────────────────────────────
 
 function readInputsFromUrl(base: RoiInputs): RoiInputs {
   if (typeof window === "undefined") return base;
@@ -62,37 +61,17 @@ function readInputsFromUrl(base: RoiInputs): RoiInputs {
     return v == null ? d : v === "1" || v === "true";
   };
   const freq = (q.get("freq") as PayFrequencyId | null) ?? base.payFrequency;
-  const billing = (q.get("billing") as Billing | null) ?? base.billing;
   return {
     ...base,
     employees: num("emp", base.employees),
     annualBudget: num("budget", base.annualBudget),
     loadedHourlyCost: num("rate", base.loadedHourlyCost),
     planName: q.get("plan") ?? base.planName,
-    billing: billing === "monthly" ? "monthly" : "annual",
     payrollEnabled: bool("payroll", base.payrollEnabled),
     payFrequency: PAY_FREQUENCIES.some((f) => f.id === freq) ? freq : base.payFrequency,
     manualHoursPerRun: num("hrs", base.manualHoursPerRun),
     overrunEnabled: bool("overrun", base.overrunEnabled),
   };
-}
-
-function buildShareLink(inputs: RoiInputs, assumptions: RoiAssumptions): string {
-  const q = new URLSearchParams({
-    emp: String(inputs.employees),
-    budget: String(inputs.annualBudget),
-    rate: String(inputs.loadedHourlyCost),
-    billing: inputs.billing,
-    payroll: inputs.payrollEnabled ? "1" : "0",
-    freq: inputs.payFrequency,
-    hrs: String(inputs.manualHoursPerRun),
-    overrun: inputs.overrunEnabled ? "1" : "0",
-    leak: String(assumptions.leakagePct),
-    det: String(assumptions.detectionEffectiveness),
-  });
-  if (inputs.planName) q.set("plan", inputs.planName);
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  return `${origin}/pricing/award-nomination/roi?${q.toString()}`;
 }
 
 // ── Small UI atoms ────────────────────────────────────────────────────────────
@@ -171,7 +150,6 @@ export default function RoiCalculator() {
   const [inputs, setInputs] = useState<RoiInputs>(() => readInputsFromUrl(DEFAULT_INPUTS));
   const [assumptions, setAssumptions] = useState<RoiAssumptions>(DEFAULT_ASSUMPTIONS);
   const [preset, setPreset] = useState<"conservative" | "typical" | "custom">("typical");
-  const [copied, setCopied] = useState(false);
 
   const viewedFired = useRef(false);
 
@@ -238,16 +216,6 @@ export default function RoiCalculator() {
     setPreset("typical");
   };
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(buildShareLink(inputs, assumptions));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* clipboard unavailable — ignore */
-    }
-  };
-
   const activeTierName =
     resolveTier(tiers, inputs.planName, inputs.employees)?.name ?? "";
 
@@ -283,13 +251,6 @@ export default function RoiCalculator() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={copyLink}
-            className="rounded-md border border-white/20 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-violet-300 hover:text-violet-300"
-          >
-            {copied ? "Link copied ✓" : "Copy shareable link"}
-          </button>
-          <button
-            type="button"
             onClick={reset}
             className="rounded-md border border-white/20 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-violet-300 hover:text-violet-300"
           >
@@ -301,10 +262,6 @@ export default function RoiCalculator() {
       <div className="mt-6 grid gap-8 lg:grid-cols-2">
         {/* ── Inputs ─────────────────────────────────────────── */}
         <div className="space-y-5">
-          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-violet-400">
-            Your organization
-          </h3>
-
           <Field label="Number of employees" hint="Used to suggest a plan.">
             <input
               type="number"
@@ -330,40 +287,20 @@ export default function RoiCalculator() {
             />
           </Field>
 
-          {/* Plan + billing */}
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Plan" hint="Auto-suggested from employees; override if needed.">
-              <select
-                value={inputs.planName ?? activeTierName}
-                onChange={(e) => set("planName", e.target.value)}
-                className={inputClass}
-              >
-                {tiers.map((t) => (
-                  <option key={t.name} value={t.name}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Billing">
-              <div className="inline-flex w-full overflow-hidden rounded-md border border-white/20">
-                {(["annual", "monthly"] as const).map((b) => (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => set("billing", b)}
-                    className={`flex-1 px-3 py-2 text-xs font-bold uppercase tracking-wider transition ${
-                      inputs.billing === b
-                        ? "bg-violet-500 text-[#0f0d18]"
-                        : "text-slate-300 hover:text-violet-300"
-                    }`}
-                  >
-                    {b}
-                  </button>
-                ))}
-              </div>
-            </Field>
-          </div>
+          {/* Plan */}
+          <Field label="Plan" hint="Auto-suggested from employees; override if needed.">
+            <select
+              value={inputs.planName ?? activeTierName}
+              onChange={(e) => set("planName", e.target.value)}
+              className={inputClass}
+            >
+              {tiers.map((t) => (
+                <option key={t.name} value={t.name}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </Field>
 
           {/* Payroll lever */}
           <div className="rounded-xl border border-white/10 bg-[#0f0d18] p-4">
@@ -496,7 +433,7 @@ export default function RoiCalculator() {
         {/* ── Results ────────────────────────────────────────── */}
         <div className="space-y-5">
           <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-violet-400">
-            Your estimate
+            Estimate
           </h3>
 
           {priceError && (
@@ -514,7 +451,7 @@ export default function RoiCalculator() {
                 {formatUsd(result.annualValue)}
               </p>
               <p className="mt-4 text-sm leading-6 text-slate-300">
-                Enterprise pricing is tailored to your organization, so we don't show a
+                Enterprise pricing is tailored to your needs, so we don't show a
                 fabricated ROI here. Talk to us for a precise number.
               </p>
               <a
@@ -600,7 +537,7 @@ export default function RoiCalculator() {
             <BreakdownRow label="Total annual value" value={result.annualValue} bold />
             {!result.isCustomPricing && result.annualSubscriptionCost != null && (
               <BreakdownRow
-                label={`Subscription (${activeTierName}, ${inputs.billing})`}
+                label={`Subscription (${activeTierName})`}
                 value={-result.annualSubscriptionCost}
               />
             )}
@@ -643,7 +580,7 @@ function BreakdownRow({
   );
 }
 
-// ── Lead capture (reuses POST /api/contact) ───────────────────────────────────
+// ── Lead capture (POST /api/roi/email) ────────────────────────────────────────
 
 function LeadCapture({
   inputs,
@@ -658,45 +595,37 @@ function LeadCapture({
   const [company, setCompany] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
-  const summary = () => {
-    const lines = [
-      "ROI Calculator — Award Nomination System",
-      `Employees: ${inputs.employees}`,
-      `Annual recognition budget: ${formatUsd(inputs.annualBudget)}`,
-      `Plan: ${tierName} (${inputs.billing})`,
-      `Payroll lever: ${inputs.payrollEnabled ? "on" : "off"}`,
-      inputs.overrunEnabled ? "Overrun avoidance: on" : "Overrun avoidance: off",
-      "",
-      `Estimated annual value: ${formatUsd(result.annualValue)}`,
-      `  • Fraud & abuse prevented: ${formatUsd(result.fraudPrevented)}`,
-      `  • Payroll automation saved: ${formatUsd(result.payrollCostSaved)}`,
-      inputs.overrunEnabled
-        ? `  • Budget-overrun avoided: ${formatUsd(result.overrunAvoidance)}`
-        : "",
-      result.annualSubscriptionCost != null
-        ? `Annual subscription cost: ${formatUsd(result.annualSubscriptionCost)}`
-        : "Pricing: Enterprise (custom)",
-      result.netAnnualBenefit != null
-        ? `Net annual benefit: ${formatUsd(result.netAnnualBenefit)}`
-        : "",
-      result.roiPercent != null ? `ROI: ${Math.round(result.roiPercent)}%` : "",
-      result.paybackMonths != null ? `Payback: ${result.paybackMonths.toFixed(1)} months` : "",
-    ];
-    return lines.filter(Boolean).join("\n");
-  };
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setStatus("sending");
     try {
-      const fd = new FormData();
-      fd.append("name", email.split("@")[0]);
-      fd.append("email", email);
-      fd.append("company", company);
-      fd.append("inquiry", "ROI Calculator");
-      fd.append("message", summary());
-      const res = await fetch(`${API_BASE}/api/contact`, { method: "POST", body: fd });
+      const res = await fetch(`${API_BASE}/api/roi/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          company,
+          employees: inputs.employees,
+          annual_budget: inputs.annualBudget,
+          plan: tierName,
+          payroll_enabled: inputs.payrollEnabled,
+          overrun_enabled: inputs.overrunEnabled,
+          annual_value: Math.round(result.annualValue),
+          fraud_prevented: Math.round(result.fraudPrevented),
+          payroll_saved: Math.round(result.payrollCostSaved),
+          overrun_avoided: Math.round(result.overrunAvoidance),
+          annual_cost:
+            result.annualSubscriptionCost == null
+              ? null
+              : Math.round(result.annualSubscriptionCost),
+          net_benefit:
+            result.netAnnualBenefit == null ? null : Math.round(result.netAnnualBenefit),
+          roi_percent: result.roiPercent == null ? null : Math.round(result.roiPercent),
+          payback_months:
+            result.paybackMonths == null ? null : Number(result.paybackMonths.toFixed(1)),
+        }),
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus("success");
       appInsights?.trackEvent({
@@ -711,7 +640,7 @@ function LeadCapture({
   if (status === "success") {
     return (
       <div className="rounded-2xl border border-violet-400/50 bg-[#0f1a19] p-5 text-sm text-slate-200">
-        Thanks — we've got your details and will send these results and follow up shortly.
+        Sent — we've emailed these results to {email}, and our team will follow up shortly.
       </div>
     );
   }
@@ -723,7 +652,7 @@ function LeadCapture({
     >
       <p className="text-sm font-semibold text-slate-100">Email me these results</p>
       <p className="mt-1 text-xs text-slate-400">
-        No gate — your estimate is already above. Share it with your team or book a walkthrough.
+        No gate — your estimate is above. We'll email you a copy and follow up.
       </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <input
