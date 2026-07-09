@@ -421,6 +421,26 @@ export default function AwardNominationPage() {
         </div>
       </section>
 
+      {/* ROI calculator CTA */}
+      <section className="border-t border-white/15 bg-[#0f1a19]">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-8 lg:flex-row lg:items-center lg:px-10">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-400">
+              Total-cost / ROI
+            </p>
+            <p className="mt-1.5 text-lg font-semibold text-slate-100">
+              See what the platform is worth to your organization.
+            </p>
+          </div>
+          <a
+            href="/pricing/award-nomination/roi"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg bg-violet-500 px-6 py-3 text-sm font-bold uppercase tracking-wider text-[#0f0d18] transition hover:bg-violet-400"
+          >
+            Calculate your ROI →
+          </a>
+        </div>
+      </section>
+
       <section className="border-t border-white/15">
         <div className="mx-auto max-w-6xl px-6 py-20 lg:px-10">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">What it does</p>
