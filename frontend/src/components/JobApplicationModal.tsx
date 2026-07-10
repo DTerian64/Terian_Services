@@ -175,7 +175,7 @@ export default function JobApplicationModal({ jobId, jobTitle, jobTagline, onClo
 
       {/* Drawer panel — full-screen on mobile, right-side drawer from sm: up */}
       <div
-        className={`relative flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out sm:max-w-md sm:rounded-l-2xl ${
+        className={`relative flex h-full w-full flex-col overflow-hidden bg-white font-jobsans shadow-2xl transition-transform duration-300 ease-out sm:max-w-md sm:rounded-l-2xl ${
           visible ? "translate-x-0" : "translate-x-full"
         }`}
       >

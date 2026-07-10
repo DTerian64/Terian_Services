@@ -110,7 +110,7 @@ export default function JobDetailPage({ jobId }: Props) {
 
       {/* Sections */}
       <section className="mx-auto max-w-5xl px-6 py-12 lg:px-10">
-        <div className="rounded-2xl bg-white p-8 text-black shadow-xl shadow-black/20 sm:p-10 lg:p-12">
+        <div className="rounded-2xl bg-white p-8 font-jobsans text-black shadow-xl shadow-black/20 sm:p-10 lg:p-12">
           <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-teal-600">
             <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none">
               <path d="M12.5 5 7.5 10 12.5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -180,14 +180,14 @@ function JobSection({ section, isFirst }: { section: Section; isFirst: boolean }
         {section.heading}
       </h2>
       {paragraphs.map((paragraph, i) => (
-        <p key={i} className="mt-4 text-sm leading-7 text-slate-800">
+        <p key={i} className="mt-4 max-w-[68ch] text-base leading-[1.7] text-slate-700">
           {paragraph}
         </p>
       ))}
       {section.bullets.length > 0 && (
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 max-w-[68ch] space-y-2.5">
           {section.bullets.map((bullet, i) => (
-            <li key={i} className="flex gap-3 text-sm leading-7 text-slate-800">
+            <li key={i} className="flex gap-3 text-base leading-[1.7] text-slate-700">
               <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
               {bullet}
             </li>
