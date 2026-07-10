@@ -34,7 +34,7 @@ export default function JobDetailPage({ jobId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
   const [showApply, setShowApply] = useState(false);
-  const [showStickyBar, setShowStickyBar] = useState(false);
+  const [showFloatingApply, setShowStickyBar] = useState(false);
   const actionRowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -97,23 +97,16 @@ export default function JobDetailPage({ jobId }: Props) {
         description={job.tagline}
       />
 
-      {/* Sticky apply bar — appears once the primary action row scrolls out of view */}
-      <div
-        className={`fixed inset-x-0 top-[5.4rem] z-40 border-b border-slate-200 bg-white/95 backdrop-blur transition-all duration-200 ${
-          showStickyBar ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
+      {/* Floating apply button — appears once the primary action row scrolls out of view */}
+      <button
+        type="button"
+        onClick={() => setShowApply(true)}
+        className={`fixed right-6 top-[6.6rem] z-40 rounded-md bg-teal-400 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-950 shadow-lg shadow-black/20 transition-all duration-200 hover:bg-teal-300 ${
+          showFloatingApply ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
         }`}
       >
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3 lg:px-10">
-          <p className="truncate text-sm font-semibold text-black">{job.title}</p>
-          <button
-            type="button"
-            onClick={() => setShowApply(true)}
-            className="shrink-0 rounded-md bg-teal-400 px-5 py-2 text-xs font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
-          >
-            Apply Now
-          </button>
-        </div>
-      </div>
+        Apply Now
+      </button>
 
       {/* Sections */}
       <section className="mx-auto max-w-5xl px-6 py-12 lg:px-10">

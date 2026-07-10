@@ -6,3 +6,26 @@ pageViews
 pageViews
 | summarize visits=count() by client_CountryOrRegion, client_City, client_Browser
 | order by visits desc
+
+union
+    (
+        app("appi-terian-services-frontend").pageViews
+        | extend Application = "Terian Services"
+    ),
+    (
+        app("appi-terianix-frontend").pageViews
+        | extend Application = "Terianix"
+    )
+| where not(client_City has_any ("Los Angeles", "Glendale"))
+| extend PacificTime = datetime_utc_to_local(timestamp, "US/Pacific")
+| project
+    PacificTime,
+    Application,
+    name,
+    url,
+    duration,
+    client_City,
+    client_CountryOrRegion,
+    client_Browser,
+    client_OS
+| order by PacificTime desc
