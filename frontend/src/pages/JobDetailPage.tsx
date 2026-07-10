@@ -169,6 +169,7 @@ export default function JobDetailPage({ jobId }: Props) {
         <JobApplicationModal
           jobId={job.id}
           jobTitle={job.title}
+          jobTagline={job.tagline}
           onClose={() => setShowApply(false)}
         />
       )}

@@ -77,6 +77,7 @@ export default function JobsPage() {
         <JobApplicationModal
           jobId={applyJob.id}
           jobTitle={applyJob.title}
+          jobTagline={applyJob.tagline}
           onClose={() => setApplyJob(null)}
         />
       )}

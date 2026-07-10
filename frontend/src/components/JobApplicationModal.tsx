@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -29,10 +29,13 @@ function formatBytes(n: number): string {
 type Props = {
   jobId: string;
   jobTitle: string;
+  jobTagline?: string;
   onClose: () => void;
 };
 
-export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props) {
+const CLOSE_ANIMATION_MS = 220;
+
+export default function JobApplicationModal({ jobId, jobTitle, jobTagline, onClose }: Props) {
   const [name,       setName]       = useState("");
   const [email,      setEmail]      = useState("");
   const [linkedin,   setLinkedin]   = useState("");
@@ -42,7 +45,33 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
   const [errors,     setErrors]     = useState<FieldErrors>({});
   const [status,     setStatus]     = useState<Status>("idle");
   const [submitError, setSubmitError] = useState("");
+  const [visible,    setVisible]    = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Open/close animation, scroll lock, escape-to-close ──────────────────────
+
+  const handleClose = useCallback(() => {
+    setVisible(false);
+    window.setTimeout(onClose, CLOSE_ANIMATION_MS);
+  }, [onClose]);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setVisible(true));
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      cancelAnimationFrame(id);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") handleClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleClose]);
 
   // ── Validation ────────────────────────────────────────────────────────────
 
@@ -53,7 +82,7 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
     else if (!EMAIL_RE.test(email.trim()))         e.email    = "Please enter a valid email address.";
     if (linkedin.trim() && !URL_RE.test(linkedin.trim()))
                                                    e.linkedin = "Please enter a valid URL (starting with http:// or https://).";
-    if (!message.trim())                           e.message  = "Cover note is required.";
+    if (!message.trim())                           e.message  = "A short message is required.";
     if (!resume)                                   e.resume   = "Please attach your resume.";
     return e;
   }
@@ -137,49 +166,64 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-        {/* Close */}
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-black"
-          aria-label="Close"
-        >
-          <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none">
-            <path d="M5 5 15 15M15 5 5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-          </svg>
-        </button>
+    <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-labelledby="ja-heading">
+      {/* Backdrop */}
+      <div
+        className={`absolute inset-0 bg-black/60 transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}
+        onClick={handleClose}
+      />
+
+      {/* Drawer panel — full-screen on mobile, right-side drawer from sm: up */}
+      <div
+        className={`relative flex h-full w-full flex-col overflow-hidden bg-white shadow-2xl transition-transform duration-300 ease-out sm:max-w-md sm:rounded-l-2xl ${
+          visible ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Header */}
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 sm:px-8">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-teal-600">Apply</p>
+            <h2 id="ja-heading" className="mt-1 truncate font-playfair text-xl font-bold text-black">
+              {jobTitle}
+            </h2>
+            {jobTagline && <p className="mt-1 text-sm leading-6 text-slate-600">{jobTagline}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={handleClose}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-black"
+            aria-label="Close"
+          >
+            <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none">
+              <path d="M5 5 15 15M15 5 5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
 
         {status === "success" ? (
-          <div className="py-6 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-teal-500/15">
+          <div className="flex flex-1 flex-col items-center justify-center gap-1 px-8 py-10 text-center">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-teal-500/15">
               <svg viewBox="0 0 24 24" className="h-7 w-7 text-teal-600" fill="none">
                 <path d="M5 13 9 17 19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h2 className="font-playfair text-2xl font-bold text-black">Application submitted</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-700">
-              Thanks for your interest in the <span className="text-black font-semibold">{jobTitle}</span> role.
+            <h3 className="font-playfair text-2xl font-bold text-black">Application submitted</h3>
+            <p className="mt-3 max-w-sm text-sm leading-7 text-slate-700">
+              Thanks for your interest in the <span className="font-semibold text-black">{jobTitle}</span> role.
               We'll be in touch if there's a good fit.
             </p>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="mt-6 rounded-md bg-teal-400 px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
             >
               Done
             </button>
           </div>
         ) : (
-          <>
-            <h2 className="font-playfair text-xl font-bold text-black">Apply</h2>
-            <p className="mt-1 text-sm text-slate-600 leading-6">{jobTitle}</p>
-
-            <form onSubmit={handleSubmit} className="mt-6 space-y-5" noValidate>
+          <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden" noValidate>
+            {/* Scrollable fields */}
+            <div className="flex-1 space-y-5 overflow-y-auto px-6 py-6 sm:px-8">
               {/* Name */}
               <div>
                 <label className={labelClass} htmlFor="ja-name">Full name *</label>
@@ -210,10 +254,10 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                 {errors.email && <FieldError id="ja-email-err">{errors.email}</FieldError>}
               </div>
 
-              {/* LinkedIn */}
+              {/* LinkedIn / portfolio */}
               <div>
                 <label className={labelClass} htmlFor="ja-linkedin">
-                  LinkedIn URL <span className="normal-case font-normal text-slate-400">(optional)</span>
+                  LinkedIn or portfolio URL <span className="normal-case font-normal text-slate-400">(optional)</span>
                 </label>
                 <input
                   id="ja-linkedin"
@@ -225,21 +269,6 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                   aria-describedby={errors.linkedin ? "ja-linkedin-err" : undefined}
                 />
                 {errors.linkedin && <FieldError id="ja-linkedin-err">{errors.linkedin}</FieldError>}
-              </div>
-
-              {/* Cover note */}
-              <div>
-                <label className={labelClass} htmlFor="ja-message">Cover note *</label>
-                <textarea
-                  id="ja-message"
-                  rows={5}
-                  value={message}
-                  onChange={(e) => { setMessage(e.target.value); clearFieldError("message"); }}
-                  placeholder="Tell us why you're a strong fit for this role..."
-                  className={`${fieldClass("message")} resize-y min-h-[120px]`}
-                  aria-describedby={errors.message ? "ja-message-err" : undefined}
-                />
-                {errors.message && <FieldError id="ja-message-err">{errors.message}</FieldError>}
               </div>
 
               {/* Resume */}
@@ -303,21 +332,46 @@ export default function JobApplicationModal({ jobId, jobTitle, onClose }: Props)
                 {errors.resume && <FieldError>{errors.resume}</FieldError>}
               </div>
 
+              {/* Message */}
+              <div>
+                <label className={labelClass} htmlFor="ja-message">Message *</label>
+                <textarea
+                  id="ja-message"
+                  rows={4}
+                  value={message}
+                  onChange={(e) => { setMessage(e.target.value); clearFieldError("message"); }}
+                  placeholder="A few sentences on why you're a strong fit for this role..."
+                  className={`${fieldClass("message")} resize-y min-h-[100px]`}
+                  aria-describedby={errors.message ? "ja-message-err" : undefined}
+                />
+                {errors.message && <FieldError id="ja-message-err">{errors.message}</FieldError>}
+              </div>
+
               {status === "error" && (
                 <p className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {submitError || "Something went wrong. Please try again."}
                 </p>
               )}
+            </div>
 
+            {/* Sticky footer actions */}
+            <div className="flex shrink-0 items-center justify-end gap-3 border-t border-slate-200 px-6 py-5 sm:px-8">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50"
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
                 disabled={status === "submitting"}
-                className="w-full rounded-md bg-teal-400 px-6 py-3 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="rounded-md bg-teal-400 px-6 py-2.5 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {status === "submitting" ? "Submitting…" : "Submit Application"}
               </button>
-            </form>
-          </>
+            </div>
+          </form>
         )}
       </div>
     </div>
