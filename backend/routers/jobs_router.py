@@ -23,6 +23,15 @@ Environment variables
   SMTP_PASSWORD                — Zoho App Password
   SMTP_HOST                    — SMTP server (default: smtppro.zoho.com)
   JOBS_NOTIFY_EMAIL            — notification destination (default: jobs@terian-services.com)
+
+Performance
+  The Cosmos credential, CosmosClient, and BlobServiceClient are created once
+  as module-level singletons and reused across requests (see team_router.py
+  for the same pattern). Opening a fresh credential + client per request —
+  the previous behavior here — added a full token acquisition plus TLS/account
+  discovery round trip to every /api/jobs call, which is what made the jobs
+  board take 15-20 s to load. The open-jobs list is additionally cached
+  in-memory for _JOBS_CACHE_TTL_SECONDS.
 """
 
 from __future__ import annotations
@@ -32,6 +41,7 @@ import logging
 import os
 import re
 import smtplib
+import time
 import uuid
 from datetime import datetime, timezone
 from email import encoders
@@ -74,14 +84,61 @@ _ALLOWED_RESUME_TYPES = {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 }
 
+_JOBS_CACHE_TTL_SECONDS = 60
 
-# ── Credential helper ─────────────────────────────────────────────────────────
 
-def _credential():
-    client_id = os.getenv("AZURE_CLIENT_ID")
-    if client_id:
-        return ManagedIdentityCredential(client_id=client_id)
-    return DefaultAzureCredential()
+# ── Singleton credential + clients ───────────────────────────────────────────
+# Previously every helper below opened a brand-new credential + CosmosClient
+# (or BlobServiceClient) via `async with`, on every single request. Creating a
+# fresh DefaultAzureCredential/ManagedIdentityCredential forces a brand-new
+# token acquisition each time (no token cache carries over between instances),
+# and constructing a new CosmosClient repeats TLS setup + account discovery.
+# That combination is what produced the 15-20 s load times on /api/jobs.
+# Reusing singletons for the process lifetime (same fix already applied in
+# team_router.py) drops the cold path down to just the query itself.
+
+_credential_instance: DefaultAzureCredential | ManagedIdentityCredential | None = None
+_cosmos_client: CosmosClient | None = None
+_blob_service_client: BlobServiceClient | None = None
+
+
+def _get_credential():
+    global _credential_instance
+    if _credential_instance is None:
+        client_id = os.getenv("AZURE_CLIENT_ID")
+        _credential_instance = (
+            ManagedIdentityCredential(client_id=client_id)
+            if client_id
+            else DefaultAzureCredential()
+        )
+        logger.info("jobs_router: credential singleton created")
+    return _credential_instance
+
+
+def _get_cosmos_client() -> CosmosClient:
+    global _cosmos_client
+    if _cosmos_client is None:
+        _cosmos_client = CosmosClient(_COSMOS_ENDPOINT, credential=_get_credential())
+        logger.info("jobs_router: CosmosClient singleton created")
+    return _cosmos_client
+
+
+def _get_blob_service_client() -> BlobServiceClient:
+    global _blob_service_client
+    if _blob_service_client is None:
+        _blob_service_client = BlobServiceClient(account_url=_BLOB_ENDPOINT, credential=_get_credential())
+        logger.info("jobs_router: BlobServiceClient singleton created")
+    return _blob_service_client
+
+
+# ── In-memory cache for the public jobs list ─────────────────────────────────
+
+_jobs_cache: list[dict] | None = None
+_jobs_cache_ts: float = 0.0
+
+
+def _jobs_cache_valid() -> bool:
+    return _jobs_cache is not None and (time.monotonic() - _jobs_cache_ts) < _JOBS_CACHE_TTL_SECONDS
 
 
 # ── Cosmos helpers ────────────────────────────────────────────────────────────
@@ -90,45 +147,56 @@ async def _get_job(job_id: str) -> dict | None:
     if not _COSMOS_ENDPOINT:
         return None
     try:
-        async with _credential() as cred:
-            async with CosmosClient(_COSMOS_ENDPOINT, credential=cred) as cosmos:
-                db = cosmos.get_database_client(_COSMOS_DATABASE)
-                container = db.get_container_client(_JOBS_CONTAINER)
-                item = await container.read_item(item=job_id, partition_key=job_id)
-                return dict(item)
+        client = _get_cosmos_client()
+        db = client.get_database_client(_COSMOS_DATABASE)
+        container = db.get_container_client(_JOBS_CONTAINER)
+        item = await container.read_item(item=job_id, partition_key=job_id)
+        return dict(item)
     except Exception as exc:
         logger.warning("jobs_router: could not fetch job %s: %s", job_id, exc)
         return None
 
 
 async def _list_open_jobs() -> list[dict]:
+    global _jobs_cache, _jobs_cache_ts
+
+    if _jobs_cache_valid():
+        return _jobs_cache  # type: ignore[return-value]
+
     if not _COSMOS_ENDPOINT:
         return []
+
+    t_start = time.monotonic()
     try:
-        async with _credential() as cred:
-            async with CosmosClient(_COSMOS_ENDPOINT, credential=cred) as cosmos:
-                db = cosmos.get_database_client(_COSMOS_DATABASE)
-                container = db.get_container_client(_JOBS_CONTAINER)
-                query = (
-                    "SELECT c.id, c.title, c.tagline, c.location, c.type, "
-                    "c.posted_at FROM c WHERE c.status = 'open'"
-                )
-                items = [item async for item in container.query_items(query=query)]
-                return items
+        client = _get_cosmos_client()
+        db = client.get_database_client(_COSMOS_DATABASE)
+        container = db.get_container_client(_JOBS_CONTAINER)
+        query = (
+            "SELECT c.id, c.title, c.tagline, c.location, c.type, "
+            "c.posted_at FROM c WHERE c.status = 'open'"
+        )
+        items = [item async for item in container.query_items(query=query)]
+        logger.info(
+            "jobs_router: listed %d open job(s) in %.0f ms",
+            len(items), (time.monotonic() - t_start) * 1000,
+        )
+        _jobs_cache = items
+        _jobs_cache_ts = time.monotonic()
+        return items
     except Exception as exc:
         logger.warning("jobs_router: could not list jobs: %s", exc)
-        return []
+        # Serve the last known-good list rather than an empty board, if we have one.
+        return _jobs_cache or []
 
 
 async def _save_application(doc: dict) -> None:
     if not _COSMOS_ENDPOINT:
         logger.warning("jobs_router: AZURE_COSMOS_ENDPOINT not set — skipping application write")
         return
-    async with _credential() as cred:
-        async with CosmosClient(_COSMOS_ENDPOINT, credential=cred) as cosmos:
-            db = cosmos.get_database_client(_COSMOS_DATABASE)
-            container = db.get_container_client(_APPLICATIONS_CTR)
-            await container.create_item(body=doc)
+    client = _get_cosmos_client()
+    db = client.get_database_client(_COSMOS_DATABASE)
+    container = db.get_container_client(_APPLICATIONS_CTR)
+    await container.create_item(body=doc)
     logger.info("jobs_router: application saved id=%s job_id=%s", doc["id"], doc["job_id"])
 
 
@@ -140,14 +208,13 @@ async def _upload_resume(job_id: str, app_id: str, filename: str, content_type: 
         return None
     blob_path = f"{job_id}/{app_id}/{filename}"
     try:
-        async with _credential() as cred:
-            async with BlobServiceClient(account_url=_BLOB_ENDPOINT, credential=cred) as svc:
-                blob = svc.get_blob_client(container=_BLOB_CONTAINER, blob=blob_path)
-                await blob.upload_blob(
-                    data,
-                    overwrite=True,
-                    content_settings=ContentSettings(content_type=content_type),
-                )
+        svc = _get_blob_service_client()
+        blob = svc.get_blob_client(container=_BLOB_CONTAINER, blob=blob_path)
+        await blob.upload_blob(
+            data,
+            overwrite=True,
+            content_settings=ContentSettings(content_type=content_type),
+        )
         logger.info("jobs_router: resume uploaded → %s/%s", _BLOB_CONTAINER, blob_path)
         return blob_path
     except Exception as exc:
@@ -383,11 +450,10 @@ async def apply_for_job(
     if blob_path:
         doc["resume_blob_path"] = blob_path
         try:
-            async with _credential() as cred:
-                async with CosmosClient(_COSMOS_ENDPOINT, credential=cred) as cosmos:
-                    db = cosmos.get_database_client(_COSMOS_DATABASE)
-                    container = db.get_container_client(_APPLICATIONS_CTR)
-                    await container.replace_item(item=app_id, body=doc, partition_key=job_id)
+            client = _get_cosmos_client()
+            db = client.get_database_client(_COSMOS_DATABASE)
+            container = db.get_container_client(_APPLICATIONS_CTR)
+            await container.replace_item(item=app_id, body=doc, partition_key=job_id)
         except Exception as exc:
             logger.warning("jobs_router: could not patch resume_blob_path into app %s: %s", app_id, exc)
 
