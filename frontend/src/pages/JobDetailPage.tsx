@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import PageLayout from "../components/PageLayout";
-import PageHero from "../components/PageHero";
 import JobApplicationModal from "../components/JobApplicationModal";
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
@@ -91,12 +90,6 @@ export default function JobDetailPage({ jobId }: Props) {
 
   return (
     <PageLayout>
-      <PageHero
-        eyebrow="Open Position"
-        title={job.title}
-        description={job.tagline}
-      />
-
       {/* Floating apply button — appears once the primary action row scrolls out of view */}
       <button
         type="button"
@@ -109,7 +102,7 @@ export default function JobDetailPage({ jobId }: Props) {
       </button>
 
       {/* Sections */}
-      <section className="mx-auto max-w-5xl px-6 py-12 lg:px-10">
+      <section className="mx-auto max-w-5xl px-6 pt-10 pb-12 lg:px-10 lg:pt-14">
         <div className="rounded-2xl bg-white p-8 font-jobsans text-black shadow-xl shadow-black/20 sm:p-10 lg:p-12">
           <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-teal-600">
             <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none">
@@ -118,7 +111,15 @@ export default function JobDetailPage({ jobId }: Props) {
             All positions
           </a>
 
-          <div ref={actionRowRef} className="mt-6 flex flex-wrap items-center justify-between gap-4">
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-teal-600">Open Position</p>
+          <h1 className="mt-3 font-playfair text-3xl font-bold leading-tight tracking-tight text-black md:text-4xl">
+            {job.title}
+          </h1>
+          {job.tagline && (
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-600">{job.tagline}</p>
+          )}
+
+          <div ref={actionRowRef} className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-8">
             <div className="flex flex-wrap items-center gap-3">
               <Tag>{job.location}</Tag>
               <Tag>{job.type}</Tag>
