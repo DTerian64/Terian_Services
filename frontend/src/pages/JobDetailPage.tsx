@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageLayout from "../components/PageLayout";
 import PageHero from "../components/PageHero";
 import JobApplicationModal from "../components/JobApplicationModal";
@@ -21,6 +21,12 @@ type Job = {
   sections: Section[];
 };
 
+function formatPostedDate(iso: string): string | null {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
 type Props = { jobId: string };
 
 export default function JobDetailPage({ jobId }: Props) {
@@ -28,6 +34,8 @@ export default function JobDetailPage({ jobId }: Props) {
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState<string | null>(null);
   const [showApply, setShowApply] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const actionRowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/jobs/${jobId}`)
@@ -40,6 +48,17 @@ export default function JobDetailPage({ jobId }: Props) {
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
   }, [jobId]);
+
+  useEffect(() => {
+    const node = actionRowRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBar(!entry.isIntersecting),
+      { rootMargin: "-88px 0px 0px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [job]);
 
   if (loading) {
     return (
@@ -68,6 +87,8 @@ export default function JobDetailPage({ jobId }: Props) {
     );
   }
 
+  const postedLabel = formatPostedDate(job.posted_at);
+
   return (
     <PageLayout>
       <PageHero
@@ -76,31 +97,54 @@ export default function JobDetailPage({ jobId }: Props) {
         description={job.tagline}
       />
 
-      {/* Sections */}
-      <section className="mx-auto max-w-3xl bg-white px-6 py-16 text-black lg:px-10">
-        <div className="flex flex-wrap items-center gap-3 mb-8">
-          <Tag>{job.location}</Tag>
-          <Tag>{job.type}</Tag>
+      {/* Sticky apply bar — appears once the primary action row scrolls out of view */}
+      <div
+        className={`fixed inset-x-0 top-[5.4rem] z-40 border-b border-slate-200 bg-white/95 backdrop-blur transition-all duration-200 ${
+          showStickyBar ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
+        }`}
+      >
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3 lg:px-10">
+          <p className="truncate text-sm font-semibold text-black">{job.title}</p>
           <button
             type="button"
             onClick={() => setShowApply(true)}
-            className="rounded-md bg-teal-400 px-5 py-2 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            className="shrink-0 rounded-md bg-teal-400 px-5 py-2 text-xs font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
           >
             Apply Now
           </button>
         </div>
+      </div>
 
-        <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-teal-600">
-          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none">
-            <path d="M12.5 5 7.5 10 12.5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          All positions
-        </a>
+      {/* Sections */}
+      <section className="mx-auto max-w-5xl px-6 py-12 lg:px-10">
+        <div className="rounded-2xl bg-white p-8 text-black shadow-xl shadow-black/20 sm:p-10 lg:p-12">
+          <a href="/jobs" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 transition hover:text-teal-600">
+            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none">
+              <path d="M12.5 5 7.5 10 12.5 15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            All positions
+          </a>
 
-        <div className="mt-10 space-y-10">
-          {job.sections.map((section) => (
-            <JobSection key={section.heading} section={section} />
-          ))}
+          <div ref={actionRowRef} className="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <Tag>{job.location}</Tag>
+              <Tag>{job.type}</Tag>
+              {postedLabel && <span className="text-xs font-medium text-slate-500">Posted {postedLabel}</span>}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowApply(true)}
+              className="rounded-md bg-teal-400 px-5 py-2 text-sm font-bold uppercase tracking-wider text-slate-950 transition hover:bg-teal-300"
+            >
+              Apply Now
+            </button>
+          </div>
+
+          <div className="mt-10">
+            {job.sections.map((section, i) => (
+              <JobSection key={section.heading} section={section} isFirst={i === 0} />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -132,13 +176,20 @@ export default function JobDetailPage({ jobId }: Props) {
   );
 }
 
-function JobSection({ section }: { section: Section }) {
+function JobSection({ section, isFirst }: { section: Section; isFirst: boolean }) {
+  const paragraphs = section.body.split(/\n\n+/).filter(Boolean);
+
   return (
-    <div>
-      <h2 className="font-playfair text-xl font-bold text-black">{section.heading}</h2>
-      {section.body && (
-        <p className="mt-3 text-sm leading-7 text-slate-800 whitespace-pre-line">{section.body}</p>
-      )}
+    <div className={isFirst ? "" : "mt-10 border-t border-slate-100 pt-10"}>
+      <h2 className="flex items-center gap-3 font-playfair text-2xl font-bold text-black">
+        <span className="h-5 w-1 shrink-0 rounded-full bg-teal-400" />
+        {section.heading}
+      </h2>
+      {paragraphs.map((paragraph, i) => (
+        <p key={i} className="mt-4 text-sm leading-7 text-slate-800">
+          {paragraph}
+        </p>
+      ))}
       {section.bullets.length > 0 && (
         <ul className="mt-4 space-y-2">
           {section.bullets.map((bullet, i) => (
