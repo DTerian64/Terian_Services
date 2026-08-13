@@ -4,6 +4,8 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import TrustPage from "./pages/TrustPage";
 import AskAIPage from "./pages/AskAI";
+import JobsPage from "./pages/JobsPage";
+import JobDetailPage from "./pages/JobDetailPage";
 
 import ProductsPage from "./pages/ProductsPage";
 import AwardNominationPage from "./pages/AwardNominationPage";
@@ -33,6 +35,17 @@ const routes: RouteEntry[] = [
   { match: (p) => p === "/pricing/award-nomination",                     component: AwardNominationPricingPage, title: "Award Nomination Pricing" },
   { match: (p) => p.startsWith("/engagement/new"),                        component: NewEngagementPage,          title: "New Engagement" },
   { match: (p) => p === "/privacy" || p === "/privacy.html",             component: PrivacyPage,                title: "Privacy Policy" },
+
+  // Jobs
+  { match: (p) => p === "/jobs" || p === "/jobs/",                       component: JobsPage,                   title: "Jobs" },
+  {
+    match: (p) => /^\/jobs\/[^/]+$/.test(p),
+    component: () => {
+      const jobId = window.location.pathname.replace(/^\/jobs\//, "");
+      return <JobDetailPage jobId={jobId} />;
+    },
+    title: "Job Details",
+  },
 
   // Products
   { match: (p) => p === "/products" || p === "/products/",               component: ProductsPage,               title: "Products" },
