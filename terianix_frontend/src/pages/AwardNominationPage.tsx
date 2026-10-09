@@ -5,7 +5,7 @@ import AwardMetrics from "../components/AwardMetrics";
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
-const DEMO_REQUEST_URL = "https://demo-awards.terianix.ai/demo/request";
+const DEMO_REQUEST_URL = "https://awards.demo-awardsrus.terianix.ai/demo/request";
 const PRESENTATION_DECK_URL = `${API_BASE}/api/introductory/award-nomination/presentation-deck`;
 const SCREENSHOT_WALKTHROUGH_URL = `${API_BASE}/api/introductory/award-nomination/screenshot-walkthrough`;
 
