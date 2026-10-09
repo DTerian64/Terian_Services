@@ -111,9 +111,11 @@ jobs:
         if: github.ref_name == 'terianix-platform'
         run: |
           set -euo pipefail
-          revisions="$(az containerapp revision list --name "$ACA_NAME" +            --resource-group "$ACA_RESOURCE_GROUP" --query '[?properties.active].name' -o tsv)"
+          revisions="$(az containerapp revision list --name "$ACA_NAME" \
+            --resource-group "$ACA_RESOURCE_GROUP" --query '[?properties.active].name' -o tsv)"
           while IFS= read -r revision; do
             if [[ -n "$revision" ]]; then
-              az containerapp revision restart --name "$ACA_NAME" +                --resource-group "$ACA_RESOURCE_GROUP" --revision "$revision"
+              az containerapp revision restart --name "$ACA_NAME" \
+                --resource-group "$ACA_RESOURCE_GROUP" --revision "$revision"
             fi
           done <<< "$revisions"

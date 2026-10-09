@@ -128,10 +128,15 @@ jobs:
           host="$(az containerapp show --name "${{ vars.TERIAN_BACKEND_APP }}" --resource-group "${{ vars.TERIAN_BACKEND_RG }}" --query properties.configuration.ingress.fqdn -o tsv)"
           [[ "$API_URL" == "https://$host" ]]
           [[ "$TERIAN_HOSTNAME" == *.azurestaticapps.net && "$TERIANIX_HOSTNAME" == *.azurestaticapps.net ]]
-          curl --fail --silent --show-error --retry 20 --retry-all-errors +            --retry-delay 10 --connect-timeout 10 --max-time 30 "$API_URL/api/health" |
+          curl --fail --silent --show-error --retry 20 --retry-all-errors \
+            --retry-delay 10 --connect-timeout 10 --max-time 30 "$API_URL/api/health" |
             python -c 'import json,sys; data=json.load(sys.stdin); assert data.get("status") == "ok", data'
           for host in "$TERIAN_HOSTNAME" "$TERIANIX_HOSTNAME"; do
-            headers="$(curl --fail --silent --show-error --connect-timeout 10 --max-time 30 +              --request OPTIONS --dump-header - --output /dev/null +              --header "Origin: https://$host" +              --header "Access-Control-Request-Method: POST" +              --header "Access-Control-Request-Headers: content-type" "$API_URL/api/ask")"
+            headers="$(curl --fail --silent --show-error --connect-timeout 10 --max-time 30 \
+              --request OPTIONS --dump-header - --output /dev/null \
+              --header "Origin: https://$host" \
+              --header "Access-Control-Request-Method: POST" \
+              --header "Access-Control-Request-Headers: content-type" "$API_URL/api/ask")"
             origin="$(printf '%s' "$headers" | tr -d '\r' | awk 'tolower($1) == "access-control-allow-origin:" {print $2}')"
             if [[ "$origin" != "https://$host" ]]; then
               echo "::error::Target backend CORS does not allow https://$host. Apply the slice-2 Terraform change."
