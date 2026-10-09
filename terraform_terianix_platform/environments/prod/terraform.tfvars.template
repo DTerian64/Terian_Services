@@ -1,0 +1,25 @@
+# This root is locked to the Terianix Platform subscription and tenant.
+subscription_id = "2bb69129-5e74-44d9-af68-96d45633f667"
+tenant_id       = "5979eb86-9af1-4c74-8e50-acbe7d6a5cf9"
+
+# Review global names before the first apply.
+storage_account_name = "stterianixservicesprod"
+cosmos_account_name  = "terianix-services-prod"
+acr_name             = "acrterianixservices"
+key_vault_name       = "kv-terianix-svc-prod"
+openai_account_name  = "oai-terianix-services-prod"
+
+# Terraform creates a dedicated target-tenant GitHub OIDC identity for this
+# repository and environment. Only an optional administrator object ID is
+# supplied externally.
+github_repository  = "DTerian64/Terian_Services"
+github_environment = "terianix-platform-prod"
+# Populate from the two frontend hostname Terraform outputs after provisioning.
+pre_cutover_frontend_origins = []
+admin_principal_id = ""
+
+# Non-secret mail configuration. Supply smtp_password and serper_api_key through
+# TF_VAR_smtp_password and TF_VAR_serper_api_key; do not put them in this file.
+smtp_user           = ""
+contact_notify_email = ""
+

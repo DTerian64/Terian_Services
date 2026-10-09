@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - terianix-platform
     paths:
       - "frontend/**"
       - ".github/workflows/deploy-swa.yml"
@@ -13,12 +14,24 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
+    environment: ${{ github.ref_name == 'terianix-platform' && 'terianix-platform-prod' || 'prod' }}
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
+
+      - name: Validate target frontend configuration
+        if: github.ref_name == 'terianix-platform'
+        env:
+          API_URL: ${{ vars.VITE_API_URL }}
+          INSIGHTS: ${{ vars.VITE_APPINSIGHTS_CONNECTION_STRING }}
+          DEPLOYMENT_TOKEN: ${{ secrets.TERIAN_SWA_DEPLOYMENT_TOKEN }}
+        run: |
+          set -euo pipefail
+          [[ "$API_URL" == https://*.azurecontainerapps.io ]]
+          [[ -n "$INSIGHTS" && -n "$DEPLOYMENT_TOKEN" ]]
 
       - name: Set up Node 20
         uses: actions/setup-node@v4
@@ -47,3 +60,12 @@ jobs:
           app_location: "frontend/dist"
           output_location: ""
           skip_app_build: true   # We built above with npm run build
+
+      - name: Check target frontend availability
+        if: github.ref_name == 'terianix-platform'
+        env:
+          HOSTNAME: ${{ vars.TERIAN_FRONTEND_HOSTNAME }}
+        run: |
+          set -euo pipefail
+          [[ "$HOSTNAME" == *.azurestaticapps.net ]]
+          curl --fail --silent --show-error --retry 10 --retry-all-errors +            --retry-delay 10 --connect-timeout 10 --max-time 30 "https://$HOSTNAME/" --output /dev/null

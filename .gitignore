@@ -12,6 +12,7 @@ dist/
 *.tfstate.backup
 *.tfstate.lock.hcl
 .terraform.lock.hcl
+!terraform_terianix_platform/**/.terraform.lock.hcl
 terraform.tfvars
 terraform.tfvars.json
 

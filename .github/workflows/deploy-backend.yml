@@ -4,7 +4,12 @@ name: Deploy Terian Services Backend (ACA)
 # Builds the FastAPI backend image server-side in ACR (no Docker on the
 # runner) and rolls a new Container App revision pointing at it.
 #
-# One-time setup
+# Environment routing
+#   main              -> prod (legacy Azure IDs remain environment secrets)
+#   terianix-platform -> terianix-platform-prod (target Azure IDs are variables)
+# Use scripts/configure-terianix-platform-github.ps1 for the target Environment.
+#
+# Legacy one-time setup
 # ──────────────
 # 1. Create or reuse an AAD service principal / user-assigned MI for OIDC.
 # 2. Add a federated credential on it for this GitHub repo:
@@ -29,6 +34,7 @@ on:
   push:
     branches:
       - main
+      - terianix-platform
     paths:
       - "backend/**"
       - ".github/workflows/deploy-backend.yml"
@@ -42,22 +48,42 @@ permissions:
 env:
   IMAGE_NAME: terian-services-backend
 
+concurrency:
+  group: terian-backend-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build image in ACR and roll ACA revision
-    environment: prod
+    environment: ${{ github.ref_name == 'terianix-platform' && 'terianix-platform-prod' || 'prod' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate Terianix target configuration
+        if: github.ref_name == 'terianix-platform'
+        env:
+          CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          BACKEND_RG: ${{ vars.TERIAN_BACKEND_RG }}
+          BACKEND_APP: ${{ vars.TERIAN_BACKEND_APP }}
+          ACR: ${{ vars.TERIAN_ACR_NAME }}
+        run: |
+          set -euo pipefail
+          [[ -n "$CLIENT_ID" && -n "$BACKEND_APP" && -n "$ACR" ]]
+          [[ "$TENANT_ID" == "5979eb86-9af1-4c74-8e50-acbe7d6a5cf9" ]]
+          [[ "$SUBSCRIPTION_ID" == "2bb69129-5e74-44d9-af68-96d45633f667" ]]
+          [[ "$BACKEND_RG" == "rg_terian_services_prod" ]]
+
       - name: Azure login (OIDC, no secrets)
         uses: azure/login@v2
         with:
-          client-id:       ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id:       ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id:       ${{ github.ref_name == 'terianix-platform' && vars.AZURE_CLIENT_ID || secrets.AZURE_CLIENT_ID }}
+          tenant-id:       ${{ github.ref_name == 'terianix-platform' && vars.AZURE_TENANT_ID || secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ github.ref_name == 'terianix-platform' && vars.AZURE_SUBSCRIPTION_ID || secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Compute image tag
         id: tag
@@ -90,3 +116,26 @@ jobs:
             --resource-group "${{ vars.TERIAN_BACKEND_RG }}" \
             --query "[?properties.active].{name:name, image:properties.template.containers[0].image, traffic:properties.trafficWeight}" \
             -o table
+
+      - name: Check target backend health and browser CORS
+        if: github.ref_name == 'terianix-platform'
+        env:
+          API_URL: ${{ vars.VITE_API_URL }}
+          TERIAN_HOSTNAME: ${{ vars.TERIAN_FRONTEND_HOSTNAME }}
+          TERIANIX_HOSTNAME: ${{ vars.TERIANIX_FRONTEND_HOSTNAME }}
+        run: |
+          set -euo pipefail
+          host="$(az containerapp show --name "${{ vars.TERIAN_BACKEND_APP }}" --resource-group "${{ vars.TERIAN_BACKEND_RG }}" --query properties.configuration.ingress.fqdn -o tsv)"
+          [[ "$API_URL" == "https://$host" ]]
+          [[ "$TERIAN_HOSTNAME" == *.azurestaticapps.net && "$TERIANIX_HOSTNAME" == *.azurestaticapps.net ]]
+          curl --fail --silent --show-error --retry 20 --retry-all-errors +            --retry-delay 10 --connect-timeout 10 --max-time 30 "$API_URL/api/health" |
+            python -c 'import json,sys; data=json.load(sys.stdin); assert data.get("status") == "ok", data'
+          for host in "$TERIAN_HOSTNAME" "$TERIANIX_HOSTNAME"; do
+            headers="$(curl --fail --silent --show-error --connect-timeout 10 --max-time 30 +              --request OPTIONS --dump-header - --output /dev/null +              --header "Origin: https://$host" +              --header "Access-Control-Request-Method: POST" +              --header "Access-Control-Request-Headers: content-type" "$API_URL/api/ask")"
+            origin="$(printf '%s' "$headers" | tr -d '\r' | awk 'tolower($1) == "access-control-allow-origin:" {print $2}')"
+            if [[ "$origin" != "https://$host" ]]; then
+              echo "::error::Target backend CORS does not allow https://$host. Apply the slice-2 Terraform change."
+              exit 1
+            fi
+          done
+          echo "Target API health and both frontend origins passed." >> "$GITHUB_STEP_SUMMARY"
