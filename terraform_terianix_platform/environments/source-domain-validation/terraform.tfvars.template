@@ -1,0 +1,4 @@
+# Root TXT adoption is deliberately off by default.
+# Confirm sole ownership, or approve takeover and freeze other owning states.
+# Copy this file to ignored terraform.tfvars and set this to true only then.
+adopt_source_apex_txt = false

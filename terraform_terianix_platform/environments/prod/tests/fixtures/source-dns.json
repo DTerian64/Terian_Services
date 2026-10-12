@@ -1,0 +1,20 @@
+{
+  "side": "Source",
+  "subscriptionId": "4ddf12bb-5397-445f-bcaa-df4c7d3dfdca",
+  "zone": {"name": "terian-services.com"},
+  "recordSets": [
+    {"name":"@","type":"Microsoft.Network/dnszones/A","TTL":300,"targetResource":{"id":"/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_platform/providers/Microsoft.Web/staticSites/source"}},
+    {"name":"@","type":"Microsoft.Network/dnszones/NS","TTL":172800,"targetResource":{}},
+    {"name":"@","type":"Microsoft.Network/dnszones/SOA","TTL":3600,"targetResource":{}},
+    {"name":"www","type":"Microsoft.Network/dnszones/CNAME","TTL":300,"CNAMERecord":{"cname":"source.7.azurestaticapps.net"},"targetResource":{}},
+    {"name":"dev-awards","type":"Microsoft.Network/dnszones/CNAME","TTL":3600,"CNAMERecord":{"cname":"old-awards.2.azurestaticapps.net"},"targetResource":{}},
+    {"name":"awards","type":"Microsoft.Network/dnszones/CNAME","TTL":3600,"targetResource":{}},
+    {"name":"service","type":"Microsoft.Network/dnszones/CNAME","TTL":3600,"CNAMERecord":{"cname":"old-service.example.test"},"targetResource":{}},
+    {"name":"app-link","type":"Microsoft.Network/dnszones/CNAME","TTL":300,"CNAMERecord":{"cname":"old-award-endpoint.example.test"},"targetResource":{}},
+    {"name":"_dnsauth.Acme-Awards","type":"Microsoft.Network/dnszones/TXT","TTL":300,"TXTRecords":[{"value":["test-award-verification"]}],"targetResource":{}},
+    {"name":"demo","type":"Microsoft.Network/dnszones/TXT","TTL":3600,"TXTRecords":[{"value":["MS=test-demo"]}],"targetResource":{}},
+    {"name":"synthetics","type":"Microsoft.Network/dnszones/TXT","TTL":3600,"TXTRecords":[{"value":["MS=test-synthetics"]}],"targetResource":{}},
+    {"name":"@","type":"Microsoft.Network/dnszones/TXT","TTL":3600,"TXTRecords":[{"value":["v=spf1 include:","zohomail.com ~all"]},{"value":["legacy-verification"]}],"targetResource":{}},
+    {"name":"@","type":"Microsoft.Network/dnszones/MX","TTL":3600,"MXRecords":[{"preference":10,"exchange":"mx.zoho.com"},{"preference":20,"exchange":"mx2.zoho.com"},{"preference":50,"exchange":"mx3.zoho.com"}],"targetResource":{}}
+  ]
+}

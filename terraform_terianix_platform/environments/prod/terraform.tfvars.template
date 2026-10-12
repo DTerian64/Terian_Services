@@ -23,3 +23,12 @@ admin_principal_id = ""
 smtp_user           = ""
 contact_notify_email = ""
 
+# Step 8: Azure only. Cloudflare is managed manually.
+# Enable after reviewing the local source export. No public DNS traffic changes.
+custom_domains_enabled     = false
+shadow_dns_records_enabled = false
+source_dns_snapshot_path   = ""
+# The token-saving script generates domain-validation.auto.tfvars.json.
+# Award DNS (including demo/synthetics TXT) is excluded. Overrides are non-Award only.
+dns_cname_overrides = {}
+

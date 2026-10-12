@@ -117,12 +117,12 @@ Those checks follow deployment and data migration.
 
 ## Completion Evidence
 
-- [ ] Target GitHub Environment is configured.
-- [ ] Backend image is the application image rather than the bootstrap image.
-- [ ] Both frontend workflows deploy successfully to their target SWAs.
-- [ ] Prompt and template workflows upload to `stterianixservicesprod`.
-- [ ] `GET /api/health` returns `{"status":"ok"}`.
-- [ ] Backend preflight responses allow both target frontend origins.
+- [x] Target GitHub Environment is configured.
+- [x] Backend image is the application image rather than the bootstrap image.
+- [x] Both frontend workflows deploy successfully to their target SWAs.
+- [x] Prompt and template workflows upload to `stterianixservicesprod`.
+- [x] `GET /api/health` returns `{"status":"ok"}`.
+- [x] Backend preflight responses allow both target frontend origins.
 - [ ] Both frontends use the target API and their own target telemetry component.
 - [ ] Browsing the target hosts does not redirect to a legacy hostname.
 

@@ -29,6 +29,7 @@ terraform_terianix_platform/
     application-insights.tf    # Frontend telemetry
     github-actions.tf          # Target GitHub deployment identity and federation
     platform.tf                # Shared platform lookup and shadow DNS zone
+    domains.tf                 # Staged Azure DNS and four TXT-validated bindings
     variables.tf
     outputs.tf
     terraform.tfvars
@@ -86,7 +87,7 @@ It deliberately does not initially own:
 - The App Service Domain registration.
 - Existing records in the live Azure DNS zone.
 - Existing Cloudflare records for `terianix.ai`.
-- Production custom-domain bindings.
+- Production custom-domain bindings (added deliberately during Step 8).
 - Legacy CIAM directories.
 
 Those singleton resources need an explicit state handoff or cutover. Managing
@@ -136,6 +137,35 @@ The deployment work for slice 2 is described in
 [Slice 2: Target Application Deployment](docs/SLICE_2_DEPLOYMENT.md).
 It reuses all five existing workflows and selects the target GitHub
 Environment when the source branch is `terianix-platform`.
+
+The initial application data copy is described in
+[Step 5: Initial Data Migration](docs/STEP_5_DATA_MIGRATION.md).
+
+The two-domain cutover is described in
+[Step 8: Custom Domains and Authoritative DNS](docs/STEP_8_DOMAIN_CUTOVER.md).
+The latest registration/DNS decision supersedes that runbook's earlier
+Azure-authoritative-zone design: both marketing domains will use manually
+managed Cloudflare DNS, with terian-services.com registration transferred
+without cancellation. See
+[Moving terian-services.com from Azure to Cloudflare](../docs/moving_terian_services_com_domain_registration_from_azure_to_cloudflare.md).
+The prepared Azure shadow zone remains in Terraform until reviewed cleanup;
+do not delegate to its name servers or destroy it automatically.
+It keeps Cloudflare manually managed, with no Cloudflare provider in the target
+root. Azure records and domain bindings are managed by Terraform. A narrowly
+scoped temporary root at `environments/source-domain-validation` publishes
+target-validation TXT in the currently authoritative source zone, using local
+state under the ignored cutover folder. Its opt-in apex correction imports the
+existing root TXT record set and appends the saved target proof while preserving
+live values, TTL, and tags. Never reapply another state owning that record set
+after this approved takeover. It is not a permanent production
+dependency. The domain registration/delegation remains a separate approval gate.
+
+The final objective is permanent deletion of the old subscription, not permanent
+coexistence. Source registration, source state storage, historical blob links,
+and old DNS endpoints must be resolved before that deletion. Legacy Award DNS,
+including demo/synthetics TXT, is excluded from the target zone and reported in
+`dns_retirement_review`. The four new-platform Award hostnames already in
+Cloudflare remain unchanged; they are not part of the marketing-site rebind.
 
 1. Provision and validate target infrastructure on Azure-provided hostnames.
 2. Configure target-tenant GitHub OIDC and deploy application artifacts.

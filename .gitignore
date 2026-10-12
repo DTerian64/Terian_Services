@@ -15,6 +15,11 @@ dist/
 !terraform_terianix_platform/**/.terraform.lock.hcl
 terraform.tfvars
 terraform.tfvars.json
+domain-validation.auto.tfvars.json
+*.tfplan
+
+# Private DNS exports and local cutover evidence
+terraform_terianix_platform/domain-cutover-local/
 
 # OS
 .DS_Store
