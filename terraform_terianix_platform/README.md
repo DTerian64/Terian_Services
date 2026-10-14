@@ -1,7 +1,7 @@
 # Terian Services on the Terianix Platform
 
-This Terraform tree is the target-subscription replacement for the legacy
-`terraform` tree.
+This Terraform tree is the target-subscription replacement for the
+`terraform_legacy_subscription` tree.
 
 It is intentionally a separate Terraform root with separate state. The legacy
 and target environments must coexist while application data, deployment
@@ -48,7 +48,7 @@ apply and cannot determine resource counts during the first plan.
 
 | Environment | Subscription | Entra tenant | Terraform root |
 | --- | --- | --- | --- |
-| Legacy | `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca` | `4d5f34d3-d97b-40c7-8704-edff856d3654` | `terraform/environments/prod` |
+| Legacy | `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca` | `4d5f34d3-d97b-40c7-8704-edff856d3654` | `terraform_legacy_subscription/environments/prod` |
 | Terianix target | `2bb69129-5e74-44d9-af68-96d45633f667` | `5979eb86-9af1-4c74-8e50-acbe7d6a5cf9` | `terraform_terianix_platform/environments/prod` |
 
 The target root has validation guards for both IDs. Do not weaken those guards

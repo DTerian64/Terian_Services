@@ -237,9 +237,20 @@ variable "smtp_user" {
 }
 
 variable "smtp_host" {
-  description = "Outgoing SMTP server hostname. Zoho Workplace: smtppro.zoho.com. Port is always 587/STARTTLS."
+  description = "Outgoing SMTP server hostname. Zoho Workplace: smtppro.zoho.com."
   type        = string
   default     = "smtppro.zoho.com"
+}
+
+variable "smtp_port" {
+  description = "Outgoing SMTP STARTTLS port. Zoho Workplace uses 587."
+  type        = number
+  default     = 587
+
+  validation {
+    condition     = var.smtp_port >= 1 && var.smtp_port <= 65535
+    error_message = "smtp_port must be between 1 and 65535."
+  }
 }
 
 variable "contact_notify_email" {

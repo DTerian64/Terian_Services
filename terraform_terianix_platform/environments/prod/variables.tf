@@ -241,6 +241,17 @@ variable "smtp_host" {
   default = "smtppro.zoho.com"
 }
 
+variable "smtp_port" {
+  description = "Zoho SMTP STARTTLS port."
+  type        = number
+  default     = 587
+
+  validation {
+    condition     = var.smtp_port >= 1 && var.smtp_port <= 65535
+    error_message = "smtp_port must be between 1 and 65535."
+  }
+}
+
 variable "smtp_password" {
   type      = string
   sensitive = true

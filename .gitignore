@@ -17,6 +17,7 @@ terraform.tfvars
 terraform.tfvars.json
 domain-validation.auto.tfvars.json
 *.tfplan
+!terraform_legacy_subscription/environments/prod/terraform.tfplan
 
 # Private DNS exports and local cutover evidence
 terraform_terianix_platform/domain-cutover-local/

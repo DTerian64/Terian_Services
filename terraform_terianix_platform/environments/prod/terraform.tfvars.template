@@ -20,7 +20,8 @@ admin_principal_id = ""
 
 # Non-secret mail configuration. Supply smtp_password and serper_api_key through
 # TF_VAR_smtp_password and TF_VAR_serper_api_key; do not put them in this file.
-smtp_user           = ""
+smtp_user            = ""
+smtp_port            = 587
 contact_notify_email = ""
 
 # Step 8: Azure only. Cloudflare is managed manually.

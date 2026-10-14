@@ -32,7 +32,7 @@ Create the new resource group first, in isolation, so a subsequent `terraform
 plan` against the full configuration shows clean diffs for the SWA move.
 
 ```bash
-cd terraform/environments/prod
+cd terraform_legacy_subscription/environments/prod
 terraform init
 terraform apply -target=azurerm_resource_group.corporate
 ```
@@ -135,7 +135,7 @@ az keyvault secret set \
 ```
 
 Then add the secret reference + env-var wiring to
-`terraform/modules/container-app/main.tf` (see the inline comment in the
+`terraform_legacy_subscription/modules/container-app/main.tf` (see the inline comment in the
 `container { … }` block) and re-apply.
 
 ## Step 6 — Configure GitHub Actions for CI

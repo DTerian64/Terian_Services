@@ -21,6 +21,7 @@ Environment variables
   SMTP_USER               — SMTP sender address (sales@terian-services.com)
   SMTP_PASSWORD           — Zoho App Password (injected from Key Vault)
   SMTP_HOST               — SMTP server (default: smtppro.zoho.com)
+  SMTP_PORT               — SMTP STARTTLS port (default: 587)
   AZURE_COSMOS_ENDPOINT   — Cosmos DB account endpoint URL
   AZURE_COSMOS_DATABASE   — database name (default: terian-services)
 """
@@ -30,7 +31,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import socket
 import smtplib
+import ssl
 import uuid
 from datetime import datetime, timezone
 from email.mime.multipart import MIMEMultipart
@@ -46,7 +49,12 @@ logger = logging.getLogger(__name__)
 _SMTP_USER     = os.getenv("SMTP_USER", "")
 _SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 _SMTP_HOST     = os.getenv("SMTP_HOST", "smtppro.zoho.com")
-_SMTP_PORT     = 587
+_SMTP_PORT_RAW = os.getenv("SMTP_PORT", "587")
+try:
+    _SMTP_PORT = int(_SMTP_PORT_RAW)
+except ValueError:
+    _SMTP_PORT = 0
+_SMTP_TIMEOUT_SECONDS = 30
 _FROM_NAME     = "Terian Services — Ask AI"
 
 _COSMOS_CONTAINER = "client_communications"
@@ -59,6 +67,23 @@ _RECIPIENT_MAP: dict[str, str] = {
 }
 
 _CONTACT_FORM_URL = "https://www.terian-services.com/contact"
+
+
+class EmailDeliveryError(RuntimeError):
+    """Raised when a notification cannot be delivered through Zoho SMTP."""
+
+
+def _smtp_configuration_error() -> str | None:
+    """Return a safe diagnostic when required Zoho SMTP settings are invalid."""
+    if not _SMTP_USER.strip():
+        return "SMTP_USER is not set"
+    if not _SMTP_PASSWORD:
+        return "SMTP_PASSWORD is not set"
+    if not _SMTP_HOST.strip():
+        return "SMTP_HOST is not set"
+    if not 1 <= _SMTP_PORT <= 65535:
+        return f"SMTP_PORT must be an integer between 1 and 65535 (got {_SMTP_PORT_RAW!r})"
+    return None
 
 
 # ── Cosmos DB persistence ─────────────────────────────────────────────────────
@@ -92,7 +117,16 @@ def _send_email_sync(
     message: str,
     doc_id: str,
 ) -> None:
-    """Send an HTML notification email via Gmail SMTP."""
+    """Send an HTML notification email via Zoho SMTP.
+
+    SMTP and network errors are logged without credentials and normalized to
+    ``EmailDeliveryError`` for the asynchronous tool boundary.
+    """
+    configuration_error = _smtp_configuration_error()
+    if configuration_error:
+        logger.error("contact tool: SMTP configuration error: %s", configuration_error)
+        raise EmailDeliveryError(configuration_error)
+
     subject = f"[Ask AI] Message from {from_name}"
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -184,10 +218,40 @@ def _send_email_sync(
     msg["Reply-To"] = from_email
     msg.attach(MIMEText(html, "html"))
 
-    with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT) as server:
-        server.starttls()
-        server.login(_SMTP_USER, _SMTP_PASSWORD)
-        server.sendmail(_SMTP_USER, [to_address], msg.as_string())
+    try:
+        with smtplib.SMTP(
+            _SMTP_HOST,
+            _SMTP_PORT,
+            timeout=_SMTP_TIMEOUT_SECONDS,
+        ) as server:
+            server.ehlo()
+            server.starttls(context=ssl.create_default_context())
+            server.ehlo()
+            server.login(_SMTP_USER, _SMTP_PASSWORD)
+            refused = server.sendmail(_SMTP_USER, [to_address], msg.as_string())
+            if refused:
+                raise smtplib.SMTPRecipientsRefused(refused)
+    except smtplib.SMTPAuthenticationError as exc:
+        logger.error(
+            "contact tool: Zoho SMTP authentication failed (code=%s)",
+            exc.smtp_code,
+        )
+        raise EmailDeliveryError("Zoho SMTP authentication failed") from exc
+    except smtplib.SMTPRecipientsRefused as exc:
+        logger.error(
+            "contact tool: Zoho SMTP rejected recipient %s (id=%s)",
+            to_address,
+            doc_id,
+        )
+        raise EmailDeliveryError("Zoho SMTP rejected the recipient") from exc
+    except (smtplib.SMTPException, OSError, socket.timeout) as exc:
+        logger.error(
+            "contact tool: Zoho SMTP delivery failed for %s (id=%s): %s",
+            to_address,
+            doc_id,
+            exc,
+        )
+        raise EmailDeliveryError("Zoho SMTP delivery failed") from exc
 
     logger.info(
         "contact tool: email sent to %s from %s (id=%s)",
@@ -227,8 +291,9 @@ async def send_notification(
             ),
         }
 
-    if not _SMTP_PASSWORD:
-        logger.error("contact tool: GMAIL_APP_PASSWORD not set")
+    configuration_error = _smtp_configuration_error()
+    if configuration_error:
+        logger.error("contact tool: SMTP configuration error: %s", configuration_error)
         return {
             "status": "error",
             "error": f"Email service is not configured. Please use {_CONTACT_FORM_URL}",

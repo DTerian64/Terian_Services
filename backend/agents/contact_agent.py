@@ -5,7 +5,7 @@ Handles requests to notify Terian Services staff on behalf of a website visitor.
 
 The agent collects the visitor's name, email, and intent, confirms the message
 with the visitor, then calls send_notification (defined in skills/contact/tools.py)
-which sends an email via Gmail SMTP and persists the record to Cosmos DB.
+which sends an email via Zoho SMTP and persists the record to Cosmos DB.
 
 Skills: base, contact
 Tools:  send_notification

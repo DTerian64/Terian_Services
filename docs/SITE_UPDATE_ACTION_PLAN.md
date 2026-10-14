@@ -235,7 +235,7 @@ Lightweight teaser page: problem, planned feature set, "Get notified at launch" 
 
 ### 5.7 Infrastructure
 
-- Update `terraform/modules/static-web-app` to enable custom domain SSL and route fallback config.
+- Update `terraform_legacy_subscription/modules/static-web-app` to enable custom domain SSL and route fallback config.
 - Confirm `staticwebapp.config.json` includes the new route redirects (old → new URLs).
 - Add CSP headers via `staticwebapp.config.json`.
 

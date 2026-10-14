@@ -34,6 +34,7 @@ module "container_app" {
   )))
   smtp_user            = var.smtp_user
   smtp_host            = var.smtp_host
+  smtp_port            = var.smtp_port
   smtp_password        = var.smtp_password
   contact_notify_email = var.contact_notify_email
 

@@ -454,6 +454,10 @@ resource "azurerm_container_app" "backend" {
         value = var.smtp_host
       }
       env {
+        name  = "SMTP_PORT"
+        value = tostring(var.smtp_port)
+      }
+      env {
         name  = "CONTACT_NOTIFY_EMAIL"
         value = var.contact_notify_email != "" ? var.contact_notify_email : var.smtp_user
       }
