@@ -1,5 +1,8 @@
 import smtplib
 import unittest
+from email import message_from_string
+from email.header import decode_header, make_header
+from email.utils import parseaddr
 from unittest.mock import MagicMock, patch
 
 from agents.skills.contact import tools
@@ -43,6 +46,13 @@ class SendEmailSyncTests(unittest.TestCase):
             "app-password",
         )
         server.sendmail.assert_called_once()
+        raw_message = server.sendmail.call_args.args[2]
+        from_header = message_from_string(raw_message)["From"]
+        display_name, address = parseaddr(from_header)
+        decoded_display_name = str(make_header(decode_header(display_name)))
+        self.assertEqual(decoded_display_name, tools._FROM_NAME)
+        self.assertEqual(address, "sales@terian-services.com")
+        self.assertIn("<sales@terian-services.com>", from_header)
 
     def test_normalizes_authentication_failure(self):
         server = MagicMock()

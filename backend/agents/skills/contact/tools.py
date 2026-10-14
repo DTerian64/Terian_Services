@@ -38,6 +38,7 @@ import uuid
 from datetime import datetime, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
 
 from azure.cosmos.aio import CosmosClient
 from azure.identity.aio import DefaultAzureCredential
@@ -213,7 +214,11 @@ def _send_email_sync(
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"]    = f"{_FROM_NAME} <{_SMTP_USER}>"
+    # Keep the mailbox outside the RFC 2047-encoded display name. Assigning the
+    # Unicode display name and address as one string causes the legacy MIME API
+    # to encode the entire value, so Zoho cannot match the From mailbox to the
+    # authenticated account and rejects the message as an unauthorized relay.
+    msg["From"]    = formataddr((_FROM_NAME, _SMTP_USER), charset="utf-8")
     msg["To"]      = to_address
     msg["Reply-To"] = from_email
     msg.attach(MIMEText(html, "html"))
@@ -237,6 +242,14 @@ def _send_email_sync(
             exc.smtp_code,
         )
         raise EmailDeliveryError("Zoho SMTP authentication failed") from exc
+    except smtplib.SMTPSenderRefused as exc:
+        logger.error(
+            "contact tool: Zoho SMTP rejected sender %s (code=%s, id=%s)",
+            exc.sender,
+            exc.smtp_code,
+            doc_id,
+        )
+        raise EmailDeliveryError("Zoho SMTP rejected the sender") from exc
     except smtplib.SMTPRecipientsRefused as exc:
         logger.error(
             "contact tool: Zoho SMTP rejected recipient %s (id=%s)",
