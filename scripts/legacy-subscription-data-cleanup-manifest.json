@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "sourceSubscriptionId": "4ddf12bb-5397-445f-bcaa-df4c7d3dfdca",
+  "tenantId": "5979eb86-9af1-4c74-8e50-acbe7d6a5cf9",
+  "legacyDataDisposalApproved": true,
+  "approval": "David confirmed data copying complete and requested removal of all remaining legacy Cosmos DB, Static Web Apps and storage accounts. No source backups; source-only links, storage queues and legacy state are disposable. DNS/registration and target resources remain protected.",
+  "resources": [
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_platform/providers/Microsoft.Web/staticSites/terian-services-frontend",
+      "type": "Microsoft.Web/staticSites",
+      "order": 30
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.Web/staticSites/terianix-frontend",
+      "type": "Microsoft.Web/staticSites",
+      "order": 30
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Web/staticSites/award-nomination-frontend-sandbox",
+      "type": "Microsoft.Web/staticSites",
+      "order": 30
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateEndpoints/pe-stawardnomssandbox",
+      "type": "Microsoft.Network/privateEndpoints",
+      "order": 40,
+      "expectedConnectionId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Storage/storageAccounts/stawardnomssandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.DocumentDB/databaseAccounts/terian-services-cosmos-db",
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.Storage/storageAccounts/stterianservices",
+      "type": "Microsoft.Storage/storageAccounts",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_platform/providers/Microsoft.Storage/storageAccounts/awardnomplatform",
+      "type": "Microsoft.Storage/storageAccounts",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Storage/storageAccounts/stawardnomssandbox",
+      "type": "Microsoft.Storage/storageAccounts",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/AZ-305/providers/Microsoft.Storage/storageAccounts/az305storage1964",
+      "type": "Microsoft.Storage/storageAccounts",
+      "order": 70
+    }
+  ]
+}

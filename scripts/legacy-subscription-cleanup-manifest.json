@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "sourceSubscriptionId": "4ddf12bb-5397-445f-bcaa-df4c7d3dfdca",
+  "tenantId": "5979eb86-9af1-4c74-8e50-acbe7d6a5cf9",
+  "resources": [
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/jobs/award-fraud-analytics-sandbox",
+      "type": "Microsoft.App/jobs",
+      "order": 10
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/jobs/award-schema-migration-sandbox",
+      "type": "Microsoft.App/jobs",
+      "order": 10
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Logic/workflows/la-award-hrbp-sla-sandbox",
+      "type": "Microsoft.Logic/workflows",
+      "order": 10
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-primary-sandbox",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-api-secondary-sandbox",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-auxiliary-sandbox",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-integrity-check-sandbox",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-integrity-ext-sandbox",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/containerApps/award-payroll-broker-sandbox",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.App/containerApps/terian-services-backend",
+      "type": "Microsoft.App/containerApps",
+      "order": 20
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Cdn/profiles/Award-Nomination-ADF-sandbox",
+      "type": "Microsoft.Cdn/profiles",
+      "order": 30
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/frontdoorWebApplicationFirewallPolicies/AwardNominationADFsandboxwaf",
+      "type": "Microsoft.Network/frontdoorWebApplicationFirewallPolicies",
+      "order": 35
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateEndpoints/pe-david64-sql-sandbox",
+      "type": "Microsoft.Network/privateEndpoints",
+      "order": 40,
+      "expectedConnectionId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Sql/servers/david64-sql-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateEndpoints/pe-award-nomination-openai-sandbox",
+      "type": "Microsoft.Network/privateEndpoints",
+      "order": 40,
+      "expectedConnectionId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.CognitiveServices/accounts/award-nomination-openai-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateEndpoints/pe-acrawardnomssandbox",
+      "type": "Microsoft.Network/privateEndpoints",
+      "order": 40,
+      "expectedConnectionId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ContainerRegistry/registries/acrawardnomssandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateEndpoints/pe-kv-awardnoms-sandbox",
+      "type": "Microsoft.Network/privateEndpoints",
+      "order": 40,
+      "expectedConnectionId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.KeyVault/vaults/kv-awardnoms-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/managedEnvironments/cae-award-primary-sandbox",
+      "type": "Microsoft.App/managedEnvironments",
+      "order": 50
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.App/managedEnvironments/cae-award-secondary-sandbox",
+      "type": "Microsoft.App/managedEnvironments",
+      "order": 50
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.App/managedEnvironments/cae-terian-corporate-prod",
+      "type": "Microsoft.App/managedEnvironments",
+      "order": 50
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.CognitiveServices/accounts/award-nomination-openai-sandbox",
+      "type": "Microsoft.CognitiveServices/accounts",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.CognitiveServices/accounts/oai-terian-corp-prod",
+      "type": "Microsoft.CognitiveServices/accounts",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ContainerRegistry/registries/acrawardnomssandbox",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.ContainerRegistry/registries/acrterianservices",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.KeyVault/vaults/kv-awardnoms-sandbox",
+      "type": "Microsoft.KeyVault/vaults",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.KeyVault/vaults/kv-terian-corp-prod",
+      "type": "Microsoft.KeyVault/vaults",
+      "order": 60
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-api-primary-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-api-secondary-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-auxiliary-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-fraud-analytics-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-integrity-check-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-integrity-check-extension-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-payroll-broker-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-award-schema-migration-sandbox",
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "order": 65
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.alertsmanagement/smartDetectorAlertRules/Failure Anomalies - appi-award-frontend-sandbox",
+      "type": "microsoft.alertsmanagement/smartDetectorAlertRules",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.alertsmanagement/smartDetectorAlertRules/Failure Anomalies - appi-award-api-sandbox",
+      "type": "microsoft.alertsmanagement/smartDetectorAlertRules",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/microsoft.alertsmanagement/smartDetectorAlertRules/Failure Anomalies - appi-terian-services-frontend",
+      "type": "microsoft.alertsmanagement/smartDetectorAlertRules",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/microsoft.alertsmanagement/smartDetectorAlertRules/Failure Anomalies - appi-terianix-frontend",
+      "type": "microsoft.alertsmanagement/smartDetectorAlertRules",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/microsoft.insights/actiongroups/Application Insights Smart Detection",
+      "type": "microsoft.insights/actiongroups",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Portal/dashboards/cdeef708-dd07-4dfd-8972-83445113da0f-dashboard",
+      "type": "Microsoft.Portal/dashboards",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/workbooks/b508b705-e31f-4c75-a398-3b948e001054",
+      "type": "microsoft.insights/workbooks",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.insights/workbooks/8cd2d594-cdeb-40f0-9937-1b5ff1803040",
+      "type": "microsoft.insights/workbooks",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_awards_dashboard/providers/microsoft.insights/workbooks/02177bc5-33fb-4b44-8637-5f02d4c89026",
+      "type": "microsoft.insights/workbooks",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_awards_dashboard/providers/Microsoft.Dashboard/dashboards/GrafanaDashboard",
+      "type": "Microsoft.Dashboard/dashboards",
+      "order": 70
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Insights/components/appi-award-api-sandbox",
+      "type": "Microsoft.Insights/components",
+      "order": 80
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Insights/components/appi-award-frontend-sandbox",
+      "type": "Microsoft.Insights/components",
+      "order": 80
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.Insights/components/appi-terian-services-frontend",
+      "type": "Microsoft.Insights/components",
+      "order": 80
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.Insights/components/appi-terianix-frontend",
+      "type": "Microsoft.Insights/components",
+      "order": 80
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/microsoft.monitor/accounts/awards-monitor-workspace",
+      "type": "microsoft.monitor/accounts",
+      "order": 85
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-primary-sandbox",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "order": 90
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.OperationalInsights/workspaces/workspace-award-secondary-sandbox",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "order": 90
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_corporate/providers/Microsoft.OperationalInsights/workspaces/log-terian-corporate-prod",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "order": 90
+    }
+  ]
+}

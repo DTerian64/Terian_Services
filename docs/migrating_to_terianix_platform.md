@@ -2,14 +2,107 @@
 
 ## Purpose
 
+**October 13 identity update:** David reports the legacy tenants deleted except
+Rideshare David64 Organization, which is now retained. Its display-name change
+to `Terian Services Inc.` and guest invitation for
+`david.admin@terianix.onmicrosoft.com` are requested, not yet confirmed complete.
+This supersedes the earlier all-three tenant deletion approval. Associated
+CIAM resource absence still requires a fresh operator inventory.
+
+**Latest legacy cleanup update:** the local operator report
+`legacy-subscription-cleanup-20261013T035850Z-6d9d3007/report.json` confirms the
+18-ID network/messaging batch completed, following the completed data batch.
+All five private DNS zones, ten VNet links, `sb-award-sandbox` and both legacy
+Award VNets are absent; 12 source entries remain. David additionally approved
+retiring all three legacy CIAM tenants because their replacements exist in the
+target. Tenant deletion is pending via the Entra deletion checks, not the bulk
+resource runner. Public DNS, registration, Network Watchers, Recovery Services
+and Azure DevOps remain separately scoped. Codex inspected local reports only.
+Earlier pending storage/network deletion statements are historical.
+See [Legacy cleanup execution](retiring_legacy_subscription_resources.md).
+
 Migrate the Terian Services Award Nomination monitoring integration from the
 legacy Award resources in subscription
 `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca` to the consolidated Terianix platform
 in subscription `2bb69129-5e74-44d9-af68-96d45633f667`.
 
-The final infrastructure objective is to delete the legacy
-`rg_award_nomination_sandbox` resource group. The legacy subscription itself
-will remain active.
+The scope expanded from retiring the legacy Award resource group to migrating
+the full Terian platform. As clarified on October 9, 2026, the final objective
+is permanent deletion of the legacy subscription, not keeping it active.
+Any coexistence is temporary for validation, data synchronization, DNS
+propagation, and rollback. Registration, state storage, telemetry retention,
+historical storage links, and every remaining workload/DNS dependency must
+be resolved before subscription deletion.
+
+On October 10, David chose a single maintenance-window cutover and explicitly
+accepted several hours of outage instead of requiring zero downtime or a
+separate source-binding retirement step. All live Azure/Terraform operations
+remain operator-run; Cloudflare changes remain manual. Domain registration,
+final data reconciliation, protected Award/Integrity Sentinel DNS, and mail
+must be accounted for before whole-source teardown. Outage acceptance does not
+make App Service Domain deletion a transfer of registration.
+The detailed window and unresolved registration route are recorded in
+`terraform_terianix_platform/docs/STEP_8_DOMAIN_CUTOVER.md`.
+
+**Latest October 12 execution update:** the source subscription's directory
+change to Terianix Platform completed, and David confirmed Owner on both
+subscriptions. The App Service Domain move failed with target eligibility error
+59743 despite Pay-As-You-Go, Enabled, spending limit Off, and registered domain
+provider. David now defers registration work and requests cost-first removal of
+confirmed-retired source resources. SQL deletion is operator-confirmed. The
+first bulk run stopped after 28 verified deletions on a generic NotFound identity
+lookup. After correction, David's rerun completed: every explicit compute target
+was verified absent, with 40 source resource entries remaining in the local report.
+Preserve the existing registration, authoritative DNS and identity directories;
+source backups remain waived.
+See [Legacy subscription cleanup](retiring_legacy_subscription_resources.md).
+David subsequently confirmed all old application compute, including Award
+payroll-broker, auxiliary/integrity and scheduled jobs, is recreated in the
+target and disposable. The cleanup runbook now provides one guarded 51-entry
+operator batch, preview by default. That compute batch is now completed.
+David then confirmed data copying complete and explicitly requested all remaining
+legacy Cosmos DB, SWAs and storage accounts gone. A second nine-target batch is
+prepared using `scripts/legacy-subscription-data-cleanup-manifest.json`: three
+SWAs, one Cosmos account, four storage accounts and the Award storage endpoint.
+Legacy data/state/storage queues and source links are disposable; source-only
+hostnames may fail until DNS is corrected. No additional backup/reconciliation
+gate is imposed. This second batch is partial: the Award SWA was deleted and
+verified absent; the Terianix SWA delete command returned success but a NotFound
+lookup/still-listed inventory mismatch stopped verification. Later targets
+were not reached. Bounded post-delete/final-inventory polling is now prepared;
+the second batch is not yet operator-confirmed completed.
+The subsequent rerun report confirms the Services SWA, storage endpoint and
+Cosmos account deleted and verified absent. It stopped at `az305storage1964`
+with an unclassified delete-command failure; the portal deletion failed too.
+The four storage accounts remain unverified, pending the actual Azure error
+from Activity log. Error-summary capture is now offline-tested; no lock,
+retention or policy changes are automated.
+The matching failed Activity log event now identifies HTTP 409
+`AccountProtectedFromDeletion` on `az305storage1964`. Its exact immutability/
+legal-hold configuration remains to be inspected; no bypass or protection
+removal is implemented.
+David subsequently confirmed `az305storage1964` deleted after manual
+container/version cleanup. Resume the existing data batch for the three other
+storage accounts; their deletions and full data-batch completion are not yet
+confirmed. Registration/DNS and identity protections remain unchanged.
+Registration/DNS, identity directories, Service Bus and other unselected resources
+remain separate; neither batch is whole-subscription retirement.
+The older planning statements below are historical, not current execution status.
+
+**Earlier October 12 decision:** retain Azure registration and relocate the
+existing App Service Domain to the target subscription. David approved source
+subscription directory reassociation and waived source backups.
+David's account outputs confirm source and target subscriptions are in different
+tenants. A direct App Service Domain resource move is therefore blocked.
+Directory reassociation, DNS-link diagnosis, move validation, and actual move
+are still pending execution. David runs all live operations; Codex prepares
+local procedures only. Cancellation/re-purchase remains rejected.
+Cloudflare stays manually managed; Azure apps and SWA bindings remain
+Terraform-managed. Preserve the existing registration and authoritative DNS.
+The selected route and its unselected historical alternative are documented in:
+
+- [Moving the App Service Domain to the new Azure subscription](moving_terian_services_com_app_service_domain_to_new_subscription.md).
+- [Moving domain registration from Azure to Cloudflare](moving_terian_services_com_domain_registration_from_azure_to_cloudflare.md).
 
 This migration must preserve:
 
@@ -464,15 +557,17 @@ externally visible ownership boundaries:
 | Area | Legacy resources | Migration treatment |
 | --- | --- | --- |
 | Terraform state | `awardnomplatform/tfstate` | Create a new, non-conflicting target state; archive the old state after cutover |
-| Authoritative DNS | `terian-services.com` Azure DNS zone | Copy every record and change registrar name servers during a controlled cutover |
+| Authoritative DNS | `terian-services.com` Azure DNS zone | Copy approved website/mail/verification records, exclude legacy Award DNS, and change delegation during a controlled cutover |
 | Domain registration | `terian-services.com` App Service Domain | Retain in a minimal old-subscription resource group or transfer through a supported registrar process |
 | Legacy DNS | `terianix.ai` Azure DNS zone | Public DNS currently delegates to Cloudflare; verify no consumer before removal |
 | Identity | Two CIAM directories | Migrate users/configuration or formally retire each directory; these are not workload resources that can simply be copied |
 | Frontend | Legacy Terian Services Static Web App | Rebuild or retire after its domains are moved |
 
 The `terian-services.com` DNS zone has website, Award environment, validation,
-and Zoho mail records. A migration must copy and verify the complete zone, not
-only the web records. Its zone also has a `CanNotDelete` lock associated with
+and Zoho mail records. The approved migration preserves website/mail/retained
+verification records, but excludes all legacy Award DNS, including demo and
+synthetics TXT. The four new-platform Award hosts under `terianix.ai` remain
+unchanged in Cloudflare. Its Azure zone also has a `CanNotDelete` lock associated with
 the purchased domain. `rg_platform` must therefore be the last group considered
 for deletion.
 
@@ -552,6 +647,16 @@ only after target validation.
 11. Resolve Terraform state, domain registration, DNS, Static Web App, and both
     CIAM directories before removing `rg_platform`.
 
+Step 8 preparation is in
+[Custom domains and authoritative DNS](../terraform_terianix_platform/docs/STEP_8_DOMAIN_CUTOVER.md).
+Both `terian-services.com` and `terianix.ai` migrate their apex/www websites.
+Only `terian-services.com` changes DNS hosting; `terianix.ai` keeps Cloudflare
+authoritative. David performs all live Azure, Cloudflare, and registrar actions.
+The supplied App Service Domain metadata links to a different resource group
+than the supplied Azure DNS zone; confirm supported cross-tenant delegation
+before changing registration. Resource-group deletion remains gated by
+domain-registration and other retained-resource ownership.
+
 ### Comparison of the Two Paths
 
 | Decision factor | Monitoring-only migration | Full Terian rebuild in target subscription |
@@ -604,8 +709,17 @@ As of October 9, 2026:
   `rg_terian_services_prod` is provisioned, and platform resources use the
   existing `rg_terianix_platform` resource group.
 - Slice 1 provisioning is complete and its Terraform plan reports no changes.
-- Slice 2 implementation reuses the five resource-specific GitHub workflows on
-  the `terianix-platform` branch. Target GitHub Environment setup, the browser
-  CORS update, and application deployment remain to be run.
+- Slice 2 reuses the five resource-specific GitHub workflows on the
+  `terianix-platform` branch. Target GitHub Environment setup, CORS, backend,
+  both frontends, prompts, and templates are deployed.
 - See [Slice 2 deployment instructions](../terraform_terianix_platform/docs/SLICE_2_DEPLOYMENT.md).
+- Step 5 initial data copying is complete: 227 source Cosmos documents and 25
+  missing blobs were copied, 3 target test documents were retained, and the
+  42 existing prompt/template blobs already matched.
+- Independent verification found no missing or conflicting data. Target API
+  checks passed for health, 3 employees/photos, 2 jobs, and both engagement
+  configurations.
+- Final synchronization, queue draining, and review of 7 historical signed
+  links still referencing the legacy storage account remain before cutover.
+- See [Step 5 data migration results](../terraform_terianix_platform/docs/STEP_5_DATA_MIGRATION.md).
 

@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "sourceSubscriptionId": "4ddf12bb-5397-445f-bcaa-df4c7d3dfdca",
+  "tenantId": "5979eb86-9af1-4c74-8e50-acbe7d6a5cf9",
+  "legacyNetworkDisposalApproved": true,
+  "approval": "David explicitly requested all legacy Award private DNS zones, Service Bus and VNets removed. They are unused; remaining namespace messages and private DNS records are disposable. Public DNS, registration, CIAM, target resources and other groups are excluded.",
+  "resources": [
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.ServiceBus/namespaces/sb-award-sandbox",
+      "type": "Microsoft.ServiceBus/namespaces",
+      "order": 100
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-sql-primary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-primary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net/virtualNetworkLinks/link-sql-secondary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-secondary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.database.windows.net",
+      "type": "Microsoft.Network/privateDnsZones",
+      "order": 120
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com/virtualNetworkLinks/link-openai-primary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-primary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com/virtualNetworkLinks/link-openai-secondary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-secondary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com",
+      "type": "Microsoft.Network/privateDnsZones",
+      "order": 120
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-kv-primary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-primary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net/virtualNetworkLinks/link-kv-secondary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-secondary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.vaultcore.azure.net",
+      "type": "Microsoft.Network/privateDnsZones",
+      "order": 120
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io/virtualNetworkLinks/link-acr-primary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-primary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io/virtualNetworkLinks/link-acr-secondary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-secondary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io",
+      "type": "Microsoft.Network/privateDnsZones",
+      "order": 120
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-blob-primary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-primary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net/virtualNetworkLinks/link-blob-secondary-sandbox",
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "order": 110,
+      "expectedZoneId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net",
+      "expectedVirtualNetworkId": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-secondary-sandbox"
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net",
+      "type": "Microsoft.Network/privateDnsZones",
+      "order": 120
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-primary-sandbox",
+      "type": "Microsoft.Network/virtualNetworks",
+      "order": 130
+    },
+    {
+      "id": "/subscriptions/4ddf12bb-5397-445f-bcaa-df4c7d3dfdca/resourceGroups/rg_award_nomination_sandbox/providers/Microsoft.Network/virtualNetworks/vnet-award-secondary-sandbox",
+      "type": "Microsoft.Network/virtualNetworks",
+      "order": 130
+    }
+  ]
+}

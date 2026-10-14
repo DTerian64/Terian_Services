@@ -1,16 +1,78 @@
 # Step 8: Custom domains and authoritative DNS
 
-**Latest status, October 12:** the registrar/delegation decision is open.
+**October 13 identity update:** David reports the legacy tenant deletions done
+except Rideshare David64 Organization, which is retained. Rename to
+`Terian Services Inc.` and guest access for `david.admin@terianix.onmicrosoft.com`
+are pending operator changes. This supersedes all-three tenant deletion approval
+below. Directory retention/renaming does not transfer the App Service Domain,
+change DNS, or establish absence of the deleted tenants' Azure billing resources.
+
+**Latest cleanup update:** the completed operator network-batch report
+`legacy-subscription-cleanup-20261013T035850Z-6d9d3007/report.json` verifies all
+18 explicit targets absent: five Award private DNS zones, ten VNet links,
+Service Bus and both VNets. Twelve source entries remain. The earlier data batch
+is also complete. David now approves retirement of the three legacy CIAM tenants;
+Entra tenant deletion checks and exact directory identification are pending.
+No tenant deletion was performed by Codex. Both public DNS zones and the domain
+registration remain retained; registration relocation remains deferred.
+Earlier partial data/network-batch statuses below are historical.
+
+**Latest execution update, October 12:** the old subscription's directory
+reassociation completed and David confirmed Owner access to both subscriptions.
+The domain registration move failed during execution with eligibility error
+59743; target Pay-As-You-Go/Enabled/spending-limit-Off/provider-Registered checks
+did not explain the rejection. David defers registration work and prioritizes
+cleanup of confirmed-retired source resources. Preserve registration and the
+authoritative source DNS zone. SQL deletion is operator-confirmed; the first
+bulk run stopped after 28 verified deletions on a generic NotFound identity
+lookup. The corrected operator rerun completed: all explicit compute targets
+were verified absent and its local report lists 40 remaining source entries.
+Full subscription retirement is not complete.
+See [Cost-first legacy cleanup](../../docs/retiring_legacy_subscription_resources.md).
+David later confirmed all old application compute is disposable and recreated
+in target. The cleanup runbook provides a single guarded operator batch; Codex
+tested it offline only. The first compute batch is completed. David then
+confirmed data copying complete and requested all legacy Cosmos DB, SWAs and
+storage accounts removed. The separate nine-target data batch was executed but
+stopped partially: the Award SWA was verified absent; Terianix SWA deletion
+returned success but its lookup/inventory disagreed. Remaining targets were
+not reached. Bounded verification retries are prepared, not confirmed run.
+The subsequent rerun verified the Services SWA, storage endpoint and Cosmos
+account absent, then failed deleting `az305storage1964`. Portal deletion also
+failed; the precise Azure error is pending Activity log inspection. Storage
+account retirement is not confirmed. No locks or retention settings are changed.
+The matching failed Activity log event reports HTTP 409
+`AccountProtectedFromDeletion`; the storage protection policy still needs
+inspection before selecting a supported cleanup route.
+David subsequently confirmed `az305storage1964` deleted following manual
+container/version cleanup. That blocker is cleared. The other three storage
+accounts remain pending in the same resumable batch; registration and DNS are
+not selected for deletion.
+The batch selects three SWAs, one Cosmos account, four
+storage accounts and the Award storage endpoint. Source data/state/storage
+queues are disposable, and remaining source-only hostnames may fail until DNS
+is corrected. Registration/DNS, identity directories and other unselected
+resources remain protected. No DNS changes are automated by either batch.
+Earlier pending-directory and cross-tenant statements below are historical.
+
+**Earlier decision, October 12:** retain Azure registration and relocate the
+App Service Domain to the target subscription. David approved reassociation
+of the source subscription's directory and waived source backups.
 David's account outputs confirm the subscriptions are still in different tenants.
-Both routes are documented proposals, not approved execution plans:
+The selected route and historical alternative are documented here:
 
 - [Moving the App Service Domain to the new Azure subscription](../../docs/moving_terian_services_com_app_service_domain_to_new_subscription.md).
 - [Moving terian-services.com registration from Azure to Cloudflare](../../docs/moving_terian_services_com_domain_registration_from_azure_to_cloudflare.md).
 
-Do not change either subscription's directory or delete the registration.
-Neither Azure-shadow-zone delegation nor Cloudflare transfer is authorized by
-the successful website cutovers below. Older decision statements later in this
-document are historical and do not override this status.
+Directory reassociation and domain relocation are approved operator work,
+not completed operations. The stale source DNS link is diagnosed; source
+repair is deferred unless move validation requires it. Minimum eligibility/access,
+directory reassociation, and domain-only move validation remain pending.
+Do not change the target subscription's directory, cancel the
+registration, or transfer it to Cloudflare. Codex does not run live operations.
+Successful website cutovers do not establish domain/DNS migration completion.
+Older decision statements later in this document are historical and do not
+override this status.
 
 ## Latest operator-confirmed www cutovers
 
@@ -86,8 +148,9 @@ runbook. Values below are from local configuration and information supplied by
 David; confirm them with fresh exports before using them.
 
 **Current implementation state:** existing Azure shadow DNS and SWA bindings are
-managed through Terraform; the permanent terian-services.com DNS/registration
-design is undecided. Terianix.ai stays on manually managed Cloudflare. No Cloudflare provider
+managed through Terraform; Azure-retained terian-services.com registration is
+selected, with DNS-link/delegation details pending. Terianix.ai stays on manually
+managed Cloudflare. No Cloudflare provider
 is added to the target root. Permanent deletion of the old subscription is
 the final objective; overlap is temporary, not the end state.
 
