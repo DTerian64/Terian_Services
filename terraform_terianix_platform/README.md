@@ -7,6 +7,28 @@ It is intentionally a separate Terraform root with separate state. The legacy
 and target environments must coexist while application data, deployment
 identity, DNS, and custom domains are migrated.
 
+## Why there are two production Terraform roots
+
+`environments/production-dns` manages selected live website records for both
+brands through Azure and Cloudflare providers, with its own state. The
+applications are in `environments/prod`. Terian Services registration and live
+DNS remain in the original Azure subscription; Terianix DNS stays in Cloudflare.
+
+| Root | Purpose | DNS zone |
+| --- | --- | --- |
+| [`environments/prod`](environments/prod) | Production applications and target platform resources in subscription `2bb69129-5e74-44d9-af68-96d45633f667` | Shadow zone in `rg_terianix_platform`, with `ns*-08.azure-dns.*`; currently non-authoritative |
+| [`environments/production-dns`](environments/production-dns/README.md) | The four live apex/www records for both brands | `terian-services.com`: Azure `rg_platform`, subscription `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca`, `ns*-04`; `terianix.ai`: existing Cloudflare zone |
+
+While public delegation uses `ns*-04`, changing the shadow zone in `prod`
+does not repair the public root domain. `production-dns` imports the existing
+four website records and points each brand at its current Static Web App.
+Mail, validation TXT, Award/Integrity Sentinel subdomains, zone resources,
+registrations, and delegation are outside its selected-record scope.
+
+Keep this root while it owns the live records. A future DNS migration needs an
+explicit Terraform ownership handoff; deleting the folder is not a handoff.
+See its README for the state key, expected plan, and operator commands.
+
 ## Module Layout
 
 All three modules are copied from the legacy Terraform into this tree. The
@@ -33,6 +55,16 @@ terraform_terianix_platform/
     variables.tf
     outputs.tf
     terraform.tfvars
+  environments/production-dns/    # Selected live Azure + Cloudflare website DNS
+    README.md                    # Scope, ownership, credentials, operator steps
+    main.tf                      # Providers and existing Azure frontend lookups
+    terian-services.tf           # Azure apex alias and www CNAME
+    terianix.tf                  # Cloudflare apex/www CNAMEs and ID discovery
+    imports.tf                   # Adopt the existing four records
+    outputs.tf                   # Managed-record inventory
+    backend.hcl                  # Retains earlier authoritative-dns state key
+    modules/cloudflare-inventory/ # Read-only zone/record discovery
+    tests/                       # Mocked providers; no cloud access
 ```
 
 Terraform loads all `.tf` files in `environments/prod` as one configuration.
@@ -48,7 +80,8 @@ apply and cannot determine resource counts during the first plan.
 
 | Environment | Subscription | Entra tenant | Terraform root |
 | --- | --- | --- | --- |
-| Legacy | `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca` | `4d5f34d3-d97b-40c7-8704-edff856d3654` | `terraform_legacy_subscription/environments/prod` |
+| Archived legacy application configuration; do not apply | `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca` | Historical tenant: `4d5f34d3-d97b-40c7-8704-edff856d3654` | `terraform_legacy_subscription/environments/prod` |
+| Retained Azure website DNS | `4ddf12bb-5397-445f-bcaa-df4c7d3dfdca` | Current tenant: `5979eb86-9af1-4c74-8e50-acbe7d6a5cf9` | `terraform_terianix_platform/environments/production-dns` |
 | Terianix target | `2bb69129-5e74-44d9-af68-96d45633f667` | `5979eb86-9af1-4c74-8e50-acbe7d6a5cf9` | `terraform_terianix_platform/environments/prod` |
 
 The target root has validation guards for both IDs. Do not weaken those guards
@@ -66,7 +99,12 @@ terian-services/terianix-platform/prod.tfstate
 Do not migrate the legacy state into this key. The target resources are a
 parallel rebuild, not moved instances of the legacy resources.
 
-## Ownership During Migration
+## Production Root Ownership During Migration
+
+This section describes `environments/prod`. `production-dns` owns only the four
+live website records described above and uses a separate state. Its backend
+retains the earlier `terian-services/authoritative-dns/terraform.tfstate` key
+so the folder rename cannot fork an existing apex-record state.
 
 This root initially owns:
 
@@ -143,15 +181,18 @@ The initial application data copy is described in
 
 The two-domain cutover is described in
 [Step 8: Custom Domains and Authoritative DNS](docs/STEP_8_DOMAIN_CUTOVER.md).
-The latest registration/DNS decision supersedes that runbook's earlier
-Azure-authoritative-zone design: both marketing domains will use manually
-managed Cloudflare DNS, with terian-services.com registration transferred
-without cancellation. See
-[Moving terian-services.com from Azure to Cloudflare](../docs/moving_terian_services_com_domain_registration_from_azure_to_cloudflare.md).
+The current DNS design keeps `terian-services.com` registered and hosted in
+Azure and `terianix.ai` hosted in Cloudflare. Selected live website records
+are managed together in
+[`environments/production-dns`](environments/production-dns/README.md).
+Earlier instructions requiring manual-only Cloudflare changes or moving
+Terian Services registration to Cloudflare are historical alternatives, not
+the current deployment procedure.
 The prepared Azure shadow zone remains in Terraform until reviewed cleanup;
 do not delegate to its name servers or destroy it automatically.
-It keeps Cloudflare manually managed, with no Cloudflare provider in the target
-root. Azure records and domain bindings are managed by Terraform. A narrowly
+The `prod` application root has no Cloudflare provider; the separate
+`production-dns` root has Azure and Cloudflare providers. Azure custom-domain
+bindings remain in `prod`. A narrowly
 scoped temporary root at `environments/source-domain-validation` publishes
 target-validation TXT in the currently authoritative source zone, using local
 state under the ignored cutover folder. Its opt-in apex correction imports the

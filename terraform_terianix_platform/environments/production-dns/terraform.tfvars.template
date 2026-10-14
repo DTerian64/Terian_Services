@@ -1,0 +1,3 @@
+# Copy to terraform.tfvars and paste your terianix.ai Cloudflare API token.
+# terraform.tfvars is ignored by Git; keep real credentials out of this template.
+cloudflare_api_token = ""

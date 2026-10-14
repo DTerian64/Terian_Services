@@ -1,4 +1,6 @@
-# Target-only Azure resources. Cloudflare remains manually managed.
+# Target-only Azure domain bindings and non-authoritative shadow DNS.
+# Live apex/www DNS for both brands is managed by ../production-dns:
+# terian-services.com through Azure DNS; terianix.ai through Cloudflare.
 variable "custom_domains_enabled" {
   description = "Manage the four target SWA bindings: Terian Services www uses CNAME validation; the other three use TXT. Does not switch authoritative DNS traffic."
   type        = bool

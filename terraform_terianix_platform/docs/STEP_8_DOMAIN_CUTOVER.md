@@ -1,5 +1,16 @@
 # Step 8: Custom domains and authoritative DNS
 
+**October 14 DNS management update:** selected live apex/www records for both
+brands now have local Terraform configuration in
+[`environments/production-dns`](../environments/production-dns/README.md).
+`terian-services.com` keeps the authoritative Azure zone in `rg_platform`;
+`terianix.ai` keeps its existing Cloudflare zone. This supersedes the manual-only
+Cloudflare/provider exclusion and proposed Terian Services-to-Cloudflare transfer
+instructions below for these four records. Existing mail, validation, Award,
+and Integrity Sentinel records remain outside that root's scope. The application
+root still manages Azure domain bindings and the non-authoritative shadow zone.
+David reviews and performs all cloud initialization, live plans, and applies.
+
 **October 13 identity update:** David reports the legacy tenant deletions done
 except Rideshare David64 Organization, which is retained. Rename to
 `Terian Services Inc.` and guest access for `david.admin@terianix.onmicrosoft.com`
